@@ -97,7 +97,7 @@ Header Area
                                                         <li><a href="<?php echo base_url('berita') ?>">Indeks Berita</a></li>
                                                     </ul>
                                                 </li>
-                                                <?php if($this->website->fitur_beladiri()=='On') { ?>
+                                                <?php if($this->website->fitur_pendaftaran()=='On') { ?>
                                                     <!-- end profil -->
                                                     <li class="menu-item-has-children">
                                                         <a href="#">Cabang</a>
@@ -124,7 +124,7 @@ Header Area
                                     <div class="col-auto d-none d-xxl-block">
                                         <div class="header-button">
                                             <?php if(Session()->get('username_client') != '') { 
-                                                if($this->website->fitur_beladiri()=='On') {
+                                                if($this->website->fitur_pendaftaran()=='On') {
                                                 ?>
                                                 <a href="<?php echo base_url('client/dasbor') ?>" class="btn btn-primary" title="Masuk ke Dasbor">
                                                     <i class="fa fa-user"></i> <?php echo substr(Session()->get('nama_client'),0,6) ?>..
@@ -134,7 +134,7 @@ Header Area
                                                 </a>
                                             <?php }}else{ ?>
                                                 <a href="https://wa.me/<?php echo $this->website->whatsapp() ?>?text=<?php echo $this->website->pesan_whatsapp() ?>" class="btn btn-success btn-sm" target="_blank"><i class="fab fa-whatsapp"></i> Chat WA</a>
-                                                <?php if($this->website->fitur_beladiri()=='On') { ?>
+                                                <?php if($this->website->fitur_pendaftaran()=='On') { ?>
                                                 <a href="<?php echo base_url('signin') ?>" class="btn btn-primary btn-sm"><i class="fa fa-lock"></i> Masuk</a>
                                                 <a href="<?php echo base_url('register') ?>" class="btn btn-danger btn-sm"><i class="fa fa-edit"></i> Daftar</a>
                                             <?php }} ?>

@@ -45,16 +45,9 @@ echo csrf_field();
 	</div>
 </div>
 
-<div class="form-group row">
-	<label class="col-3">Fitur Website untuk Situs Perguruan Beladiri</label>
-	<div class="col-9">
-		<select name="fitur_beladiri" class="form-control">
-			<option value="Off">Off - Non Aktif</option>
-			<option value="On" <?php if($konfigurasi->fitur_beladiri=='On') { echo 'selected'; } ?>>On - Aktif</option>
-		</select>
-	</div>
-</div>
 
+
+<hr>
 <h4>Informasi Profil Website/Aplikasi</h4>
 <hr>
 <div class="form-group row">
@@ -71,6 +64,7 @@ echo csrf_field();
 	</div>
 </div>
 
+<hr>
 <h4>Kontak dan Alamat</h4>
 <hr>
 
@@ -116,6 +110,7 @@ echo csrf_field();
 	</div>
 </div>
 
+<hr>
 <h4>Kontak Whatsapp</h4>
 <hr>
 
@@ -134,6 +129,7 @@ echo csrf_field();
 	</div>
 </div>
 
+<hr>
 <h4>Jejaring Sosial</h4>
 <hr>
 
@@ -182,6 +178,43 @@ echo csrf_field();
 	<div class="col-6">
 		<input type="text" name="youtube" class="form-control" value="<?php echo $konfigurasi->youtube ?>">
 		<small class="text-secondary">Alamat link akun</small>
+	</div>
+</div>
+
+<hr>
+<h4>Informasi Pendaftaran Online</h4>
+<hr>
+
+<div class="form-group row">
+	<label class="col-3">Fitur Website untuk Pendaftaran Online</label>
+	<div class="col-6">
+		<select name="fitur_pendaftaran" class="form-control">
+			<option value="Off">Off - Non Aktif</option>
+			<option value="On" <?php if($konfigurasi->fitur_pendaftaran=='On') { echo 'selected'; } ?>>On - Aktif</option>
+		</select>
+	</div>
+</div>
+
+<div class="form-group row">
+	<label class="col-3">Periode Pendaftaran Online</label>
+	<div class="col-2">
+		<input type="text" name="mulai_pendaftaran" placeholder="dd-mm-yyyy" class="form-control tanggal" value="<?php echo $this->website->tanggal_id($konfigurasi->mulai_pendaftaran) ?>">
+		<small class="text-secondary">Tanggal mulai</small>
+	</div>
+	<div class="col-2">
+		<input type="text" name="selesai_pendaftaran" placeholder="dd-mm-yyyy" class="form-control tanggal" value="<?php echo $this->website->tanggal_id($konfigurasi->selesai_pendaftaran) ?>">
+		<small class="text-secondary">Tanggal selesai</small>
+	</div>
+	<div class="col-2">
+		<input type="text" name="pengumuman_pendaftaran" placeholder="dd-mm-yyyy" class="form-control tanggal" value="<?php echo $this->website->tanggal_id($konfigurasi->pengumuman_pendaftaran) ?>">
+		<small class="text-secondary">Tanggal pengumuman</small>
+	</div>
+</div>
+
+<div class="form-group row">
+	<label class="col-3">Informasi pendaftaran</label>
+	<div class="col-9">
+		<textarea name="keterangan_pendaftaran" class="form-control konten" rows="5"><?php echo $konfigurasi->keterangan_pendaftaran ?></textarea>
 	</div>
 </div>
 

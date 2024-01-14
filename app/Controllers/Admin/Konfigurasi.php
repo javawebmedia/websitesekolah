@@ -47,7 +47,11 @@ class Konfigurasi extends BaseController
 						'google_map'		=> $this->request->getPost('google_map'),
 						'paginasi'			=> $this->request->getPost('paginasi'),
 						'paginasi_depan'	=> $this->request->getPost('paginasi_depan'),
-						'fitur_beladiri'	=> $this->request->getPost('fitur_beladiri')
+						'fitur_pendaftaran'	=> $this->request->getPost('fitur_pendaftaran'),
+						'mulai_pendaftaran'			=> $this->website->tanggal_input($this->request->getPost('mulai_pendaftaran')),
+						'selesai_pendaftaran'		=> $this->website->tanggal_input($this->request->getPost('selesai_pendaftaran')),
+						'pengumuman_pendaftaran'	=> $this->website->tanggal_input($this->request->getPost('pengumuman_pendaftaran')),
+						'keterangan_pendaftaran'	=> $this->request->getPost('keterangan_pendaftaran'),
 					];
 			$m_konfigurasi->edit($data);
 			// masuk database

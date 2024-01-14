@@ -26,7 +26,7 @@
               <p>Dashboard</p>
             </a>
           </li>
-          <?php if($this->website->fitur_beladiri()=='On') { ?>
+          <?php if($this->website->fitur_pendaftaran()=='On') { ?>
           <li class="nav-item">
             <a href="<?php echo base_url('admin/pendaftar') ?>" class="nav-link">
               <i class="nav-icon fas fa-child"></i>
@@ -268,7 +268,7 @@
             </ul>
           </li>
 
-          <?php if($this->website->fitur_beladiri()=='On') { ?>
+          <?php if($this->website->fitur_pendaftaran()=='On') { ?>
           <!-- master -->
           <li class="nav-item">
             <a href="#" class="nav-link">

@@ -37,12 +37,12 @@ class Website
 		return $konfigurasi->metatext;
 	}
 
-	// fitur_beladiri
-	public function fitur_beladiri()
+	// fitur_pendaftaran
+	public function fitur_pendaftaran()
 	{
 		$m_konfigurasi 	= new Konfigurasi_model();
 		$konfigurasi 	= $m_konfigurasi->listing();
-		return $konfigurasi->fitur_beladiri;
+		return $konfigurasi->fitur_pendaftaran;
 	}
 
 	// kepsek

@@ -9,17 +9,14 @@ echo csrf_field();
 	<div class="col-6">
 		<input type="file" name="icon" value="<?php echo $konfigurasi->icon ?>" class="form-control">
 		<small class="text-secondary">Format: JPG, PNG, GIF</small>
+		<br>
+		<button type="submit" class="btn btn-success mt-2"><i class="fa fa-save"></i> Simpan</button>
 	</div>
 	<div class="col-3">
 		<img src="<?php echo $this->website->icon() ?>" class="img img-thumbnail">
 	</div>
 </div>
 
-<div class="form-group row">
-	<label class="col-3"></label>
-	<div class="col-9">
-		<button type="submit" class="btn btn-success"><i class="fa fa-save"></i> Simpan</button>
-	</div>
-</div>
+
 
 <?php echo form_close(); ?>
