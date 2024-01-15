@@ -28,7 +28,7 @@ echo csrf_field();
 
 <div class="form-group row">
 	<label class="col-3">Alamat Website</label>
-	<div class="col-9">
+	<div class="col-6">
 		<input type="text" name="website" class="form-control" value="<?php echo $konfigurasi->website ?>">
 	</div>
 </div>
@@ -70,28 +70,28 @@ echo csrf_field();
 
 <div class="form-group row">
 	<label class="col-3">Official Email</label>
-	<div class="col-9">
+	<div class="col-6">
 		<input type="text" name="email" class="form-control" value="<?php echo $konfigurasi->email ?>">
 	</div>
 </div>
 
 <div class="form-group row">
 	<label class="col-3">Secondary Email</label>
-	<div class="col-9">
+	<div class="col-6">
 		<input type="text" name="email_cadangan" class="form-control" value="<?php echo $konfigurasi->email_cadangan ?>">
 	</div>
 </div>
 
 <div class="form-group row">
 	<label class="col-3">Telepon</label>
-	<div class="col-9">
+	<div class="col-6">
 		<input type="text" name="telepon" class="form-control" value="<?php echo $konfigurasi->telepon ?>">
 	</div>
 </div>
 
 <div class="form-group row">
 	<label class="col-3">HP</label>
-	<div class="col-9">
+	<div class="col-6">
 		<input type="text" name="hp" class="form-control" value="<?php echo $konfigurasi->hp ?>">
 	</div>
 </div>
@@ -116,7 +116,7 @@ echo csrf_field();
 
 <div class="form-group row">
 	<label class="col-3">Nomor Whatsapp <i class="fab fa-whatsapp text-success"></i></label>
-	<div class="col-9">
+	<div class="col-6">
 		<input type="text" name="whatsapp" class="form-control" value="<?php echo $konfigurasi->whatsapp ?>">
 		<small class="text-warning">Format nomor: 628122727427</small>
 	</div>
