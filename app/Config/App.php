@@ -6,6 +6,18 @@ use CodeIgniter\Config\BaseConfig;
 
 class App extends BaseConfig
 {
+   public function __construct()
+    {
+        $base_url = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == "on") ? "https" : "http");
+        $base_url .= "://".$_SERVER['HTTP_HOST'];
+        $base_url .= str_replace(basename($_SERVER['SCRIPT_NAME']),"",$_SERVER['SCRIPT_NAME']);
+
+        // Set the dynamic base URL
+        $this->baseURL = $base_url;
+
+        // ... (rest of the constructor)
+    }
+
     /**
      * --------------------------------------------------------------------------
      * Base Site URL
@@ -16,7 +28,7 @@ class App extends BaseConfig
      *
      *    http://example.com/
      */
-    public string $baseURL = 'http://localhost/websitesekolah/';
+    public string $baseURL;
 
     /**
      * Allowed Hostnames in the Site URL other than the hostname in the baseURL.

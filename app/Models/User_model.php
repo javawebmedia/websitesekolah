@@ -61,6 +61,18 @@ class User_model extends Model
         return $query->getRow();
     }
 
+    // kode_rahasia
+    public function kode_rahasia($kode_rahasia)
+    {
+        $builder = $this->db->table('users');
+        $builder->select('users.*,staff.nama AS nama_staff, staff.jabatan');
+        $builder->join('staff','staff.id_staff = users.id_staff','LEFT');
+        $builder->where('users.kode_rahasia',$kode_rahasia);
+        $builder->orderBy('users.id_user','DESC');
+        $query = $builder->get();
+        return $query->getRow();
+    }
+
     // check
     public function check($email)
     {

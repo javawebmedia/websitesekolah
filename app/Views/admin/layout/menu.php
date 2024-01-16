@@ -351,6 +351,12 @@
                 </a>
               </li>
               <li class="nav-item">
+                <a href="<?php echo base_url('admin/konfigurasi/email') ?>" class="nav-link">
+                  <i class="fa fa-arrow-right nav-icon"></i>
+                  <p>Setting Email</p>
+                </a>
+              </li>
+              <li class="nav-item">
                 <a href="<?php echo base_url('admin/konfigurasi/banner') ?>" class="nav-link">
                   <i class="fa fa-arrow-right nav-icon"></i>
                   <p>About Us &amp; Banner</p>

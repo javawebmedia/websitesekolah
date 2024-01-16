@@ -1,0 +1,15 @@
+# System / Log files
+*.DS_Store
+*.log
+# *.env
+*.sql
+
+# Archives
+*.zip
+*.txt
+
+# Config file
+# app/Config/
+writable/
+writable/debugbar/
+writable/logs

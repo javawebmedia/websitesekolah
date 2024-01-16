@@ -66,6 +66,43 @@ class Konfigurasi extends BaseController
 		}
 	}
 
+	// email
+	public function email()
+	{
+		$this->simple_login->checklogin();
+		// $this->simple_login->checkadmin();
+		$m_site     = new Konfigurasi_model();
+        $site       = $m_site->listing();
+
+        // Start validasi
+		if($this->request->getMethod() === 'post' && $this->validate(
+			[
+            'smtp_user' 	=> 'required|min_length[3]',
+        	])) {
+			// masuk database
+			$data = [	'id_konfigurasi'	=> $this->request->getPost('id_konfigurasi'),
+						'id_user'			=> $this->session->get('id_user'),
+						'protocol'			=> $this->request->getPost('protocol'),
+						'smtp_host'			=> $this->request->getPost('smtp_host'),
+						'smtp_port'			=> $this->request->getPost('smtp_port'),
+						'smtp_timeout'		=> $this->request->getPost('smtp_timeout'),
+						'smtp_user'			=> $this->request->getPost('smtp_user'),
+						'smtp_pass'			=> $this->request->getPost('smtp_pass'),
+					];
+			$m_site->edit($data);
+			// UPDATE VERSI
+			$this->session->setFlashdata('sukses','Konfigurasi email telah diupdate');
+			return redirect()->to(base_url('admin/konfigurasi/email'));
+	    }else{
+
+			$data = [   'title'     => 'Setting Email',
+						'site'      => $site,
+						'content'	=> 'admin/konfigurasi/email'
+	                ];
+	        return view('admin/layout/wrapper',$data);
+	    }
+	}
+
 	// sekolah
 	public function sekolah()
 	{
