@@ -39,6 +39,8 @@ $uri = service('uri');
   <link rel="stylesheet" href="<?php echo base_url() ?>assets/admin/plugins/dropzone/min/dropzone.min.css">
   <!-- SweetAlert2 -->
   <link rel="stylesheet" href="<?php echo base_url() ?>assets/admin/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
+  <!-- dropzonejs -->
+  <link rel="stylesheet" href="<?php echo base_url() ?>assets/admin/plugins/dropzone/min/dropzone.min.css">
   <!-- Theme style -->
   <link rel="stylesheet" href="<?php echo base_url() ?>assets/admin/dist/css/adminlte.min.css">
   <link rel="stylesheet" href="<?php echo base_url() ?>assets/css/admin.css">

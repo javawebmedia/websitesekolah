@@ -50,6 +50,16 @@ class Download extends BaseController
 		echo view('admin/layout/wrapper',$data);
 	}
 
+	// Show all
+	public function show()
+	{
+		header('Content-Type: application/json; charset=utf-8');
+		$this->simple_login->checklogin();
+		$m_download	= new Download_model();
+		$data 		= $m_download->listing();
+		echo json_encode($data);
+	}
+
 	// kategori_download
 	public function kategori_download($id_kategori_download)
 	{

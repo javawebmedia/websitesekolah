@@ -135,6 +135,8 @@ $awal = $sek-100;
 <script src="<?php echo base_url() ?>assets/admin/plugins/bs-stepper/js/bs-stepper.min.js"></script>
 <!-- dropzonejs -->
 <script src="<?php echo base_url() ?>assets/admin/plugins/dropzone/min/dropzone.min.js"></script>
+<!-- dropzonejs -->
+<script src="<?php echo base_url() ?>assets/admin/plugins/dropzone/min/dropzone.min.js"></script>
 <!-- AdminLTE App -->
 <script src="<?php echo base_url() ?>assets/admin/dist/js/adminlte.min.js"></script>
 <script>
@@ -332,7 +334,7 @@ $(document).on("click", ".disable-link", function(e){
   previewNode.parentNode.removeChild(previewNode)
 
   var myDropzone = new Dropzone(document.body, { // Make the whole body a dropzone
-    url: "/target-url", // Set the url
+    url: "<?php echo base_url('admin/media/unggah') ?>", // Set the url
     thumbnailWidth: 80,
     thumbnailHeight: 80,
     parallelUploads: 20,
@@ -361,8 +363,11 @@ $(document).on("click", ".disable-link", function(e){
 
   // Hide the total progress bar when nothing's uploading anymore
   myDropzone.on("queuecomplete", function(progress) {
-    document.querySelector("#total-progress").style.opacity = "0"
-  })
+    document.querySelector("#total-progress").style.opacity = "0";
+    // Call the listMedia() function to refresh the media list and DataTable
+    listMedia();
+    table.DataTable().ajax.reload(); // Assuming your DataTable is initialized with ajax
+  });
 
   // Setup the buttons for all transfers
   // The "add files" button doesn't need to be setup because the config
@@ -400,9 +405,7 @@ $(document).on("click", ".disable-link", function(e){
       "responsive": true,
     });
   });
-</script>
-<!-- Page specific script -->
-<script>
+// adada
   $(function () {
     //Enable check and uncheck all functionality
     $('.checkbox-toggle').click(function () {
@@ -433,6 +436,8 @@ $(document).on("click", ".disable-link", function(e){
       }
     })
   })
+
+  
 </script>
 </body>
 </html>

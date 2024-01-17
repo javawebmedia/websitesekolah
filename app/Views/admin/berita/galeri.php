@@ -11,7 +11,7 @@
 
 				<div class="callout callout-info p-2">
 					Anda dapat mengelola data galeri di <a href="<?php echo base_url('admin/galeri') ?>">Kelola Galeri</a>.
-					<br>Silakan copy link gambar di bawah ini untuk digunakan pada text editor berita.
+					<br>Silakan copy link gambar di bawah ini untuk menggunakan link gambar.
 				</div>
 
 				<table class="table table-bordered table-sm" id="galeriListing">
@@ -69,7 +69,6 @@
 				}
 				$('#listGaleri').html(html);					
 			}
-
 		});
 	}
 
