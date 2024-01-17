@@ -33,34 +33,6 @@
               <p>Data Pendaftar</p>
             </a>
           </li>
-
-          <!-- berita -->
-          <li class="nav-item">
-            <a href="#" class="nav-link">
-              <i class="nav-icon fas fa-graduation-cap"></i>
-              <p>Siswa &amp; Pelatih <i class="right fas fa-angle-left"></i></p>
-            </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="<?php echo base_url('admin/anggota') ?>" class="nav-link">
-                  <i class="fa fa-arrow-right nav-icon"></i>
-                  <p>Data Siswa &amp; Pelatih</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="<?php echo base_url('admin/anggota/tambah') ?>" class="nav-link">
-                  <i class="fa fa-arrow-right nav-icon"></i>
-                  <p>Tambah Siswa &amp; Pelatih</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="<?php echo base_url('admin/tingkatan') ?>" class="nav-link">
-                  <i class="fa fa-arrow-right nav-icon"></i>
-                  <p>Tingkatan / Sabuk</p>
-                </a>
-              </li>
-            </ul>
-          </li>
         <?php } ?>
           
 
@@ -268,7 +240,6 @@
             </ul>
           </li>
 
-          <?php if($this->website->fitur_pendaftaran()=='On') { ?>
           <!-- master -->
           <li class="nav-item">
             <a href="#" class="nav-link">
@@ -276,12 +247,6 @@
               <p>Master Data <i class="right fas fa-angle-left"></i></p>
             </a>
             <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="<?php echo base_url('admin/usia') ?>" class="nav-link">
-                  <i class="fa fa-arrow-right nav-icon"></i>
-                  <p>Kelompok Usia</p>
-                </a>
-              </li>
               <li class="nav-item">
                 <a href="<?php echo base_url('admin/jenjang') ?>" class="nav-link">
                   <i class="fa fa-arrow-right nav-icon"></i>
@@ -306,27 +271,9 @@
                   <p>Agama</p>
                 </a>
               </li>
-              <li class="nav-item">
-                <a href="<?php echo base_url('admin/cabang') ?>" class="nav-link">
-                  <i class="fa fa-arrow-right nav-icon"></i>
-                  <p>Cabang Latihan</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="<?php echo base_url('admin/kategori_cabang') ?>" class="nav-link">
-                  <i class="fa fa-arrow-right nav-icon"></i>
-                  <p>Kategori Cabang</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="<?php echo base_url('admin/tingkatan') ?>" class="nav-link">
-                  <i class="fa fa-arrow-right nav-icon"></i>
-                  <p>Tingkatan / Sabuk</p>
-                </a>
-              </li>
+              
             </ul>
           </li>
-        <?php } ?>
 
         <?php if(Session()->get('akses_level')=='Admin') { ?>
           <!-- pengguna -->
