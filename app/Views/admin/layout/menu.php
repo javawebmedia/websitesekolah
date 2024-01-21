@@ -64,29 +64,113 @@
             </ul>
           </li>
 
+          <!-- PRESTASI -->
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-certificate"></i>
+              <p>Prestasi &amp; Penghargaan <i class="right fas fa-angle-left"></i></p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="<?php echo base_url('admin/prestasi') ?>" class="nav-link">
+                  <i class="fa fa-arrow-right nav-icon"></i>
+                  <p>Data Prestasi Penghargaan</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="<?php echo base_url('admin/prestasi/tambah') ?>" class="nav-link">
+                  <i class="fa fa-arrow-right nav-icon"></i>
+                  <p>Tambah Prestasi Penghargaan</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="<?php echo base_url('admin/kategori_prestasi') ?>" class="nav-link">
+                  <i class="fa fa-arrow-right nav-icon"></i>
+                  <p>Kategori Prestasi Penghargaan</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+
+          <!-- Fasilitas -->
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-home"></i>
+              <p>Fasilitas <i class="right fas fa-angle-left"></i></p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="<?php echo base_url('admin/fasilitas') ?>" class="nav-link">
+                  <i class="fa fa-arrow-right nav-icon"></i>
+                  <p>Data Fasilitas</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="<?php echo base_url('admin/fasilitas/tambah') ?>" class="nav-link">
+                  <i class="fa fa-arrow-right nav-icon"></i>
+                  <p>Tambah Fasilitas</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="<?php echo base_url('admin/kategori_fasilitas') ?>" class="nav-link">
+                  <i class="fa fa-arrow-right nav-icon"></i>
+                  <p>Kategori Fasilitas</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+
+          <!-- Fasilitas -->
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-futbol"></i>
+              <p>Ekstrakurikuler <i class="right fas fa-angle-left"></i></p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="<?php echo base_url('admin/ekstrakurikuler') ?>" class="nav-link">
+                  <i class="fa fa-arrow-right nav-icon"></i>
+                  <p>Data Ekstrakurikuler</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="<?php echo base_url('admin/ekstrakurikuler/tambah') ?>" class="nav-link">
+                  <i class="fa fa-arrow-right nav-icon"></i>
+                  <p>Tambah Ekstrakurikuler</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="<?php echo base_url('admin/kategori_ekstrakurikuler') ?>" class="nav-link">
+                  <i class="fa fa-arrow-right nav-icon"></i>
+                  <p>Kategori Ekstrakurikuler</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+
           <!-- PORTFOLIO -->
           <li class="nav-item">
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-tasks"></i>
-              <p>Portfolio <i class="right fas fa-angle-left"></i></p>
+              <p>Karya &amp; Portfolio <i class="right fas fa-angle-left"></i></p>
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
                 <a href="<?php echo base_url('admin/portfolio') ?>" class="nav-link">
                   <i class="fa fa-arrow-right nav-icon"></i>
-                  <p>Data Portfolio</p>
+                  <p>Data Karya &amp; Portfolio</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="<?php echo base_url('admin/portfolio/tambah') ?>" class="nav-link">
                   <i class="fa fa-arrow-right nav-icon"></i>
-                  <p>Tambah Portfolio</p>
+                  <p>Tambah Karya &amp; Portfolio</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="<?php echo base_url('admin/kategori_portfolio') ?>" class="nav-link">
                   <i class="fa fa-arrow-right nav-icon"></i>
-                  <p>Kategori Portfolio</p>
+                  <p>Kategori Karya &amp; Portfolio</p>
                 </a>
               </li>
             </ul>
@@ -124,25 +208,25 @@
           <li class="nav-item">
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-upload"></i>
-              <p>Download <i class="right fas fa-angle-left"></i></p>
+              <p>File &amp; Download<i class="right fas fa-angle-left"></i></p>
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
                 <a href="<?php echo base_url('admin/download') ?>" class="nav-link">
                   <i class="fa fa-arrow-right nav-icon"></i>
-                  <p>Data Download</p>
+                  <p>Data File &amp; Download</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="<?php echo base_url('admin/download/tambah') ?>" class="nav-link">
                   <i class="fa fa-arrow-right nav-icon"></i>
-                  <p>Tambah Download</p>
+                  <p>Tambah File &amp; Download</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="<?php echo base_url('admin/kategori_download') ?>" class="nav-link">
                   <i class="fa fa-arrow-right nav-icon"></i>
-                  <p>Kategori Download</p>
+                  <p>Kategori File &amp; Download</p>
                 </a>
               </li>
             </ul>
@@ -152,25 +236,25 @@
           <li class="nav-item">
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-user-check"></i>
-              <p>Data Client <i class="right fas fa-angle-left"></i></p>
+              <p>Data Client &amp; Mitra <i class="right fas fa-angle-left"></i></p>
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
                 <a href="<?php echo base_url('admin/client') ?>" class="nav-link">
                   <i class="fa fa-arrow-right nav-icon"></i>
-                  <p>Data Client</p>
+                  <p>Data Client &amp; Mitra</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="<?php echo base_url('admin/client/tambah') ?>" class="nav-link">
                   <i class="fa fa-arrow-right nav-icon"></i>
-                  <p>Tambah Client</p>
+                  <p>Tambah Client &amp; Mitra</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="<?php echo base_url('admin/kategori_client') ?>" class="nav-link">
                   <i class="fa fa-arrow-right nav-icon"></i>
-                  <p>Kategori Client</p>
+                  <p>Kategori Client &amp; Mitra</p>
                 </a>
               </li>
             </ul>

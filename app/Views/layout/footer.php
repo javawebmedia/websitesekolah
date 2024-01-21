@@ -6,90 +6,90 @@ $nav_profil     = $m_menu->profil('Profil');
 <!--==============================
 Footer Area
 ==============================-->
-<footer class="footer-wrapper footer-layout1">
-    <div class="widget-area">
-        <div class="container">
-            <div class="row justify-content-between">
-                <div class="col-md-6 col-xxl-4 col-xl-4">
-                    <div class="widget footer-widget">
-                        <div class="as-widget-about">
-                            
-                            <h4 class="widget_title"><?php echo $this->website->namaweb() ?></h4>
-                            <p class="about-text"><?php echo $this->website->alamat() ?></p>                            
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 col-xxl-4 col-xl-auto">
-                    <div class="widget footer-widget">
-                        <div class="as-widget-about">
-                            <h3 class="widget_title">Follow Us On:</h3>
-                            <div class="as-social">
-                                    <a href="https://www.facebook.com/"><i class="fab fa-facebook-f"></i></a>
-                                    <a href="https://www.instagram.com/"><i class="fab fa-instagram"></i></a>
-                                    <a href="https://www.youtube.com/"><i class="fab fa-youtube"></i></a>
-                                </div>
-                            </div>
-                    </div>
-                </div>
-                
-                <div class="col-md-6 col-xl-4">
-                    <div class="widget widget_nav_menu footer-widget">
-                        <h3 class="widget_title">Tentang kami</h3>
-                        <div class="menu-all-pages-container">
-                            <ul class="menu">
-                                <?php foreach($nav_profil as $nav_profil) { ?>
-                                    <li><a href="<?php echo base_url('profil/'.$nav_profil->slug_berita) ?>"><?php echo $nav_profil->judul_berita ?></a></li>
-                                <?php } ?>
-                                <li><a href="<?php echo base_url('staff') ?>">Team <?php echo $this->website->namaweb() ?></a></li>
-                                <li><a href="<?php echo base_url('kontak') ?>">Kontak</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<footer class="bg-navy text-inverse">
+    <div class="container py-13 py-md-15">
+      <div class="row gy-6 gy-lg-0">
+        <div class="col-md-4 col-lg-3">
+          <div class="widget">
+            <img class="mb-4" src="./assets/img/logo-dark.png" srcset="./assets/img/logo-dark@2x.png 2x" alt="" />
+            <p class="mb-4">© 2023 Sandbox. <br class="d-none d-lg-block" />All rights reserved.</p>
+            <nav class="nav social ">
+              <a href="#"><i class="uil uil-twitter"></i></a>
+              <a href="#"><i class="uil uil-facebook-f"></i></a>
+              <a href="#"><i class="uil uil-dribbble"></i></a>
+              <a href="#"><i class="uil uil-instagram"></i></a>
+              <a href="#"><i class="uil uil-youtube"></i></a>
+            </nav>
+            <!-- /.social -->
+          </div>
+          <!-- /.widget -->
         </div>
-    </div>
-    <div class="container">
-        <div class="copyright-wrap">
-            <div class="row justify-content-between align-items-center">
-                <div class="col-lg-6">
-                    <p class="copyright-text">Copyright <i class="fal fa-copyright"></i> <?php echo date('Y') ?> <a href="<?php echo $this->website->website() ?>"><?php echo $this->website->namaweb() ?></a>. All Rights Reserved.</p>
-                </div>
-                <div class="col-lg-6 text-end d-none d-lg-block">
-                    <div class="footer-links">
-                        <ul>
-                            <li><a href="https://javawebmedia.com">Java Web Media</a></li>
-                            <li><a href="<?php echo base_url('login') ?>">Login Admin</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
+        <!-- /column -->
+        <div class="col-md-4 col-lg-3">
+          <div class="widget">
+            <h4 class="widget-title  mb-3">Get in Touch</h4>
+            <address class="pe-xl-15 pe-xxl-17">Moonshine St. 14/05 Light City, London, United Kingdom</address>
+            <a href="mailto:#" class="link-body">info@email.com</a><br /> 00 (123) 456 78 90
+          </div>
+          <!-- /.widget -->
         </div>
+        <!-- /column -->
+        <div class="col-md-4 col-lg-3">
+          <div class="widget">
+            <h4 class="widget-title  mb-3">Learn More</h4>
+            <ul class="list-unstyled text-reset mb-0">
+              <li><a href="#">About Us</a></li>
+              <li><a href="#">Our Story</a></li>
+              <li><a href="#">Projects</a></li>
+              <li><a href="#">Terms of Use</a></li>
+              <li><a href="#">Privacy Policy</a></li>
+            </ul>
+          </div>
+          <!-- /.widget -->
+        </div>
+        <!-- /column -->
+        <div class="col-md-12 col-lg-3">
+          <div class="widget">
+            <h4 class="widget-title  mb-3">Our Newsletter</h4>
+            <p class="mb-5">Subscribe to our newsletter to get our news & deals delivered to you.</p>
+            <div class="newsletter-wrapper">
+              <!-- Begin Mailchimp Signup Form -->
+              <div id="mc_embed_signup2">
+                <form action="https://elemisfreebies.us20.list-manage.com/subscribe/post?u=aa4947f70a475ce162057838d&amp;id=b49ef47a9a" method="post" id="mc-embedded-subscribe-form2" name="mc-embedded-subscribe-form" class="validate " target="_blank" novalidate>
+                  <div id="mc_embed_signup_scroll2">
+                    <div class="mc-field-group input-group form-floating">
+                      <input type="email" value="" name="EMAIL" class="required email form-control" placeholder="Email Address" id="mce-EMAIL2">
+                      <label for="mce-EMAIL2">Email Address</label>
+                      <input type="submit" value="Join" name="subscribe" id="mc-embedded-subscribe2" class="btn btn-primary ">
+                    </div>
+                    <div id="mce-responses2" class="clear">
+                      <div class="response" id="mce-error-response2" style="display:none"></div>
+                      <div class="response" id="mce-success-response2" style="display:none"></div>
+                    </div> <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+                    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_ddc180777a163e0f9f66ee014_4b1bcfa0bc" tabindex="-1" value=""></div>
+                    <div class="clear"></div>
+                  </div>
+                </form>
+              </div>
+              <!--End mc_embed_signup-->
+            </div>
+            <!-- /.newsletter-wrapper -->
+          </div>
+          <!-- /.widget -->
+        </div>
+        <!-- /column -->
+      </div>
+      <!--/.row -->
     </div>
-</footer>
-<!--********************************
-        Code End  Here 
-******************************** -->
-<!-- Scroll To Top -->
-<a href="#" class="scrollToTop scroll-btn"><i class="far fa-arrow-up"></i></a>
-<!--==============================
-All Js File
-============================== -->
-<!-- Jquery -->
-<script src="<?php echo base_url() ?>assets/javawebmedia/assets/js/vendor/jquery-3.6.0.min.js"></script>
-<!-- Slick Slider -->
-<script src="<?php echo base_url() ?>assets/javawebmedia/assets/js/slick.min.js"></script>
-<!-- Bootstrap -->
-<script src="<?php echo base_url() ?>assets/javawebmedia/assets/js/bootstrap.min.js"></script>
-<!-- Magnific Popup -->
-<script src="<?php echo base_url() ?>assets/javawebmedia/assets/js/jquery.magnific-popup.min.js"></script>
-<!-- Counter Up -->
-<script src="<?php echo base_url() ?>assets/javawebmedia/assets/js/jquery.counterup.min.js"></script>
-<!-- Isotope Filter -->
-<script src="<?php echo base_url() ?>assets/javawebmedia/assets/js/imagesloaded.pkgd.min.js"></script>
-<script src="<?php echo base_url() ?>assets/javawebmedia/assets/js/isotope.pkgd.min.js"></script>
-<!-- Main Js File -->
-<script src="<?php echo base_url() ?>assets/javawebmedia/assets/js/main.js"></script>
+    <!-- /.container -->
+  </footer>
+  <div class="progress-wrap">
+    <svg class="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">
+      <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98" />
+    </svg>
+  </div>
+  <script src="<?php echo base_url() ?>assets/template/assets/js/plugins.js"></script>
+  <script src="<?php echo base_url() ?>assets/template/assets/js/theme.js"></script>
 <script>
     <?php if(isset($_GET['logout'])) { ?>
     Swal.fire({

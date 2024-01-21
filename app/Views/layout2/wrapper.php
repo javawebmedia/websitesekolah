@@ -5,7 +5,7 @@ $this->session          = \Config\Services::session();
 // check
 include('head.php');
 include('header.php');
-// include('menu.php');
+include('menu.php');
 if($content) {
 	echo view($content);
 }
