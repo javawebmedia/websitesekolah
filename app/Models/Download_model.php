@@ -44,8 +44,6 @@ class Download_model extends Model
         $this->join('users','users.id_user = download.id_user','LEFT');
         $this->like('download.judul_download',$keywords,'BOTH');
         $this->orLike('download.isi',$keywords,'BOTH');
-        $this->orLike('download.keywords',$keywords,'BOTH');
-        $this->orLike('download.ringkasan',$keywords,'BOTH');
         $this->limit($limit,$start);
         $this->orderBy('download.id_download','DESC');
         $query = $this->get();
@@ -61,8 +59,6 @@ class Download_model extends Model
         $this->join('users','users.id_user = download.id_user','LEFT');
         $this->like('download.judul_download',$keywords,'BOTH');
         $this->orLike('download.isi',$keywords,'BOTH');
-        $this->orLike('download.keywords',$keywords,'BOTH');
-        $this->orLike('download.ringkasan',$keywords,'BOTH');
         $this->orderBy('download.id_download','DESC');
         $query = $this->get();
         return $query->getNumRows();

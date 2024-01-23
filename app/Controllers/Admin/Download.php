@@ -160,6 +160,7 @@ class Download extends BaseController
 					'file_ext' 				=> $file_ext,
 					'file_size' 			=> $file_size,
 					'website'				=> $this->request->getVar('website'),
+					'status_download'		=> $this->request->getVar('status_download'),
 					'tanggal_post'			=> date('Y-m-d H:i:s')
 	        	);
 	        	$m_download->tambah($data);
@@ -172,6 +173,7 @@ class Download extends BaseController
 					'jenis_download'		=> $this->request->getVar('jenis_download'),
 					'isi'					=> $this->request->getVar('isi'),
 					'website'				=> $this->request->getVar('website'),
+					'status_download'		=> $this->request->getVar('status_download'),
 					'tanggal_post'			=> date('Y-m-d H:i:s')
 	        	);
 	        	$m_download->tambah($data);
@@ -222,7 +224,8 @@ class Download extends BaseController
 					'gambar' 				=> $namabaru,
 					'website'				=> $this->request->getVar('website'),
 					'file_ext' 				=> $file_ext,
-					'file_size' 			=> $file_size
+					'file_size' 			=> $file_size,
+					'status_download'		=> $this->request->getVar('status_download'),
 	        	);
 	        	$m_download->edit($data);
         		return redirect()->to(base_url('admin/download'))->with('sukses', 'Data Berhasil di Simpan');
@@ -235,6 +238,7 @@ class Download extends BaseController
 					'jenis_download'		=> $this->request->getVar('jenis_download'),
 					'isi'					=> $this->request->getVar('isi'),
 					'website'				=> $this->request->getVar('website'),
+					'status_download'		=> $this->request->getVar('status_download'),
 	        	);
 	        	$m_download->edit($data);
         		return redirect()->to(base_url('admin/download'))->with('sukses', 'Data Berhasil di Simpan');

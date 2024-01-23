@@ -21,6 +21,19 @@ class Prestasi_model extends Model
         return $query->getResult();
     }
 
+    // home
+    public function home($limit)
+    {
+        $builder = $this->db->table('prestasi');
+        $builder->select('prestasi.*, kategori_prestasi.nama_kategori_prestasi, kategori_prestasi.slug_kategori_prestasi, users.nama');
+        $builder->join('kategori_prestasi','kategori_prestasi.id_kategori_prestasi = prestasi.id_kategori_prestasi','LEFT');
+        $builder->join('users','users.id_user = prestasi.id_user','LEFT');
+        $builder->limit($limit);
+        $builder->orderBy('prestasi.id_prestasi','DESC');
+        $query = $builder->get();
+        return $query->getResult();
+    }
+
     // jenis
     public function jenis_prestasi_depan($jenis_prestasi)
     {

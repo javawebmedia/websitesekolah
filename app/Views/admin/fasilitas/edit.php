@@ -56,8 +56,8 @@ echo csrf_field();
 
 <div class="form-group row">
 	<label class="col-md-3">Kategori &amp; Status</label>
-	<div class="col-md-2">
-		<select name="id_kategori_fasilitas" class="form-control">
+	<div class="col-md-4">
+		<select name="id_kategori_fasilitas" class="form-control select2">
 			<?php foreach($kategori_fasilitas as $kategori_fasilitas) { ?>
 			<option value="<?php echo $kategori_fasilitas->id_kategori_fasilitas ?>" <?php if($fasilitas->id_kategori_fasilitas==$kategori_fasilitas->id_kategori_fasilitas) { echo 'selected'; } ?>>
 				<?php echo $kategori_fasilitas->nama_kategori_fasilitas ?>

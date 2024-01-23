@@ -15,6 +15,8 @@ class Konfigurasi extends BaseController
 		$m_konfigurasi 	= new Konfigurasi_model();
 		$konfigurasi 	= $m_konfigurasi->listing();
 		$id_konfigurasi = $konfigurasi->id_konfigurasi;
+
+		
 		// Start validasi
 		if($this->request->getMethod() === 'post' && $this->validate(
 			[

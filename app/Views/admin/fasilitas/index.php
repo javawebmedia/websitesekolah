@@ -88,7 +88,7 @@
 				</small>
 			</td>
 			<td><small><i class="fa fa-tags"></i> <?php echo $fasilitas->nama_kategori_fasilitas ?>
-				<br><i class="fa fa-home"></i> <?php echo $fasilitas->kondisi_fasilitas ?></small></td>
+				<br><i class="fa fa-check-circle"></i> <?php echo $fasilitas->kondisi_fasilitas ?></small></td>
 			<td>
 				<?php if($fasilitas->status_fasilitas=='Publish') { ?>
 					<span class="badge bg-info">

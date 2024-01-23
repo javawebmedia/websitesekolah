@@ -29,14 +29,20 @@ echo csrf_field();
 		</select>
 		<small class="text-secondary">Kategori</small>
 	</div>
-	<div class="col-md-4">
+	<div class="col-md-2">
 		<select name="jenis_download" class="form-control">
 			<option value="Download">Download</option>
 			<option value="Panduan" <?php if($download->jenis_download=="Panduan") { echo 'selected'; } ?>>Panduan</option>
 		</select>
 		<small class="text-secondary">Jenis konten</small>
 	</div>
-	
+	<div class="col-md-2">
+		<select name="status_download" class="form-control">
+			<option value="Publish">Publish</option>
+			<option value="Draft" <?php if($download->status_download=="Draft") { echo 'selected'; } ?>>Draft</option>
+		</select>
+		<small class="text-secondary">Status tampil</small>
+	</div>
 </div>
 
 <div class="form-group row">

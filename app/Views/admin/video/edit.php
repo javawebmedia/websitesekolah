@@ -12,31 +12,34 @@
 <div class="form-group row">
 	<label class="col-3">Kode Video Youtube</label>
 	<div class="col-9">
-		<div class="input-group mb-3">
-          <div class="input-group-prepend">
-            <span class="input-group-text"><i class="fab fa-youtube"></i> https://www.youtube.com/watch?v=</span>
-          </div>
+		
 			<input type="text" name="video" class="form-control" placeholder="Kode video youtube" value="<?php echo $video->video ?>" required>
 			
-		</div>
-		<small class="text-secondary">Misal: <strong>https://www.youtube.com/watch?v=<strong class="text-danger">rqQOCRdUreE</strong></strong>. Ambil kode berwarna merah.</small>
+		<small class="text-secondary">Misal: https://youtu.be/cxLeZXObWDA?si=r_WiHBY4V91cb7Ql. Klik <strong>Share</strong> pada video Youtube. Lalu copy link yang disediakan.</small>
 	</div>
 </div>
 
 <div class="form-group row">
 	<label class="col-3">Gambar Thumbnail  dan Status</label>
 	
-	<div class="col-5">
+	<div class="col-3">
 		<input type="file" name="gambar" class="form-control" placeholder="Gambar Thumbnail" value="<?php echo $video->gambar ?>">
 		<small class="text-secondary">Gambar Thumbnail Video. Format: JPG, JPEG, PNG, GIF</small>
 	</div>
-	<div class="col-3">
+	<div class="col-2">
 		<select name="status_video" class="form-control">
 			<option value="Publish">Publish</option>
 			<option value="Draft" <?php if($video->status_video=="Draft") { echo 'selected'; } ?>>Draft</option>
 		</select>
 		<small class="text-secondary">Status Video</small>
 	</div>
+	<div class="col-2">
+						<select name="posisi_video" class="form-control">
+							<option value="Beranda">Beranda</option>
+							<option value="Video"  <?php if($video->posisi_video=="Video") { echo 'selected'; } ?>>Galeri Video</option>
+						</select>
+						<small class="text-secondary">Posisi Video</small>
+					</div>
 	<div class="col-1">
 		<?php if($video->gambar=="") { echo '-'; }else{ ?>
 					<img src="<?php echo base_url('assets/upload/image/thumbs/'.$video->gambar) ?>" class="img img-thumbnail">

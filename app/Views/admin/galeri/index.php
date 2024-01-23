@@ -83,7 +83,7 @@
 				<small>
 					<br><i class="fa fa-link"></i> <?php echo $galeri->website ?>
 					<br><i class="fa fa-tasks"></i> <?php echo $galeri->status_text ?>
-					<br><i class="fa fa-thumbs"></i> <?php echo $galeri->text_website ?>
+					<br><i class="fa fa-newspaper"></i> <?php echo $galeri->text_website ?>
 					<textarea title="Copy link gambar/file ini" class="form-control"><?php echo base_url('assets/upload/image/'.$galeri->gambar) ?></textarea>
 				</small>
 			</td>

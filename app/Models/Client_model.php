@@ -21,6 +21,19 @@ class Client_model extends Model
         return $query->getResult();
     }
 
+    // home
+    public function home()
+    {
+        $builder = $this->db->table('client');
+        $builder->select('client.*, kategori_client.nama_kategori_client, kategori_client.slug_kategori_client, users.nama');
+        $builder->join('kategori_client','kategori_client.id_kategori_client = client.id_kategori_client','LEFT');
+        $builder->join('users','users.id_user = client.id_user','LEFT');
+        $builder->limit(6);
+        $builder->orderBy('client.id_client','DESC');
+        $query = $builder->get();
+        return $query->getResult();
+    }
+
     // jenis
     public function jenis_client_depan($jenis_client)
     {

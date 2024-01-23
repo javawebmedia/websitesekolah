@@ -58,7 +58,7 @@ echo csrf_field();
 <div class="form-group row">
 	<label class="col-md-3">Kategori &amp; Status</label>
 	<div class="col-md-4">
-		<select name="id_kategori_prestasi" class="form-control">
+		<select name="id_kategori_prestasi" class="form-control select2">
 			<?php foreach($kategori_prestasi as $kategori_prestasi) { ?>
 			<option value="<?php echo $kategori_prestasi->id_kategori_prestasi ?>">
 				<?php echo $kategori_prestasi->nama_kategori_prestasi ?>
@@ -67,7 +67,13 @@ echo csrf_field();
 		</select>
 		<small class="text-secondary">Kategori</small>
 	</div>
-	
+	<div class="col-md-2">
+		<select name="status_prestasi" class="form-control">
+			<option value="Publish">Publish</option>
+			<option value="Draft">Draft</option>
+		</select>
+		<small class="text-secondary">Status Tampil</small>
+	</div>
 	<div class="col-md-2">
 		<select name="status_text" class="form-control">
 			<option value="Ya">Aktif</option>

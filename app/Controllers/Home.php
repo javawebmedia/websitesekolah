@@ -10,7 +10,9 @@ use App\Models\Konfigurasi_model;
 use App\Models\Galeri_model;
 use App\Models\Berita_model;
 use App\Models\Staff_model;
-
+use App\Models\Prestasi_model;
+use App\Models\Video_model;
+use App\Models\Client_model;
 
 class Home extends BaseController
 {
@@ -21,17 +23,23 @@ class Home extends BaseController
         $this->galeri_model         = new Galeri_model();
         $this->berita_model         = new Berita_model();
         $this->staff_model          = new Staff_model();
+        $this->prestasi_model       = new Prestasi_model();
+        $this->video_model          = new Video_model();
+        $this->client_model         = new Client_model();
     }
 
     // index
     public function index()
     {
         $site       = $this->konfigurasi_model->listing();
-        $galeri     = $this->galeri_model->jenis_galeri_depan('Homepage');
-        $popup      = $this->galeri_model->jenis_galeri_depan('Pop Up');
+        $galeri     = $this->galeri_model->jenis_galeri_pop('Homepage');
+        $popup      = $this->galeri_model->jenis_galeri_pop('Pop Up');
         $keunggulan = $this->berita_model->jenis_publish('Keunggulan');
         $berita     = $this->berita_model->beranda('Berita',6);
         $staff      = $this->staff_model->home(6);
+        $prestasi   = $this->prestasi_model->home(6);
+        $video      = $this->video_model->home();
+        $client     = $this->client_model->home();
 
         $data = [   'title'         => $site->namaweb.' | '.$site->tagline,
                     'description'   => $site->deskripsi,
@@ -42,6 +50,9 @@ class Home extends BaseController
                     'keunggulan'    => $keunggulan,
                     'berita'        => $berita,
                     'staff'         => $staff,
+                    'prestasi'      => $prestasi,
+                    'video'         => $video,
+                    'client'        => $client,
                     'content'       => 'home/index'
                 ];
         return view('layout/wrapper',$data);

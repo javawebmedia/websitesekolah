@@ -42,11 +42,11 @@ echo csrf_field();
 
 <div class="form-group row">
 	<label class="col-3">Upload Banner Baru <span class="text-danger">*</span></label>
-	<div class="col-8">
+	<div class="col-6">
 		<input type="file" name="banner" value="<?php echo $konfigurasi->banner ?>" class="form-control">
 		<small class="text-secondary">Format: JPG, PNG, GIF</small>
 	</div>
-	<div class="col-1">
+	<div class="col-3">
 		<img src="<?php echo $this->website->banner() ?>" class="img img-thumbnail">
 	</div>
 </div>

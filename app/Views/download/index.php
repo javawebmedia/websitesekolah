@@ -1,22 +1,25 @@
-<!--==============================
-Breadcumb
-============================== -->
-<div class="breadcumb-wrapper background-heroj">
-    <div class="container z-index-common">
-        <h1 class="breadcumb-title"><?php echo $title ?></h1> 
+<section class="wrapper bg-soft-primary">
+  <div class="container pt-10 pb-19 pt-md-14 pb-md-6 pb-sm-3 text-center">
+    <div class="row">
+      <div class="col-md-7 col-lg-6 col-xl-5 mx-auto">
+        <h1 class="display-1 mb-1"><?php echo $title ?></h1>
     </div>
+    <!-- /column -->
 </div>
-    <!--==============================
-Event Area  
-==============================-->
-<section class="space-extra-bottom mt-5">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
+<!-- /.row -->
+</div>
+<!-- /.container -->
+</section>
+<!-- /section -->
+<section class="wrapper bg-light">
+  <div class="container pb-14 pb-md-16">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <div class="blog classic-view pt-10">
 
-                <table class="table table-sm table-hover" id="example2">
+                <table class="table table-sm table-bordered" id="example2">
                     <thead>
-                        <tr class="text-center bg-light">
+                        <tr class="text-center bg-secondary">
                             <th width="5%" class="text-center">No</th>
                             <th width="40%">Judul</th>
                             <th width="10%">Jenis</th>
@@ -53,6 +56,6 @@ Event Area
             </div>
         </div>
     </div>
+</div>
 </section>
-
 

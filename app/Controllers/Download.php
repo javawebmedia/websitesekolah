@@ -4,6 +4,7 @@ namespace App\Controllers;
 use CodeIgniter\Controller;
 use App\Models\Konfigurasi_model;
 use App\Models\Download_model;
+use App\Models\Kategori_download_model;
 
 class Download extends BaseController
 {
@@ -16,7 +17,7 @@ class Download extends BaseController
 		$pager 			= service('pager'); 
 		$total 			= $m_download->total_jenis_download('Download');
         $page    		= (int) ($this->request->getGet('page') ?? 1);
-        $perPage 		= $this->website->paginasi_depan();
+        $perPage 		= 1000;
         $total   		= $total;
         $pager_links 	= $pager->makeLinks($page, $perPage, $total,'bootstrap_pagination');
         $page 			= ($this->request->getGet('page'))?($this->request->getGet('page')-1)*$perPage:0;
@@ -25,6 +26,35 @@ class Download extends BaseController
 		$data = [	'title'			=> 'Download File',
 					'description'	=> 'Download File '.$konfigurasi->namaweb.', '.$konfigurasi->tentang,
 					'keywords'		=> 'Download File '.$konfigurasi->namaweb.', '.$konfigurasi->keywords,
+					'download'		=> $download,
+					'konfigurasi'	=> $konfigurasi,
+					'pagination'	=> $pager_links,
+					'content'		=> 'download/index'
+				];
+		echo view('layout/wrapper',$data);
+	}
+
+	// kategori
+	public function kategori($slug_kategori_download)
+	{
+		$m_konfigurasi 				= new Konfigurasi_model();
+		$m_download					= new Download_model();
+		$m_kategori_download		= new Kategori_download_model();
+		$konfigurasi 				= $m_konfigurasi->listing();
+		$kategori_download 			= $m_kategori_download->read($slug_kategori_download);
+		$id_kategori_download		= $kategori_download->id_kategori_download;
+		$pager 						= service('pager'); 
+		$total 						= $m_download->total_kategori_download($id_kategori_download,'Download',);
+        $page    					= (int) ($this->request->getGet('page') ?? 1);
+        $perPage 					= 1000;
+        $total   					= $total;
+        $pager_links 				= $pager->makeLinks($page, $perPage, $total,'bootstrap_pagination');
+        $page 						= ($this->request->getGet('page'))?($this->request->getGet('page')-1)*$perPage:0;
+        $download 					= $m_download->kategori_download_all($id_kategori_download,'Download',$perPage, $page);
+
+		$data = [	'title'			=> $kategori_download->nama_kategori_download,
+					'description'	=> 'Download File: '.$kategori_download->nama_kategori_download,
+					'keywords'		=> 'Download File: '.$kategori_download->nama_kategori_download,
 					'download'		=> $download,
 					'konfigurasi'	=> $konfigurasi,
 					'pagination'	=> $pager_links,

@@ -58,8 +58,9 @@
         		</button>
 			</th>
 			<th width="5%">Gambar</th>
-			<th width="45%">Judul</th>
+			<th width="35%">Judul</th>
 			<th width="15%">Kategori &amp; Jenis</th>
+			<th width="15%">Status</th>
 			<th width="15%">Author</th>
 			<th></th>
 		</tr>
@@ -88,6 +89,17 @@
 			</td>
 			<td><small><i class="fa fa-tags"></i> <?php echo $prestasi->nama_kategori_prestasi ?>
 				<br><i class="fa fa-home"></i> <?php echo $prestasi->jenjang_prestasi ?></small></td>
+			<td>
+				<?php if($prestasi->status_prestasi=='Publish') { ?>
+					<span class="badge bg-info">
+						<i class="fa fa-eye"></i> <?php echo $prestasi->status_prestasi ?>
+					</span>
+				<?php }else{ ?>
+					<span class="badge bg-secondary">
+						<i class="fa fa-eye-slash"></i> Not Published
+					</span>
+				<?php } ?>
+			</td>
 			<td><?php echo $prestasi->nama ?></td>
 			<td>
 				

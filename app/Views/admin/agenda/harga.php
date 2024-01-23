@@ -26,14 +26,14 @@ echo csrf_field();
                     Periode/tanggal diskon silakan update di data produk.
                 </div>
                 <div class="form-group row">
-                    <label class="col-4">Biaya Pendaftaran (Kontingen) Normal &amp; Diskon</label>
+                    <label class="col-4">Biaya Pendaftaran  Normal &amp; Diskon</label>
                     <div class="col-4">
                         <input type="number" name="harga_produk" class="form-control" placeholder="harga" value="<?php echo set_value('harga_produk') ?>" required>
-                        <small class="text-gray">Biaya Pendaftaran (Kontingen) <em>normal</em></small>
+                        <small class="text-gray">Biaya Pendaftaran  <em>normal</em></small>
                     </div>
                     <div class="col-4">
                         <input type="number" name="harga_diskon" class="form-control" placeholder="harga diskon" value="<?php echo set_value('harga_diskon') ?>" required>
-                        <small class="text-gray">Biaya Pendaftaran (Kontingen) <em>diskon</em></small>
+                        <small class="text-gray">Biaya Pendaftaran  <em>diskon</em></small>
                     </div>
                 </div>
 
@@ -78,8 +78,8 @@ echo csrf_field();
 <thead>
 <tr>
     <th>#</th>
-    <th>Biaya Pendaftaran (Kontingen) Normal</th>
-    <th>Biaya Pendaftaran (Kontingen) Diskon</th>
+    <th>Biaya Pendaftaran  Normal</th>
+    <th>Biaya Pendaftaran  Diskon</th>
     <th>Nama Varian</th>
     <th>Keterangan</th>
     <th>Status</th>

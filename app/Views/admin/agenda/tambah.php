@@ -13,28 +13,29 @@ echo csrf_field();
 </div>
 
 <div class="form-group row">
-	<label class="col-sm-3 control-label text-right">Upload Foto/ Gambar dan Status Pendaftaran (Kontingen)</label>
-	<div class="col-sm-5">
+	<label class="col-sm-3 control-label text-right">Upload Foto/ Gambar</label>
+	<div class="col-sm-6">
 		<input type="file" name="gambar" class="form-control" placeholder="Upload gambar" id="file">
 		<div id="imagePreview"></div>
 		<small class="text-gray">Gambar format: jpg, jpeg, png, gif, svg</small>
 	</div>
-	<div class="col-sm-4">
+	
+</div>
+
+<div class="form-group row">
+	<label class="col-sm-3 control-label text-right">Status, Tanggal Pendaftaran  Dibuka &amp; Ditutup</label>
+	<div class="col-sm-2">
 		<select name="status_pendaftaran" class="form-control">
 			<option value="Buka">Buka</option>
 			<option value="Tutup">Tutup</option>
 		</select>
-		<small class="text-gray">Status Buka Pendaftaran (Kontingen)</small>
+		<small class="text-gray">Status Buka Pendaftaran </small>
 	</div>
-</div>
-
-<div class="form-group row">
-	<label class="col-sm-3 control-label text-right">Tanggal Pendaftaran (Kontingen) Dibuka &amp; Ditutup</label>
-	<div class="col-sm-4">
+	<div class="col-sm-2">
 		<input type="text" name="tanggal_buka" class="form-control tanggal" value="<?php echo set_value('tanggal_buka') ?>">
 		<small class="text-gray">Tanggal Buka</small>
 	</div>
-	<div class="col-sm-4">
+	<div class="col-sm-2">
 		<input type="text" name="tanggal_tutup" class="form-control tanggal" value="<?php echo set_value('tanggal_tutup') ?>">
 		<small class="text-gray">Tanggal Tutup</small>
 	</div>
@@ -42,7 +43,7 @@ echo csrf_field();
 
 <div class="form-group row">
 	<label class="col-sm-3 control-label text-right">Kategori, Status &amp; Kode</label>
-	<div class="col-sm-5">
+	<div class="col-sm-2">
 		<select name="id_kategori_agenda" class="form-control select2">
 			<?php foreach($kategori_agenda as $kategori_agenda) { ?>
 				<option value="<?php echo $kategori_agenda['id_kategori_agenda'] ?>"><?php echo $kategori_agenda['nama_kategori_agenda'] ?></option>
@@ -64,14 +65,14 @@ echo csrf_field();
 </div>
 
 <div class="form-group row">
-	<label class="col-sm-3 control-label text-right">Biaya Pendaftaran (Kontingen) Normal &amp; Diskon</label>
-	<div class="col-sm-4">
+	<label class="col-sm-3 control-label text-right">Biaya Pendaftaran  Normal &amp; Diskon</label>
+	<div class="col-sm-3">
 		<input type="number" name="harga" class="form-control" required value="<?php echo set_value('harga') ?>">
-		<small class="text-gray">Biaya Pendaftaran (Kontingen) normal</small>
+		<small class="text-gray">Biaya Pendaftaran  normal</small>
 	</div>
-	<div class="col-sm-4">
+	<div class="col-sm-3">
 		<input type="number" name="harga_diskon" class="form-control" required value="<?php echo set_value('harga_diskon') ?>">
-		<small class="text-gray">Biaya Pendaftaran (Kontingen) <em>diskon</em></small>
+		<small class="text-gray">Biaya Pendaftaran  <em>diskon</em></small>
 	</div>
 </div>
 
@@ -81,17 +82,17 @@ echo csrf_field();
 		<input type="text" name="tanggal_mulai" class="form-control tanggal" required value="<?php echo set_value('tanggal_mulai') ?>">
 		<small class="text-gray">Tanggal mulai</small>
 	</div>
-	<div class="col-sm-2">
+	<div class="col-sm-1">
 		<input type="text" name="jam_mulai" class="form-control jam" required value="<?php echo set_value('jam_mulai') ?>">
-		<small class="text-gray">Jam mulai: 08:00</small>
+		<small class="text-gray">Jam mulai</small>
 	</div>
 	<div class="col-sm-2">
 		<input type="text" name="tanggal_selesai" class="form-control tanggal" required value="<?php echo set_value('tanggal_selesai') ?>">
 		<small class="text-gray">Tanggal selesai</small>
 	</div>
-	<div class="col-sm-2">
+	<div class="col-sm-1">
 		<input type="text" name="jam_selesai" class="form-control jam" required value="<?php echo set_value('jam_selesai') ?>">
-		<small class="text-gray">Jam selesai: 12:00</small>
+		<small class="text-gray">Jam selesai</small>
 	</div>
 </div>
 

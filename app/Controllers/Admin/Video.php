@@ -42,6 +42,7 @@ class Video extends BaseController
 							'keterangan'		=> $this->request->getPost('keterangan'),
 							'video'				=> $this->request->getPost('video'),
 							'status_video'		=> $this->request->getPost('status_video'),
+							'posisi_video'		=> $this->request->getPost('posisi_video'),
 							'urutan'			=> $this->request->getPost('urutan'),
 							'gambar'			=> $judulbaru,
 							'tanggal_post'		=> date('Y-m-d H:i:s')
@@ -59,6 +60,7 @@ class Video extends BaseController
 							'keterangan'		=> $this->request->getPost('keterangan'),
 							'video'				=> $this->request->getPost('video'),
 							'status_video'		=> $this->request->getPost('status_video'),
+							'posisi_video'		=> $this->request->getPost('posisi_video'),
 							'urutan'			=> $this->request->getPost('urutan'),
 							'tanggal_post'		=> date('Y-m-d H:i:s')
 						];
@@ -112,6 +114,7 @@ class Video extends BaseController
 							'keterangan'	=> $this->request->getPost('keterangan'),
 							'video'			=> $this->request->getPost('video'),
 							'status_video'	=> $this->request->getPost('status_video'),
+							'posisi_video'	=> $this->request->getPost('posisi_video'),
 							'urutan'		=> $this->request->getPost('urutan'),
 							'gambar'		=> $judulbaru
 						];
@@ -129,6 +132,7 @@ class Video extends BaseController
 							'keterangan'	=> $this->request->getPost('keterangan'),
 							'video'			=> $this->request->getPost('video'),
 							'status_video'	=> $this->request->getPost('status_video'),
+							'posisi_video'	=> $this->request->getPost('posisi_video'),
 							'urutan'		=> $this->request->getPost('urutan'),
 						];
 				$m_video->edit($data);

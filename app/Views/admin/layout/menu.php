@@ -64,6 +64,62 @@
             </ul>
           </li>
 
+          <!-- galeri -->
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-image"></i>
+              <p>Galeri &amp; Banner <i class="right fas fa-angle-left"></i></p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="<?php echo base_url('admin/galeri') ?>" class="nav-link">
+                  <i class="fa fa-arrow-right nav-icon"></i>
+                  <p>Data Galeri &amp; Banner</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="<?php echo base_url('admin/galeri/tambah') ?>" class="nav-link">
+                  <i class="fa fa-arrow-right nav-icon"></i>
+                  <p>Tambah Galeri &amp; Banner</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="<?php echo base_url('admin/kategori_galeri') ?>" class="nav-link">
+                  <i class="fa fa-arrow-right nav-icon"></i>
+                  <p>Kategori Galeri &amp; Banner</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+
+          <!-- download -->
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-upload"></i>
+              <p>File &amp; Download<i class="right fas fa-angle-left"></i></p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="<?php echo base_url('admin/download') ?>" class="nav-link">
+                  <i class="fa fa-arrow-right nav-icon"></i>
+                  <p>Data File &amp; Download</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="<?php echo base_url('admin/download/tambah') ?>" class="nav-link">
+                  <i class="fa fa-arrow-right nav-icon"></i>
+                  <p>Tambah File &amp; Download</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="<?php echo base_url('admin/kategori_download') ?>" class="nav-link">
+                  <i class="fa fa-arrow-right nav-icon"></i>
+                  <p>Kategori File &amp; Download</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+
           <!-- PRESTASI -->
           <li class="nav-item">
             <a href="#" class="nav-link">
@@ -91,6 +147,71 @@
               </li>
             </ul>
           </li>
+
+          <!-- event -->
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-calendar-check"></i>
+              <p>Event &amp; Agenda <i class="right fas fa-angle-left"></i></p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="<?php echo base_url('admin/agenda') ?>" class="nav-link">
+                  <i class="fa fa-arrow-right nav-icon"></i>
+                  <p>Data Event &amp; Agenda</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="<?php echo base_url('admin/agenda/tambah') ?>" class="nav-link">
+                  <i class="fa fa-arrow-right nav-icon"></i>
+                  <p>Tambah Event &amp; Agenda</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="<?php echo base_url('admin/kategori_agenda') ?>" class="nav-link">
+                  <i class="fa fa-arrow-right nav-icon"></i>
+                  <p>Kategori Event &amp; Agenda</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+
+          <!-- video -->
+          <li class="nav-item">
+            <a href="<?php echo base_url('admin/video') ?>" class="nav-link">
+              <i class="nav-icon fab fa-youtube"></i>
+              <p>Video Youtube</p>
+            </a>
+          </li>
+
+           <!-- PORTFOLIO -->
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-tasks"></i>
+              <p>Karya &amp; Portfolio <i class="right fas fa-angle-left"></i></p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="<?php echo base_url('admin/portfolio') ?>" class="nav-link">
+                  <i class="fa fa-arrow-right nav-icon"></i>
+                  <p>Data Karya &amp; Portfolio</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="<?php echo base_url('admin/portfolio/tambah') ?>" class="nav-link">
+                  <i class="fa fa-arrow-right nav-icon"></i>
+                  <p>Tambah Karya &amp; Portfolio</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="<?php echo base_url('admin/kategori_portfolio') ?>" class="nav-link">
+                  <i class="fa fa-arrow-right nav-icon"></i>
+                  <p>Kategori Karya &amp; Portfolio</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+
 
           <!-- Fasilitas -->
           <li class="nav-item">
@@ -148,89 +269,7 @@
             </ul>
           </li>
 
-          <!-- PORTFOLIO -->
-          <li class="nav-item">
-            <a href="#" class="nav-link">
-              <i class="nav-icon fas fa-tasks"></i>
-              <p>Karya &amp; Portfolio <i class="right fas fa-angle-left"></i></p>
-            </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="<?php echo base_url('admin/portfolio') ?>" class="nav-link">
-                  <i class="fa fa-arrow-right nav-icon"></i>
-                  <p>Data Karya &amp; Portfolio</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="<?php echo base_url('admin/portfolio/tambah') ?>" class="nav-link">
-                  <i class="fa fa-arrow-right nav-icon"></i>
-                  <p>Tambah Karya &amp; Portfolio</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="<?php echo base_url('admin/kategori_portfolio') ?>" class="nav-link">
-                  <i class="fa fa-arrow-right nav-icon"></i>
-                  <p>Kategori Karya &amp; Portfolio</p>
-                </a>
-              </li>
-            </ul>
-          </li>
-
-          <!-- galeri -->
-          <li class="nav-item">
-            <a href="#" class="nav-link">
-              <i class="nav-icon fas fa-image"></i>
-              <p>Galeri &amp; Banner <i class="right fas fa-angle-left"></i></p>
-            </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="<?php echo base_url('admin/galeri') ?>" class="nav-link">
-                  <i class="fa fa-arrow-right nav-icon"></i>
-                  <p>Data Galeri &amp; Banner</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="<?php echo base_url('admin/galeri/tambah') ?>" class="nav-link">
-                  <i class="fa fa-arrow-right nav-icon"></i>
-                  <p>Tambah Galeri &amp; Banner</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="<?php echo base_url('admin/kategori_galeri') ?>" class="nav-link">
-                  <i class="fa fa-arrow-right nav-icon"></i>
-                  <p>Kategori Galeri &amp; Banner</p>
-                </a>
-              </li>
-            </ul>
-          </li>
-
-          <!-- download -->
-          <li class="nav-item">
-            <a href="#" class="nav-link">
-              <i class="nav-icon fas fa-upload"></i>
-              <p>File &amp; Download<i class="right fas fa-angle-left"></i></p>
-            </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="<?php echo base_url('admin/download') ?>" class="nav-link">
-                  <i class="fa fa-arrow-right nav-icon"></i>
-                  <p>Data File &amp; Download</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="<?php echo base_url('admin/download/tambah') ?>" class="nav-link">
-                  <i class="fa fa-arrow-right nav-icon"></i>
-                  <p>Tambah File &amp; Download</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="<?php echo base_url('admin/kategori_download') ?>" class="nav-link">
-                  <i class="fa fa-arrow-right nav-icon"></i>
-                  <p>Kategori File &amp; Download</p>
-                </a>
-              </li>
-            </ul>
-          </li>
+         
 
           <!-- CLIENT -->
           <li class="nav-item">
@@ -260,41 +299,7 @@
             </ul>
           </li>
 
-          <!-- event -->
-          <li class="nav-item">
-            <a href="#" class="nav-link">
-              <i class="nav-icon fas fa-calendar-check"></i>
-              <p>Event &amp; Agenda <i class="right fas fa-angle-left"></i></p>
-            </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="<?php echo base_url('admin/agenda') ?>" class="nav-link">
-                  <i class="fa fa-arrow-right nav-icon"></i>
-                  <p>Data Event &amp; Agenda</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="<?php echo base_url('admin/agenda/tambah') ?>" class="nav-link">
-                  <i class="fa fa-arrow-right nav-icon"></i>
-                  <p>Tambah Event &amp; Agenda</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="<?php echo base_url('admin/kategori_agenda') ?>" class="nav-link">
-                  <i class="fa fa-arrow-right nav-icon"></i>
-                  <p>Kategori Event &amp; Agenda</p>
-                </a>
-              </li>
-            </ul>
-          </li>
-
-          <!-- video -->
-          <li class="nav-item">
-            <a href="<?php echo base_url('admin/video') ?>" class="nav-link">
-              <i class="nav-icon fab fa-youtube"></i>
-              <p>Video Youtube</p>
-            </a>
-          </li>
+          
          
           <!-- Guru -->
           <li class="nav-item">
@@ -332,6 +337,12 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
+                <a href="<?php echo base_url('admin/link_website') ?>" class="nav-link">
+                  <i class="fa fa-arrow-right nav-icon"></i>
+                  <p>Link Website</p>
+                </a>
+              </li>
+              <li class="nav-item">
                 <a href="<?php echo base_url('admin/jenjang') ?>" class="nav-link">
                   <i class="fa fa-arrow-right nav-icon"></i>
                   <p>Jenjang Pendidikan</p>
@@ -360,6 +371,15 @@
           </li>
 
         <?php if(Session()->get('akses_level')=='Admin') { ?>
+
+          <!-- video -->
+          <li class="nav-item">
+            <a href="<?php echo base_url('admin/menu') ?>" class="nav-link">
+              <i class="nav-icon fa fa-sitemap"></i>
+              <p>Menu Website</p>
+            </a>
+          </li>
+
           <!-- pengguna -->
           <li class="nav-item">
             <a href="<?php echo base_url('admin/user') ?>" class="nav-link">

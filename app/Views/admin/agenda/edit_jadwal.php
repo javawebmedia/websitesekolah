@@ -29,7 +29,7 @@ echo validation_errors('<div class="alert alert-warning">','</div>');
 echo form_open_multipart(base_url('admin/produk/edit_harga/'.$harga_produk->id_harga_produk),array('class'	=> 'form-horizontal'));
 ?>
 <div class="form-group row">
-	<label class="col-sm-3 control-label text-right">Status Biaya Pendaftaran (Kontingen) Produk <span class="text-danger">*</span></label>
+	<label class="col-sm-3 control-label text-right">Status Biaya Pendaftaran  Produk <span class="text-danger">*</span></label>
 	<div class="col-sm-9">
       <select name="status_harga_produk" class="form-control select2">
       	<option value="Buka">Buka</option>

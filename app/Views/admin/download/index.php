@@ -8,8 +8,13 @@
             	<i class="fa fa-search"></i> Cari
             </button>
             <a href="<?php echo base_url('admin/download/tambah') ?>" class="btn btn-success">
-				<i class="fa fa-plus"></i> Tambah Baru
-			</a>
+							<i class="fa fa-plus"></i> Tambah Baru
+						</a>
+						<?php if(isset($_GET['keywords'])) { ?>
+							<a href="<?php echo base_url('admin/download') ?>" class="btn btn-secondary">
+								<i class="fa fa-arrow-left"></i>
+							</a>
+						<?php } ?>
           </span>
         </div>
         <?php echo form_close() ?>
@@ -55,8 +60,9 @@
 					<i class="far fa-square"></i>
         </button>
 			</th>
-			<th width="45%">Judul</th>
-			<th width="30%">Deskripsi</th>
+			<th width="50%">Judul</th>
+			<th width="20%">Deskripsi</th>
+			<th width="10%">Status</th>
 			<th></th>
 		</tr>
 	</thead>
@@ -75,8 +81,9 @@
 					<?php echo $download->judul_download ?>
 				</a>
 				<small>
-					<br><i class="fa fa-link"></i> <span class="text-info" title="Copy link gambar/file ini"><?php echo base_url('assets/upload/file/'.$download->gambar) ?></span>
-					<br><i class="fa fa-calendar-check"></i> <?php echo $this->website->tanggal_bulan_menit($download->tanggal) ?>
+					<br><i class="fa fa-download"></i> <?php echo base_url('download/unduh/'.$download->id_download) ?>
+					<br><i class="fa fa-link"></i> Link file:<br><textarea class="form-control form-control-sm" title="Copy link gambar/file ini"><?php echo base_url('assets/upload/file/'.$download->gambar) ?></textarea>
+					<i class="fa fa-calendar-check"></i> <?php echo $this->website->tanggal_bulan_menit($download->tanggal) ?>
 					<br><i class="fa fa-calendar-plus"></i> <?php echo $this->website->tanggal_bulan_menit($download->tanggal_post) ?>
 					<br><i class="fa fa-eye"></i> <?php echo $download->hits ?>
 				</small>
@@ -91,6 +98,17 @@
 				<br><i class="fa fa-file-code"></i> <?php echo strtoupper($download->file_ext) ?>
 				<br><i class="fas fa-file"></i> <?php echo $download->file_size ?> MB
 			</small>
+			</td>
+			<td>
+				<?php if($download->status_download=='Publish') { ?>
+					<span class="badge bg-info">
+						<i class="fa fa-eye"></i> <?php echo $download->status_download ?>
+					</span>
+				<?php }else{ ?>
+					<span class="badge bg-secondary">
+						<i class="fa fa-eye-slash"></i> Not Published
+					</span>
+				<?php } ?>
 			</td>
 			<td>
 				<div  class="btn-group">

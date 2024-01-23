@@ -9,7 +9,7 @@ echo csrf_field();
 ?>
 
 <div class="modal fade" id="modal-default">
-	<div class="modal-dialog modal-lg">
+	<div class="modal-dialog modal-xl">
 		<div class="modal-content">
 			<div class="modal-header">
 				<h4 class="modal-title">Tambah Baru</h4>
@@ -31,21 +31,18 @@ echo csrf_field();
 				<div class="form-group row">
 					<label class="col-3">Kode Video Youtube</label>
 					<div class="col-9">
-						<div class="input-group mb-3">
-		                  <div class="input-group-prepend">
-		                    <span class="input-group-text"><i class="fab fa-youtube"></i> https://www.youtube.com/watch?v=</span>
-		                  </div>
+		                  
 							<input type="text" name="video" class="form-control" placeholder="Kode video youtube" value="<?php echo set_value('video') ?>" required>
 							
-						</div>
-						<small class="text-secondary">Misal: <strong>https://www.youtube.com/watch?v=<strong class="text-danger">rqQOCRdUreE</strong></strong>. Ambil kode berwarna merah.</small>
+						
+						<small class="text-secondary">Misal: https://youtu.be/cxLeZXObWDA?si=r_WiHBY4V91cb7Ql. Klik <strong>Share</strong> pada video Youtube. Lalu copy link yang disediakan.</small>
 					</div>
 				</div>
 
 				<div class="form-group row">
 					<label class="col-3">Gambar Thumbnail dan Status</label>
 					
-					<div class="col-6">
+					<div class="col-3">
 						<input type="file" name="gambar" class="form-control" placeholder="Gambar? logo" value="<?php echo set_value('gambar') ?>">
 						<small class="text-secondary">Gambar Thumbnail Video. Format: JPG, JPEG, PNG, GIF</small>
 					</div>
@@ -55,6 +52,13 @@ echo csrf_field();
 							<option value="Draft">Draft</option>
 						</select>
 						<small class="text-secondary">Status Video</small>
+					</div>
+					<div class="col-3">
+						<select name="posisi_video" class="form-control">
+							<option value="Beranda">Beranda</option>
+							<option value="Video">Galeri Video</option>
+						</select>
+						<small class="text-secondary">Posisi Video</small>
 					</div>
 				</div>
 

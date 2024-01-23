@@ -60,7 +60,7 @@ class Fasilitas extends BaseController
 		// Start validasi
 		if($this->request->getMethod() === 'post' && $this->validate(
 			[
-				'judul_fasilitas' 	=> 'required',
+				'judul_fasilitas' 	=> 'required|is_unique[fasilitas.judul_fasilitas]',
 				'gambar'	 	=> [
 					                'ext_in[gambar,jpg,jpeg,gif,png,svg]',
 					                'max_size[gambar,4096]',
@@ -80,6 +80,7 @@ class Fasilitas extends BaseController
 	        	$data = array(
 	        		'id_user'				=> $this->session->get('id_user'),
 					'id_kategori_fasilitas'	=> $this->request->getVar('id_kategori_fasilitas'),
+					'slug_fasilitas'		=> strtolower(url_title($this->request->getVar('judul_fasilitas'))),
 					'judul_fasilitas'		=> $this->request->getVar('judul_fasilitas'),
 					'kode_nomor_fasilitas'	=> $this->request->getVar('kode_nomor_fasilitas'),
 					'kondisi_fasilitas'		=> $this->request->getVar('kondisi_fasilitas'),
@@ -99,6 +100,7 @@ class Fasilitas extends BaseController
         		$data = array(
 	        		'id_user'				=> $this->session->get('id_user'),
 					'id_kategori_fasilitas'	=> $this->request->getVar('id_kategori_fasilitas'),
+					'slug_fasilitas'		=> strtolower(url_title($this->request->getVar('judul_fasilitas'))),
 					'judul_fasilitas'		=> $this->request->getVar('judul_fasilitas'),
 					'kode_nomor_fasilitas'	=> $this->request->getVar('kode_nomor_fasilitas'),
 					'kondisi_fasilitas'		=> $this->request->getVar('kondisi_fasilitas'),
@@ -209,6 +211,7 @@ class Fasilitas extends BaseController
 	        		'id_fasilitas'			=> $id_fasilitas,
 	        		'id_user'				=> $this->session->get('id_user'),
 					'id_kategori_fasilitas'	=> $this->request->getVar('id_kategori_fasilitas'),
+					'slug_fasilitas'		=> strtolower(url_title($this->request->getVar('judul_fasilitas'))),
 					'judul_fasilitas'		=> $this->request->getVar('judul_fasilitas'),
 					'kode_nomor_fasilitas'	=> $this->request->getVar('kode_nomor_fasilitas'),
 					'kondisi_fasilitas'		=> $this->request->getVar('kondisi_fasilitas'),
@@ -228,6 +231,7 @@ class Fasilitas extends BaseController
 	        		'id_fasilitas'			=> $id_fasilitas,
 	        		'id_user'				=> $this->session->get('id_user'),
 					'id_kategori_fasilitas'	=> $this->request->getVar('id_kategori_fasilitas'),
+					'slug_fasilitas'		=> strtolower(url_title($this->request->getVar('judul_fasilitas'))),
 					'judul_fasilitas'		=> $this->request->getVar('judul_fasilitas'),
 					'kode_nomor_fasilitas'	=> $this->request->getVar('kode_nomor_fasilitas'),
 					'kondisi_fasilitas'		=> $this->request->getVar('kondisi_fasilitas'),

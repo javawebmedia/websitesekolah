@@ -1,50 +1,77 @@
-<!--==============================
-Breadcumb
-============================== -->
-<div class="breadcumb-wrapper background-heroj">
-    <div class="container z-index-common">
-        <h1 class="breadcumb-title"><?php echo $title ?></h1> 
+<section class="wrapper bg-soft-primary">
+  <div class="container pt-10 pb-19 pt-md-14 pb-md-20 text-center">
+    <div class="row">
+      <div class="col-md-7 col-lg-6 col-xl-5 mx-auto">
+        <h1 class="display-1 mb-1"><?php echo $title ?></h1>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /.row -->
+</div>
+<!-- /.container -->
+</section>
+<!-- /section -->
+<section class="wrapper bg-light">
+  <div class="container pb-14 pb-md-16">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="blog classic-view mt-n17">
+        <?php foreach($berita as $berita) { ?>
+
+            <article class="post">
+                <div class="card">
+                  <figure class="card-img-top overlay overlay-1 hover-scale">
+                    <a class="link-dark" href="<?php echo base_url('berita/read/'.$berita->slug_berita) ?>">
+                      <?php if($berita->gambar !='') { ?>
+                            <img src="<?php echo base_url('assets/upload/image/'.$berita->gambar) ?>" alt="<?php echo $title ?>" class="img-thumbnail">
+                        <?php } ?>
+                    </a>
+                    <figcaption>
+                      <h5 class="from-top mb-0">Baca detail...</h5>
+                    </figcaption>
+                  </figure>
+                  <div class="card-body">
+                    <div class="post-header">
+                      <div class="post-category text-line">
+                        <a href="<?php echo base_url('berita/kategori/'.$berita->slug_kategori) ?>" class="hover" rel="category"><?php echo $berita->nama_kategori ?></a>
+                      </div>
+                      <!-- /.post-category -->
+                      <h2 class="post-title mt-1 mb-0">
+                        <a class="link-dark" href="<?php echo base_url('berita/read/'.$berita->slug_berita) ?>">
+                            <?php echo $berita->judul_berita ?>
+                        </a>
+                    </h2>
+                    </div>
+                    <!-- /.post-header -->
+                    <div class="post-content">
+                      <p><?php echo $berita->ringkasan ?></p>
+                    </div>
+                    <!-- /.post-content -->
+                  </div>
+                  <!--/.card-body -->
+                  <div class="card-footer">
+                    <ul class="post-meta d-flex mb-0">
+                      <li class="post-date"><i class="uil uil-calendar-alt"></i><span><?php echo $this->website->tanggal_bulan_menit($berita->tanggal_publish) ?></span></li>
+                      <li class="post-author"><a href="#"><i class="uil uil-user"></i><span><?php echo $berita->nama ?></span></a></li>
+                      <li class="post-comments"><a href="#"><i class="fa fa-eye"></i><span> Dibaca <?php echo $berita->hits ?> kali</span></a></li>
+                    </ul>
+                    <!-- /.post-meta -->
+                  </div>
+                  <!-- /.card-footer -->
+                </div>
+                <!-- /.card -->
+              </article>
+              <!-- /.post -->
+
+            
+    <?php } ?>
+    <div class="col-xxl-10 col-lg-10 offset-1">
+        <div class="as-blog blog-single has-post-thumbnail row justify-content-end">
+            <?php if(isset($pagination)) { echo str_replace('index.php/','',$pagination); } ?>
+        </div>
     </div>
 </div>
-    <!--==============================
-Event Area  
-==============================-->
-    <section class="space-extra-bottom mt-5">
-        <div class="container">
-            <div class="row">
-                <?php foreach($berita as $berita) { ?>
-                <div class="col-xxl-10 col-lg-10 offset-1">
-                   <div class="as-blog blog-single has-post-thumbnail row">
-                            <div class="col-md-4">
-                                <div class="blog-img">
-                                    <?php if($berita->gambar !='') { ?>
-                                        <img src="<?php echo base_url('assets/upload/image/'.$berita->gambar) ?>" alt="<?php echo $title ?>" class="img-thumbnail">
-                                     <?php } ?>
-                                 </div>
-                             </div>
-                             <div class="col-md-8">
-                                <div class="blog-content">
-                                    <h2 class="blog-title"><a href="<?php echo base_url('berita/read/'.$berita->slug_berita) ?>"><?php echo $berita->judul_berita ?></a></h2>
-                                    <div class="blog-meta">
-                                        <a href="<?php echo base_url('berita/kategori/'.$berita->slug_kategori) ?>"><i class="fa fa-tags"></i> <?php echo $berita->nama_kategori ?></a>
-                                        <a href="#"><i class="far fa-eye"></i><?php echo $berita->hits ?> views</a>
-                                        <a href="#"><i class="far fa-calendar-check"></i><?php echo $this->website->tanggal_bulan_menit($berita->tanggal_publish) ?></a>
-                                    </div>
-                                    <p><?php echo $berita->ringkasan ?></p>
-                                    <div class="blog-bottom">
-                                        <a href="<?php echo base_url('berita/read/'.$berita->slug_berita) ?>" class="link-btn">Baca Detail <i class="fas fa-arrow-right"></i></a>
-                                    </div>
-                                </div>
-                            </div>
-                        
-                    </div>
-                </div>
-                <?php } ?>
-                <div class="col-xxl-10 col-lg-10 offset-1">
-                    <div class="as-blog blog-single has-post-thumbnail row justify-content-end">
-                        <?php if(isset($pagination)) { echo str_replace('index.php/','',$pagination); } ?>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+</div>
+</div>
+</div>
+</section>

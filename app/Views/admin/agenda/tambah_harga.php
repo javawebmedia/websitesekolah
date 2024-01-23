@@ -37,7 +37,7 @@ echo validation_errors('<div class="alert alert-warning">','</div>');
 echo form_open_multipart(base_url('admin/produk/harga/'.$produk->id_produk),array('class'	=> 'form-horizontal'));
 ?>
 <div class="form-group row">
-	<label class="col-sm-3 control-label text-right">Status Biaya Pendaftaran (Kontingen) <span class="text-danger">*</span></label>
+	<label class="col-sm-3 control-label text-right">Status Biaya Pendaftaran  <span class="text-danger">*</span></label>
 	<div class="col-sm-9">
       <select name="status_harga_produk" class="form-control select2">
       	<option value="Buka">Buka</option>
@@ -47,7 +47,7 @@ echo form_open_multipart(base_url('admin/produk/harga/'.$produk->id_produk),arra
 </div>
 
 <div class="form-group row">
-	<label class="col-sm-3 control-label text-right">Nama Paket Biaya Pendaftaran (Kontingen) <span class="text-danger">*</span></label>
+	<label class="col-sm-3 control-label text-right">Nama Paket Biaya Pendaftaran  <span class="text-danger">*</span></label>
 	<div class="col-sm-9">
       <input type="text" name="nama_harga_produk" class="form-control" value="<?php echo set_value('nama_harga_produk') ?>">
       <small class="text-gray">Misal: Paket Group 3-5 Orang</small>
@@ -55,7 +55,7 @@ echo form_open_multipart(base_url('admin/produk/harga/'.$produk->id_produk),arra
 </div>
 
 <div class="form-group row">
-	<label class="col-sm-3 control-label text-right">Biaya Pendaftaran (Kontingen)/Biaya Investasi <span class="text-danger">*</span></label>
+	<label class="col-sm-3 control-label text-right">Biaya Pendaftaran /Biaya Investasi <span class="text-danger">*</span></label>
 	<div class="col-sm-9">
       <input type="number" name="biaya_produk" class="form-control" value="<?php echo set_value('biaya_produk') ?>">
 	</div>

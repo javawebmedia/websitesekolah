@@ -29,6 +29,20 @@ class Galeri_model extends Model
         $builder->join('kategori_galeri','kategori_galeri.id_kategori_galeri = galeri.id_kategori_galeri','LEFT');
         $builder->join('users','users.id_user = galeri.id_user','LEFT');
         $builder->where('galeri.jenis_galeri',$jenis_galeri);
+        $builder->limit(5);
+        $builder->orderBy('galeri.id_galeri','DESC');
+        $query = $builder->get();
+        return $query->getResult();
+    }
+
+    // jenis_galeri_pop
+    public function jenis_galeri_pop($jenis_galeri)
+    {
+        $builder = $this->db->table('galeri');
+        $builder->select('galeri.*, kategori_galeri.nama_kategori_galeri, kategori_galeri.slug_kategori_galeri, users.nama');
+        $builder->join('kategori_galeri','kategori_galeri.id_kategori_galeri = galeri.id_kategori_galeri','LEFT');
+        $builder->join('users','users.id_user = galeri.id_user','LEFT');
+        $builder->where('galeri.jenis_galeri',$jenis_galeri);
         $builder->orderBy('galeri.id_galeri','DESC');
         $query = $builder->get();
         return $query->getRow();

@@ -26,6 +26,18 @@ class Video_model extends Model
         return $query->getResult();
     }
 
+    // home
+    public function home()
+    {
+        $builder = $this->db->table('video');
+        $builder->select('*');
+        $builder->where([   'status_video'  => 'Publish',
+                            'posisi_video'  => 'Beranda']);
+        $builder->orderBy('video.id_video','DESC');
+        $query = $builder->get();
+        return $query->getRow();
+    }
+
     // semua
     public function semua($limit,$start)
     {

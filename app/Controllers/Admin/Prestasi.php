@@ -60,7 +60,7 @@ class Prestasi extends BaseController
 		// Start validasi
 		if($this->request->getMethod() === 'post' && $this->validate(
 			[
-				'judul_prestasi' 	=> 'required',
+				'judul_prestasi' 	=> 'required|is_unique[prestasi.judul_prestasi]',
 				'gambar'	 	=> [
 					                'ext_in[gambar,jpg,jpeg,gif,png,svg]',
 					                'max_size[gambar,4096]',
@@ -74,12 +74,13 @@ class Prestasi extends BaseController
 	            // Create thumb
 	            $image = \Config\Services::image()
 			    ->withFile(WRITEPATH . '../assets/upload/image/'.$namabaru)
-			    ->fit(100, 100, 'center')
+			    ->fit(300,200, 'center')
 			    ->save(WRITEPATH . '../assets/upload/image/thumbs/'.$namabaru);
 	        	// masuk database
 	        	$data = array(
 	        		'id_user'				=> $this->session->get('id_user'),
 					'id_kategori_prestasi'	=> $this->request->getVar('id_kategori_prestasi'),
+					'slug_prestasi'			=> strtolower(url_title($this->request->getVar('judul_prestasi'))),
 					'judul_prestasi'		=> $this->request->getVar('judul_prestasi'),
 					'nama_penerima'			=> $this->request->getVar('nama_penerima'),
 					'jenjang_prestasi'		=> $this->request->getVar('jenjang_prestasi'),
@@ -90,6 +91,7 @@ class Prestasi extends BaseController
 					'website'				=> $this->request->getVar('website'),
 					'text_website'			=> $this->request->getVar('text_website'),
 					'status_text'			=> $this->request->getVar('status_text'),
+					'status_prestasi'		=> $this->request->getVar('status_prestasi'),
 					'tanggal_post'			=> date('Y-m-d H:i:s')
 	        	);
 	        	$m_prestasi->tambah($data);
@@ -98,6 +100,7 @@ class Prestasi extends BaseController
         		$data = array(
 	        		'id_user'				=> $this->session->get('id_user'),
 					'id_kategori_prestasi'	=> $this->request->getVar('id_kategori_prestasi'),
+					'slug_prestasi'			=> strtolower(url_title($this->request->getVar('judul_prestasi'))),
 					'judul_prestasi'		=> $this->request->getVar('judul_prestasi'),
 					'nama_penerima'			=> $this->request->getVar('nama_penerima'),
 					'jenjang_prestasi'		=> $this->request->getVar('jenjang_prestasi'),
@@ -107,6 +110,7 @@ class Prestasi extends BaseController
 					'website'				=> $this->request->getVar('website'),
 					'text_website'			=> $this->request->getVar('text_website'),
 					'status_text'			=> $this->request->getVar('status_text'),
+					'status_prestasi'		=> $this->request->getVar('status_prestasi'),
 					'tanggal_post'			=> date('Y-m-d H:i:s')
 	        	);
 	        	$m_prestasi->tambah($data);
@@ -200,13 +204,14 @@ class Prestasi extends BaseController
 	            // Create thumb
 	            $image = \Config\Services::image()
 			    ->withFile(WRITEPATH . '../assets/upload/image/'.$namabaru)
-			    ->fit(100, 100, 'center')
+			    ->fit(300,200, 'center')
 			    ->save(WRITEPATH . '../assets/upload/image/thumbs/'.$namabaru);
 	        	// masuk database
 			    $data = array(
 	        		'id_prestasi'			=> $id_prestasi,
 	        		'id_user'				=> $this->session->get('id_user'),
 					'id_kategori_prestasi'	=> $this->request->getVar('id_kategori_prestasi'),
+					'slug_prestasi'			=> strtolower(url_title($this->request->getVar('judul_prestasi'))),
 					'judul_prestasi'		=> $this->request->getVar('judul_prestasi'),
 					'nama_penerima'			=> $this->request->getVar('nama_penerima'),
 					'jenjang_prestasi'		=> $this->request->getVar('jenjang_prestasi'),
@@ -217,6 +222,7 @@ class Prestasi extends BaseController
 					'website'				=> $this->request->getVar('website'),
 					'text_website'			=> $this->request->getVar('text_website'),
 					'status_text'			=> $this->request->getVar('status_text'),
+					'status_prestasi'		=> $this->request->getVar('status_prestasi'),
 	        	);
 	        	$m_prestasi->edit($data);
         		return redirect()->to(base_url('admin/prestasi'))->with('sukses', 'Data Berhasil di Simpan');
@@ -225,6 +231,7 @@ class Prestasi extends BaseController
 	        		'id_prestasi'			=> $id_prestasi,
 	        		'id_user'				=> $this->session->get('id_user'),
 					'id_kategori_prestasi'	=> $this->request->getVar('id_kategori_prestasi'),
+					'slug_prestasi'			=> strtolower(url_title($this->request->getVar('judul_prestasi'))),
 					'judul_prestasi'		=> $this->request->getVar('judul_prestasi'),
 					'nama_penerima'			=> $this->request->getVar('nama_penerima'),
 					'jenjang_prestasi'		=> $this->request->getVar('jenjang_prestasi'),
@@ -232,6 +239,7 @@ class Prestasi extends BaseController
 					'website'				=> $this->request->getVar('website'),
 					'text_website'			=> $this->request->getVar('text_website'),
 					'status_text'			=> $this->request->getVar('status_text'),
+					'status_prestasi'		=> $this->request->getVar('status_prestasi'),
 	        	);
 	        	$m_prestasi->edit($data);
         		return redirect()->to(base_url('admin/prestasi'))->with('sukses', 'Data Berhasil di Simpan');

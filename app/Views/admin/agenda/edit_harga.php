@@ -35,12 +35,12 @@ echo csrf_field();
                     </div>
                     <div class="col-3">
                         <input type="number" name="harga_produk" class="form-control" placeholder="harga" value="<?php echo $harga_produk['harga_produk'] ?>">
-                        <small class="text-gray">Biaya Pendaftaran (Kontingen) <em>normal</em></small>
+                        <small class="text-gray">Biaya Pendaftaran  <em>normal</em></small>
                     </div>
 
                     <div class="col-3">
                         <input type="number" name="harga_diskon" class="form-control" placeholder="harga diskon" value="<?php echo $harga_produk['harga_diskon'] ?>">
-                        <small class="text-gray">Biaya Pendaftaran (Kontingen) <em>diskon</em></small>
+                        <small class="text-gray">Biaya Pendaftaran  <em>diskon</em></small>
                     </div>
                 </div>
 

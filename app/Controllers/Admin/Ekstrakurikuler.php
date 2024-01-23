@@ -60,7 +60,7 @@ class Ekstrakurikuler extends BaseController
 		// Start validasi
 		if($this->request->getMethod() === 'post' && $this->validate(
 			[
-				'judul_ekstrakurikuler' 	=> 'required',
+				'judul_ekstrakurikuler' 	=> 'required|is_unique[ekstrakurikuler.judul_ekstrakurikuler]',
 				'gambar'	 	=> [
 					                'ext_in[gambar,jpg,jpeg,gif,png,svg]',
 					                'max_size[gambar,4096]',
@@ -80,6 +80,7 @@ class Ekstrakurikuler extends BaseController
 	        	$data = array(
 	        		'id_user'						=> $this->session->get('id_user'),
 					'id_kategori_ekstrakurikuler'	=> $this->request->getVar('id_kategori_ekstrakurikuler'),
+					'slug_ekstrakurikuler'			=> strtolower(url_title($this->request->getVar('slug_ekstrakurikuler'))),
 					'judul_ekstrakurikuler'			=> $this->request->getVar('judul_ekstrakurikuler'),
 					'nama_penanggung_jawab'			=> $this->request->getVar('nama_penanggung_jawab'),
 					'isi'							=> $this->request->getVar('isi'),
@@ -96,6 +97,7 @@ class Ekstrakurikuler extends BaseController
         		$data = array(
 	        		'id_user'						=> $this->session->get('id_user'),
 					'id_kategori_ekstrakurikuler'	=> $this->request->getVar('id_kategori_ekstrakurikuler'),
+					'slug_ekstrakurikuler'			=> strtolower(url_title($this->request->getVar('judul_ekstrakurikuler'))),
 					'judul_ekstrakurikuler'			=> $this->request->getVar('judul_ekstrakurikuler'),
 					'nama_penanggung_jawab'			=> $this->request->getVar('nama_penanggung_jawab'),
 					'isi'							=> $this->request->getVar('isi'),
@@ -203,6 +205,7 @@ class Ekstrakurikuler extends BaseController
 	        		'id_ekstrakurikuler'			=> $id_ekstrakurikuler,
 	        		'id_user'						=> $this->session->get('id_user'),
 					'id_kategori_ekstrakurikuler'	=> $this->request->getVar('id_kategori_ekstrakurikuler'),
+					'slug_ekstrakurikuler'			=> strtolower(url_title($this->request->getVar('judul_ekstrakurikuler'))),
 					'judul_ekstrakurikuler'			=> $this->request->getVar('judul_ekstrakurikuler'),
 					'nama_penanggung_jawab'			=> $this->request->getVar('nama_penanggung_jawab'),
 					'isi'							=> $this->request->getVar('isi'),
@@ -219,6 +222,7 @@ class Ekstrakurikuler extends BaseController
 	        		'id_ekstrakurikuler'			=> $id_ekstrakurikuler,
 	        		'id_user'						=> $this->session->get('id_user'),
 					'id_kategori_ekstrakurikuler'	=> $this->request->getVar('id_kategori_ekstrakurikuler'),
+					'slug_ekstrakurikuler'			=> strtolower(url_title($this->request->getVar('judul_ekstrakurikuler'))),
 					'judul_ekstrakurikuler'			=> $this->request->getVar('judul_ekstrakurikuler'),
 					'nama_penanggung_jawab'			=> $this->request->getVar('nama_penanggung_jawab'),
 					'isi'							=> $this->request->getVar('isi'),

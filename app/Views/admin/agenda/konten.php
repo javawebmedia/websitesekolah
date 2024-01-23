@@ -30,11 +30,11 @@
           <td>: <?php echo $produk->panjang ?> x <?php echo $produk->lebar ?> x <?php echo $produk->tinggi ?> cm</td>
       </tr>
         <tr>
-          <td width="30%">Biaya Pendaftaran (Kontingen) beli</td>
+          <td width="30%">Biaya Pendaftaran  beli</td>
           <td>: Rp. <?php echo number_format($produk->harga_produk,'0',',','.') ?></td>
       </tr>
         <tr>
-          <td width="30%">Biaya Pendaftaran (Kontingen) jual</td>
+          <td width="30%">Biaya Pendaftaran  jual</td>
           <td>: Rp. <?php echo number_format($produk->harga_jual,'0',',','.') ?></td>
       </tr>
         <tr>

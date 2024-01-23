@@ -44,12 +44,12 @@ echo form_open(base_url('admin/agenda/proses'));
   <div class="col-md-8">
       
 
-        <button class="btn btn-dark btn-sm" type="submit" name="draft" onClick="check();" >
-          <i class="fa fa-times"></i> Jangan Publikasikan
+        <button class="btn btn-secondary btn-sm" type="submit" name="draft" onClick="check();" >
+          <i class="fa fa-eye-slash"></i> Jangan Publikasikan
         </button>
 
         <button class="btn btn-dark btn-sm" type="submit" name="publish" onClick="check();" >
-          <i class="fa fa-check"></i> Publish
+          <i class="fa fa-eye"></i> Publish
         </button>
 
         
@@ -77,8 +77,8 @@ echo form_open(base_url('admin/agenda/proses'));
             <th width="5%" class="align-middle">GAMBAR</th>
             <th width="20%" class="align-middle">NAMA</th>
             <th width="20%" class="align-middle">VENUE</th>
-            <th width="20%" class="align-middle">INFO PENDAFTARAN</th>
-            <th width="10%" class="align-middle">STATUS - PENDAFTARAN</th> 
+            <th width="20%" class="align-middle">PENDAFTARAN</th>
+            <th width="10%" class="align-middle">STATUS</th> 
             <th width="15%" class="align-middle">Action</th>
           </tr>
         </thead>
@@ -105,26 +105,45 @@ echo form_open(base_url('admin/agenda/proses'));
               <td><a href="<?php echo base_url('agenda/detail/'.$agenda['slug_agenda']) ?>" class="text-capitalize" target="_blank">
                 <?php echo $agenda['nama_agenda'] ?> <sup><i class="fa fa-search"></i></sup></a>
                 <small>
-                  <br>Kode: <?php echo $agenda['kode_agenda'] ?>
-                  <br>Urutan: <?php echo $agenda['urutan'] ?>
-                  <br>Kategori: <a href="<?php echo base_url('admin/agenda/kategori/'.$agenda['id_kategori_agenda']) ?>" class="text-capitalize">
-                <?php echo $agenda['nama_kategori_agenda'] ?></a>
-                <br><?php echo $agenda['deskripsi'] ?></small></td>
+                  <br><i class="fa fa-code"></i> <?php echo $agenda['kode_agenda'] ?>
+                  <br><i class="fa fa-check-circle"></i> <?php echo $agenda['urutan'] ?>
+                  <br><i class="fa fa-tags"></i> <a href="<?php echo base_url('admin/agenda/kategori/'.$agenda['id_kategori_agenda']) ?>" class="text-capitalize">
+                <?php echo $agenda['nama_kategori_agenda'] ?></a></small></td>
                 <td><?php echo $agenda['nama_tempat'] ?>
                 <small>
-                  <br>Link Map: <?php echo $agenda['link_google_map'] ?>
-                  <br>Alamat: <?php echo $agenda['alamat'] ?>
+                  <br><i class="fa fa-map"></i> <?php echo $agenda['link_google_map'] ?>
+                  <br><i class="fa fa-home"></i> <?php echo strip_tags($agenda['alamat']) ?>
                 </small>
                 </td>
                 <td>Rp <?php echo number_format($agenda['harga'],'0',',','.') ?>
                   <small>
-                    <br>Diskon: <?php echo number_format($agenda['harga_diskon'],'0',',','.') ?>
-                    <br>Tgl Pendaftaran (Kontingen): <?php echo $this->website->tanggal_id($agenda['tanggal_buka']) ?> sd <?php echo $this->website->tanggal_id($agenda['tanggal_tutup']) ?>
-                    <br>Tgl Diskon: <?php echo $this->website->tanggal_id($agenda['tanggal_mulai']) ?> sd <?php echo $this->website->tanggal_id($agenda['tanggal_selesai']) ?>
+                    <br><i class="fa fa-shopping-cart"></i> Rp <?php echo number_format($agenda['harga_diskon'],'0',',','.') ?>
+                    <br><i class="fa fa-calendar-check"></i> <?php echo $this->website->tanggal_id($agenda['tanggal_buka']) ?> sd <?php echo $this->website->tanggal_id($agenda['tanggal_tutup']) ?>
+                    <br><i class="fa fa-calendar-times"></i> <?php echo $this->website->tanggal_id($agenda['tanggal_mulai']) ?> sd <?php echo $this->website->tanggal_id($agenda['tanggal_selesai']) ?>
                   </small>
                 </td>
-                <td class="text-center"><a href="<?php echo base_url('admin/agenda/status_agenda/'.$agenda['status_agenda']) ?>">
-                  <?php echo $agenda['status_agenda'] ?></a> - <?php echo $agenda['status_pendaftaran'] ?></td>
+                <td class="text-center">
+                  <a href="<?php echo base_url('admin/agenda/status_agenda/'.$agenda['status_agenda']) ?>">
+                    <?php if($agenda['status_agenda']=='Publish') { ?>
+                      <span class="badge bg-dark mb-1">
+                        <i class="fa fa-eye"></i> <?php echo $agenda['status_agenda'] ?>
+                      </span>
+                    <?php }else{ ?>
+                      <span class="badge bg-secondary mb-1">
+                        <i class="fa fa-eye-slash"></i> Not Published
+                      </span>
+                    <?php } ?>
+                    </a>
+                    <?php if($agenda['status_pendaftaran']=='Buka') { ?>
+                      <span class="badge bg-info mb-1">
+                        <i class="fa fa-check-circle"></i> <?php echo $agenda['status_pendaftaran'] ?>
+                      </span>
+                    <?php }else{ ?>
+                      <span class="badge bg-warning mb-1">
+                        <i class="fa fa-times-circle"></i> Tutup
+                      </span>
+                    <?php } ?>
+                  </td>
                   <td class="text-center">
                     <div class="btn-group mb-2">
                         <a class="btn btn-success btn-xs" href="<?php echo base_url('admin/agenda/gambar/'.$agenda['id_agenda']) ?>"><i class="fa fa-image"></i> Gambar</a>
@@ -139,12 +158,10 @@ echo form_open(base_url('admin/agenda/proses'));
                         </div>
 
                       <div class="btn-group mb-2">
-                        <a class="btn btn-primary btn-xs" href="<?php echo base_url('admin/agenda/jadwal/'.$agenda['id_agenda']) ?>"><i class="fa fa-calendar-check"></i> Jadwal Pelaksanaan</a>
+                        <a class="btn btn-primary btn-xs" href="<?php echo base_url('admin/agenda/jadwal/'.$agenda['id_agenda']) ?>"><i class="fa fa-calendar-check"></i> Jadwal Agenda</a>
                       </div>
 
-                      <div class="btn-group mb-2">
-                        <a class="btn btn-danger btn-xs" href="<?php echo base_url('admin/agenda/kelompok/'.$agenda['id_agenda']) ?>"><i class="fa fa-sitemap"></i> Kategorisasi Event</a>
-                      </div>
+                      
                       </td>
                     </tr>
 
