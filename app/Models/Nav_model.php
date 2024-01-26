@@ -35,6 +35,7 @@ class Nav_model extends Model
         $builder = $this->db->table('download');
         $builder->select('download.judul_download, download.hits, download.gambar, download.id_download, kategori_download.nama_kategori_download, kategori_download.slug_kategori_download');
         $builder->join('kategori_download', 'kategori_download.id_kategori_download = download.id_kategori_download');
+        $builder->where('download.jenis_download','Download');
         $builder->groupBy('download.id_kategori_download');
         $builder->orderBy('kategori_download.urutan','ASC');
         $query = $builder->get();

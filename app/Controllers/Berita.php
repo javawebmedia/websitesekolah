@@ -2,7 +2,7 @@
 namespace App\Controllers;
 use App\Models\Konfigurasi_model;
 use App\Models\Berita_model;
-use App\Models\Menu_model;
+use App\Models\Nav_model;
 use App\Models\Kategori_model;
 
 class Berita extends BaseController
@@ -93,9 +93,9 @@ class Berita extends BaseController
     public function profil($slug_berita)
     {
         $m_berita   = new Berita_model();
-        $m_menu     = new Menu_model();
+        $m_nav      = new Nav_model();
         $berita     = $m_berita->read($slug_berita);
-        $news       = $m_menu->profil('Profil');
+        $news       = $m_nav->profil('Profil');
 
         $data = array(  'id_berita' => $berita->id_berita,
                         'hits'      => $berita->hits+1

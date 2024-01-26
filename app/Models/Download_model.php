@@ -80,13 +80,15 @@ class Download_model extends Model
     }
 
     // kategori_download
-    public function kategori_download_all($id_kategori_download,$limit,$start)
+    public function kategori_download_all($id_kategori_download,$jenis_download,$limit,$start)
     {
         $this->table('download');
         $this->select('download.*, kategori_download.nama_kategori_download, kategori_download.slug_kategori_download, users.nama');
         $this->join('kategori_download','kategori_download.id_kategori_download = download.id_kategori_download','LEFT');
         $this->join('users','users.id_user = download.id_user','LEFT');
-        $this->where( [  'download.id_kategori_download'    => $id_kategori_download]);
+        $this->where( [ 'download.id_kategori_download' => $id_kategori_download,
+                        'download.jenis_download'       => $jenis_download
+                    ]);
         $this->limit($limit,$start);
         $this->orderBy('download.id_download','DESC');
         $query = $this->get();

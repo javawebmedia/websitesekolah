@@ -130,7 +130,7 @@ class Staff extends BaseController
 	            // Create thumb
 	            $image = \Config\Services::image()
 			    ->withFile(WRITEPATH . '../assets/upload/staff/'.$namabaru)
-			    ->fit(100, 100, 'center')
+			    ->fit(300, 300, 'center')
 			    ->save(WRITEPATH . '../assets/upload/staff/thumbs/'.$namabaru);
 	        	// masuk database
 	        	// masuk database
@@ -215,7 +215,7 @@ class Staff extends BaseController
 	            // Create thumb
 	            $image = \Config\Services::image()
 			    ->withFile(WRITEPATH . '../assets/upload/staff/'.$namabaru)
-			    ->fit(100, 100, 'center')
+			    ->fit(300, 300, 'center')
 			    ->save(WRITEPATH . '../assets/upload/staff/thumbs/'.$namabaru);
 	        	// masuk database
 	        	// masuk database

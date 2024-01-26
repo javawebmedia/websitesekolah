@@ -17,7 +17,6 @@
 <!-- Mobile Specific Metas -->
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="theme-color" content="#ffffff">
-
 <!-- All CSS File-->
 <link rel="stylesheet" href="<?php echo base_url() ?>assets/admin/plugins/fontawesome-free/css/all.min.css">
 <link rel="stylesheet" href="<?php echo base_url() ?>assets/template/assets/css/plugins.css">

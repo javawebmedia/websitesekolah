@@ -17,9 +17,9 @@ class Staff extends BaseController
 		$konfigurasi 		= $m_konfigurasi->listing();
 		$kategori_staff 	= $m_kategori_staff->listing();
 
-		$data = [	'title'				=> 'Dewan dan Tim',
-					'description'		=> 'Dewan dan Tim '.$konfigurasi->namaweb.', '.$konfigurasi->tentang,
-					'keywords'			=> 'Dewan dan Tim '.$konfigurasi->namaweb.', '.$konfigurasi->keywords,
+		$data = [	'title'				=> 'Guru, Staff, dan Pimpinan',
+					'description'		=> 'Guru, Staff, dan Pimpinan '.$konfigurasi->namaweb.', '.$konfigurasi->tentang,
+					'keywords'			=> 'Guru, Staff, dan Pimpinan '.$konfigurasi->namaweb.', '.$konfigurasi->keywords,
 					'kategori_staff'	=> $kategori_staff,
 					'm_staff'			=> $m_staff,
 					'konfigurasi'		=> $konfigurasi,

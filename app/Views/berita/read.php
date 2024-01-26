@@ -1,8 +1,8 @@
-<section class="wrapper bg-soft-primary">
+<section class="wrapper bg-soft-primary  bg-image" data-image-src="<?php echo $this->website->banner() ?>">
   <div class="container pt-10 pb-19 pt-md-14 pb-md-20 text-center">
     <div class="row">
       <div class="col-md-10 col-lg-10 col-xl-10 mx-auto">
-        <h1 class="display-1 mb-1"><?php echo $title ?></h1>
+        <h1 class="display-1 mb-1 text-warning"><?php echo $title ?></h1>
     </div>
     <!-- /column -->
 </div>

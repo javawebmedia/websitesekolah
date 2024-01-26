@@ -85,7 +85,7 @@ class Galeri extends BaseController
 	            // Create thumb
 	            $image = \Config\Services::image()
 			    ->withFile(WRITEPATH . '../assets/upload/image/'.$namabaru)
-			    ->fit(100, 100, 'center')
+			    ->fit(300, 300, 'center')
 			    ->save(WRITEPATH . '../assets/upload/image/thumbs/'.$namabaru);
 	        	// masuk database
 	        	$data = array(
@@ -205,7 +205,7 @@ class Galeri extends BaseController
 	            // Create thumb
 	            $image = \Config\Services::image()
 			    ->withFile(WRITEPATH . '../assets/upload/image/'.$namabaru)
-			    ->fit(100, 100, 'center')
+			    ->fit(300, 300, 'center')
 			    ->save(WRITEPATH . '../assets/upload/image/thumbs/'.$namabaru);
 	        	// masuk database
 			    $data = array(

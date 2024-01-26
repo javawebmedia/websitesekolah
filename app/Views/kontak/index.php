@@ -1,65 +1,87 @@
-<!--==============================
-Breadcumb
-============================== -->
-<div class="breadcumb-wrapper background-heroj">
-    <div class="container z-index-common">
+ <!-- /header -->
+    <section class="wrapper image-wrapper bg-image" data-image-src="<?php echo $this->website->banner() ?>">
+      <div class="container pt-17 pb-20 pt-md-19 pb-md-21 text-center">
         <div class="row">
-            <div class=" col-xxl-8 col-lg-8 offset-2">
-                <h1 class="breadcumb-title"><?php echo $title ?></h1> 
-            </div>
-            
+          <div class="col-lg-8 mx-auto">
+            <h1 class="display-1 mb-3 text-warning"><?php echo $title ?></h1>
+          </div>
+          <!-- /column -->
         </div>
-    </div>
-</div>
-<!--==============================
-Event Area  
-==============================-->
-<section class="space-extra-bottom mt-5">
-    <div class="container">
-        <div class="row">
+        <!-- /.row -->
+      </div>
+      <!-- /.container -->
+    </section>
+ <!-- /section -->
+    <section class="wrapper bg-light angled upper-end">
+      <div class="container pb-11">
+        <div class="row mb-14 mb-md-16">
+          <div class="col-xl-10 mx-auto mt-n19">
+            <div class="card">
+              <div class="row gx-0">
+                <div class="col-lg-6 align-self-stretch">
+                  <div class="map map-full rounded-top rounded-lg-start">
+                    <style type="text/css" media="screen">
+                        iframe {
+                            width:100%; 
+                            height: 100%; 
+                            border:0;
+                        }
+                    </style>
 
-            <div class="col-xxl-10 col-lg-10 offset-1">
-                <div class="course-single">
-                    <div class="course-single-top row">
-                        <div class="col-md-6">
-                            <div class="map-contact">
-                                <div class="contact-info">
-                                    <div class="contact-info_icon">
-                                        <i class="fal fa-location-dot"></i>
-                                    </div>
-                                    <div class="media-body">
-                                        <h4 class="contact-info_title"><strong><?php echo $this->website->namaweb() ?></strong></h4>
-                                        <span class="contact-info_text">
-                                            <?php echo $this->website->alamat() ?>
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="contact-info">
-                                    <div class="contact-info_icon">
-                                        <i class="fal fa-phone"></i>
-                                    </div>
-                                    <div class="media-body">
-                                        <h4 class="contact-info_title"><strong>Phone Number</strong></h4>
-                                        <span class="contact-info_text">
-                                            <span>Telepon: <a href="tel:<?php echo $konfigurasi->telepon ?>"><?php echo $konfigurasi->telepon ?></a></span>
-                                            <br>
-                                            <span>HP: <a href="tel:<?php echo $konfigurasi->hp ?>"><?php echo $konfigurasi->hp ?></a></span>
-                                        </span>
-                                    </div>
-                                </div>
-                                
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="rounded border border-secondary bg-light p-2">
-                                <?php echo $konfigurasi->google_map ?>
-                            </div>
-                            
-                        </div>
-                    </div>
+                    <?php echo $konfigurasi->google_map ?>
+                   
+                  </div>
+                  <!-- /.map -->
                 </div>
+                <!--/column -->
+                <div class="col-lg-6">
+                  <div class="p-10 p-md-11 p-lg-14">
+                    <div class="d-flex flex-row">
+                      <div>
+                        <div class="icon text-primary fs-28 me-4 mt-n1"> <i class="uil uil-location-pin-alt"></i> </div>
+                      </div>
+                      <div class="align-self-start justify-content-start">
+                        <h5 class="mb-1">Alamat</h5>
+                        <address>
+                            <?php echo $this->website->alamat() ?>
+                        </address>
+                      </div>
+                    </div>
+                    <!--/div -->
+                    <div class="d-flex flex-row">
+                      <div>
+                        <div class="icon text-primary fs-28 me-4 mt-n1"> <i class="uil uil-phone-volume"></i> </div>
+                      </div>
+                      <div>
+                        <h5 class="mb-1">Telepon</h5>
+                        <p><?php echo $konfigurasi->telepon ?> <br /><?php echo $konfigurasi->hp ?></p>
+                      </div>
+                    </div>
+                    <!--/div -->
+                    <div class="d-flex flex-row">
+                      <div>
+                        <div class="icon text-primary fs-28 me-4 mt-n1"> <i class="uil uil-envelope"></i> </div>
+                      </div>
+                      <div>
+                        <h5 class="mb-1">E-mail</h5>
+                        <p class="mb-0"><a href="mailto:<?php echo $konfigurasi->email ?>" class="link-body"><?php echo $konfigurasi->email ?></a></p>
+                      </div>
+                    </div>
+                    <!--/div -->
+                  </div>
+                  <!--/div -->
+                </div>
+                <!--/column -->
+              </div>
+              <!--/.row -->
             </div>
-
+            <!-- /.card -->
+          </div>
+          <!-- /column -->
         </div>
-    </div>
-</section>
+        <!-- /.row -->
+        
+      </div>
+      <!-- /.container -->
+    </section>
+

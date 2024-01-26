@@ -1,8 +1,8 @@
-<section class="wrapper bg-soft-primary">
-  <div class="container pt-10 pb-19 pt-md-14 pb-md-6 pb-sm-3 text-center">
+<section class="wrapper bg-soft-primary  bg-image" data-image-src="<?php echo $this->website->banner() ?>">
+  <div class="container pt-10 pb-19 pt-md-14 pb-md-15 pb-sm-3 text-center">
     <div class="row">
       <div class="col-md-7 col-lg-6 col-xl-5 mx-auto">
-        <h1 class="display-1 mb-1"><?php echo $title ?></h1>
+        <h1 class="display-1 mb-1 text-warning"><?php echo $title ?></h1>
     </div>
     <!-- /column -->
 </div>
@@ -44,7 +44,9 @@
                             <td class="text-center"><?php echo $download->hits ?> kali</td>
                             <td>
                                 <?php if($download->gambar=="") { echo '-'; }else{ ?>
-                                    <a href="<?php echo base_url('download/unduh/'.$download->id_download) ?>" class="btn btn-primary btn-sm mt-1" target="_blank"><i class="fa fa-download"></i> Unduh</a>
+                                    <a href="<?php echo base_url('download/unduh/'.$download->id_download) ?>" class="btn btn-primary btn-sm mt-1" target="_blank">
+                                        <small><i class="fa fa-download"></i> Unduh</small>
+                                    </a>
                                 <?php } ?>
                                
                             </td>

@@ -63,6 +63,32 @@ class Prestasi_model extends Model
         return $query->getResult();
     }
 
+    // kategori_prestasi_home
+    public function kategori_prestasi_status($limit, $start, $id_kategori_prestasi,$status_prestasi)
+    {
+        $builder = $this->db->table('prestasi');
+        $builder->select('prestasi.*, kategori_prestasi.nama_kategori_prestasi, kategori_prestasi.slug_kategori_prestasi, users.nama');
+        $builder->join('kategori_prestasi','kategori_prestasi.id_kategori_prestasi = prestasi.id_kategori_prestasi','LEFT');
+        $builder->join('users','users.id_user = prestasi.id_user','LEFT');
+        $builder->where(array(  'prestasi.id_kategori_prestasi' => $id_kategori_prestasi,
+                                'prestasi.status_prestasi'      => $status_prestasi
+                        ));
+        $builder->limit($limit,$start);
+        $builder->orderBy('prestasi.id_prestasi','DESC');
+        $query = $builder->get();
+        return $query->getResult();
+    }
+
+    // total_kategori_prestasi
+    public function total_kategori_prestasi_status($id_kategori_prestasi,$status_prestasi)
+    {
+        $builder = $this->db->table('prestasi');
+        $builder->where('id_kategori_prestasi',$id_kategori_prestasi);
+        $builder->where('status_prestasi',$status_prestasi);
+        $query = $builder->get();
+        return $query->getNumRows();
+    }
+
     // Listing
     public function paginasi_admin($limit,$start)
     {

@@ -4,7 +4,7 @@ namespace App\Controllers;
 use CodeIgniter\Controller;
 use App\Models\Konfigurasi_model;
 use App\Models\Berita_model;
-use App\Models\Menu_model;
+use App\Models\Nav_model;
 use App\Models\Kategori_model;
 use App\Models\Galeri_model;
 
@@ -42,9 +42,9 @@ class Layanan extends BaseController
     public function detail($slug_berita)
     {
         $m_berita   = new Berita_model();
-        $m_menu     = new Menu_model();
+        $m_nav     = new Nav_model();
         $berita     = $m_berita->read($slug_berita);
-        $news       = $m_menu->profil('Layanan');
+        $news       = $m_nav->profil('Layanan');
 
         $data = array(  'id_berita' => $berita->id_berita,
                         'hits'      => $berita->hits+1

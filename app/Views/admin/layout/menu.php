@@ -269,7 +269,41 @@
             </ul>
           </li>
 
-         
+         <!-- Akademik -->
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-graduation-cap"></i>
+              <p>Manajemen Siswa <i class="right fas fa-angle-left"></i></p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="<?php echo base_url('admin/siswa') ?>" class="nav-link">
+                  <i class="fa fa-arrow-right nav-icon"></i>
+                  <p>Master Siswa</p>
+                </a>
+              </li>
+
+              <li class="nav-item">
+                <a href="<?php echo base_url('admin/rombel') ?>" class="nav-link">
+                  <i class="fa fa-arrow-right nav-icon"></i>
+                  <p>Rombongan Belajar</p>
+                </a>
+              </li>
+              
+              <li class="nav-item">
+                <a href="<?php echo base_url('admin/tahun') ?>" class="nav-link">
+                  <i class="fa fa-arrow-right nav-icon"></i>
+                  <p>Master Tahun Ajaran</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="<?php echo base_url('admin/kelas') ?>" class="nav-link">
+                  <i class="fa fa-arrow-right nav-icon"></i>
+                  <p>Master Kelas</p>
+                </a>
+              </li>
+            </ul>
+          </li>
 
           <!-- CLIENT -->
           <li class="nav-item">

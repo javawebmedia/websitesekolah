@@ -22,16 +22,16 @@ $uri = service('uri');
   </div>
 </div>
 </form>
-<?php echo form_close(); ?>
 <div class="clearfix"><hr></div>
-<?php
-echo form_open(base_url('admin/siswa/proses'));
-?>
+<!-- Form untuk hapus data -->
+<?php echo form_open(base_url('admin/siswa/proses'), array('id' => 'form-hapus-data')); ?>
+
 <input type="hidden" name="pengalihan" value="<?php echo str_replace('index.php/','',CURRENT_URL()) ?>">
 
 <div class="row">
   <div class="col-md-6">
     <div class="input-group input-group-sm">
+      <button type="submit" class="btn btn-secondary btn-sm" id="hapus-data-btn" name="submit" value="delete" title="Hapus"><i class="fa fa-trash"></i> </button>
       <select name="status_siswa" class="form-control">
         <option value="Aktif">Aktif</option>
         <option value="Lulus">Lulus</option>
@@ -39,7 +39,7 @@ echo form_open(base_url('admin/siswa/proses'));
         <option value="Pindah">Pindah</option>
       </select>
       <span class="input-group-btn" >
-        <button type="submit" class="btn btn-light btn-sm" name="submit" value="update"><i class="fa fa-save"></i> Update Status Siswa</button>
+        <button type="submit" class="btn btn-secondary btn-sm" name="submit" value="update"><i class="fa fa-save"></i> Update Status Siswa</button>
       </span>
     </div>
   </div>
@@ -141,5 +141,8 @@ echo form_open(base_url('admin/siswa/proses'));
 
 <?php echo form_close(); ?>
 
-              <div class="clearfix"><hr></div>
-              <div class="pull-right"><?php if(isset($pagin)) { echo $pagin; } ?></div>
+<div class="clearfix"><hr></div>
+<div class="pull-right"><?php if(isset($pagin)) { echo $pagin; } ?></div>
+</div>
+
+

@@ -318,6 +318,12 @@ class Siswa extends BaseController
    				$m_siswa->edit($data);
    			}
    			return redirect()->to($pengalihan)->with('sukses', 'Siswa berhasil diupdate statusnya');
+		}elseif($submit=='delete') {
+			for($i=0; $i < sizeof($id_siswa);$i++) {
+				$data = array(	'id_siswa'		=> $id_siswa[$i]);
+   				$m_siswa->delete($data);
+   			}
+   			return redirect()->to($pengalihan)->with('sukses', 'Siswa berhasil dihapus');
 		}
 	}
 

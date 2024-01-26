@@ -98,7 +98,7 @@ foreach($nav_menu as $nav_menu) {
                           <h6 class="dropdown-header">Profil, Staff &amp; Team</h6>
                           <ul class="list-unstyled pb-lg-1">
                             <?php foreach($nav_profil as $nav_profil) { ?>
-                            <li><a class="dropdown-item" href="<?php echo base_url('profil/'.$nav_profil->slug_berita) ?>"><?php echo $nav_profil->judul_berita ?></a></li>
+                            <li><a class="dropdown-item" href="<?php echo base_url('berita/profil/'.$nav_profil->slug_berita) ?>"><?php echo $nav_profil->judul_berita ?></a></li>
                           <?php } ?>
                             <li><a class="dropdown-item" href="<?php echo base_url('staff') ?>">Team &amp; Staff<?php echo $this->website->namaweb() ?></a></li>
                           </ul>
@@ -205,6 +205,11 @@ foreach($nav_menu as $nav_menu) {
                   <!--/.dropdown-menu -->
                 </li>
               <?php }  if($site_setting->letak_menu=='Tautan') { echo $menu_tambahan; } ?>
+              <?php if($site_setting->menu_kontak=='Publish') { ?>
+                <li class="nav-item">
+                  <a class="nav-link" href="<?php echo base_url('kontak') ?>">Kontak</a>
+                </li>
+              <?php } ?>
                 
                 
               </ul>
@@ -228,12 +233,15 @@ foreach($nav_menu as $nav_menu) {
             <!-- /.offcanvas-body -->
           </div>
           <!-- /.navbar-collapse -->
-          <?php if($site_setting->menu_kontak=='Publish') { ?>
+          <?php if($site_setting->fitur_pendaftaran=='On') { ?>
           <div class="navbar-other w-100 d-flex ms-auto">
             <ul class="navbar-nav flex-row align-items-center ms-auto">
               
               <li class="nav-item d-none d-md-block">
-                <a href="<?php echo base_url('kontak') ?>" class="btn btn-sm btn-primary rounded-pill">Kontak</a>
+                <a href="<?php echo base_url('pendaftaran') ?>" class="btn btn-sm btn-primary px-2 py-1 text-sm">Pendaftaran</a>
+              </li>
+              <li class="nav-item d-none d-md-block">
+                <a href="<?php echo base_url('signin') ?>" class="btn btn-sm btn-danger px-2 py-1 text-sm">Login</a>
               </li>
               <li class="nav-item d-lg-none">
                 <button class="hamburger offcanvas-nav-btn"><span></span></button>
