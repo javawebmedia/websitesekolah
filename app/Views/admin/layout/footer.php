@@ -56,7 +56,7 @@ $awal = $sek-100;
     convert_urls : true,
     height: 500,
     plugins: 'print preview paste searchreplace autolink directionality visualblocks visualchars fullscreen image link media template codesample code table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists textcolor wordcount imagetools colorpicker textpattern help',
-    toolbar: 'formatselect | bold italic strikethrough forecolor backcolor | link | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent | image | table | removeformat',
+    toolbar: 'formatselect | bold italic strikethrough forecolor backcolor | blocks fontfamily fontsize | link | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent | image | table | removeformat',
     visual_table_class: 'tiny-table'
   });
 // KONTEN
@@ -65,9 +65,13 @@ $awal = $sek-100;
     relative_urls : false,
     remove_script_host : false,
     convert_urls : true,
-    height: 300,
+    toolbar_mode: 'scrolling',
+    height: 400,
     plugins: 'print preview paste searchreplace autolink directionality visualblocks visualchars fullscreen image link media template codesample code table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists textcolor wordcount imagetools colorpicker textpattern help',
-    toolbar: 'formatselect | bold italic strikethrough forecolor backcolor | link | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent | image | table | removeformat',
+    toolbar: [
+            'blocks fontfamily fontsize bold italic strikethrough forecolor backcolor copy | code fullscreen preview | save print | pagebreak anchor codesample',
+            'undo redo | alignleft aligncenter alignright alignjustify | link image media table | numlist bullist outdent indent | charmap emoticons removeformat | ltr rtl'
+            ],
     visual_table_class: 'tiny-table'
   });
 

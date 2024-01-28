@@ -21,17 +21,54 @@ class Ekstrakurikuler_model extends Model
         return $query->getResult();
     }
 
-    // jenis
-    public function jenis_ekstrakurikuler_depan($jenis_ekstrakurikuler)
+    // read
+    public function read($slug_ekstrakurikuler)
     {
         $builder = $this->db->table('ekstrakurikuler');
         $builder->select('ekstrakurikuler.*, kategori_ekstrakurikuler.nama_kategori_ekstrakurikuler, kategori_ekstrakurikuler.slug_kategori_ekstrakurikuler, users.nama');
         $builder->join('kategori_ekstrakurikuler','kategori_ekstrakurikuler.id_kategori_ekstrakurikuler = ekstrakurikuler.id_kategori_ekstrakurikuler','LEFT');
         $builder->join('users','users.id_user = ekstrakurikuler.id_user','LEFT');
-        $builder->where('ekstrakurikuler.jenis_ekstrakurikuler',$jenis_ekstrakurikuler);
+        $builder->where('ekstrakurikuler.slug_ekstrakurikuler',$slug_ekstrakurikuler);
         $builder->orderBy('ekstrakurikuler.id_ekstrakurikuler','DESC');
         $query = $builder->get();
         return $query->getRow();
+    }
+
+    // home
+    public function home($limit,$status_ekstrakurikuler)
+    {
+        $builder = $this->db->table('ekstrakurikuler');
+        $builder->select('ekstrakurikuler.*, kategori_ekstrakurikuler.nama_kategori_ekstrakurikuler, kategori_ekstrakurikuler.slug_kategori_ekstrakurikuler, users.nama');
+        $builder->join('kategori_ekstrakurikuler','kategori_ekstrakurikuler.id_kategori_ekstrakurikuler = ekstrakurikuler.id_kategori_ekstrakurikuler','LEFT');
+        $builder->join('users','users.id_user = ekstrakurikuler.id_user','LEFT');
+        $builder->where('ekstrakurikuler.status_ekstrakurikuler',$status_ekstrakurikuler);
+        $builder->limit($limit);
+        $builder->orderBy('ekstrakurikuler.id_ekstrakurikuler','DESC');
+        $query = $builder->get();
+        return $query->getResult();
+    }
+
+    // jenis
+    public function status_ekstrakurikuler($limit,$start,$status_ekstrakurikuler)
+    {
+        $builder = $this->db->table('ekstrakurikuler');
+        $builder->select('ekstrakurikuler.*, kategori_ekstrakurikuler.nama_kategori_ekstrakurikuler, kategori_ekstrakurikuler.slug_kategori_ekstrakurikuler, users.nama');
+        $builder->join('kategori_ekstrakurikuler','kategori_ekstrakurikuler.id_kategori_ekstrakurikuler = ekstrakurikuler.id_kategori_ekstrakurikuler','LEFT');
+        $builder->join('users','users.id_user = ekstrakurikuler.id_user','LEFT');
+        $builder->where('ekstrakurikuler.status_ekstrakurikuler',$status_ekstrakurikuler);
+        $builder->limit($limit,$start);
+        $builder->orderBy('ekstrakurikuler.id_ekstrakurikuler','DESC');
+        $query = $builder->get();
+        return $query->getResult();
+    }
+
+    // total_kategori_ekstrakurikuler
+    public function total_status_ekstrakurikuler($status_ekstrakurikuler)
+    {
+        $builder = $this->db->table('ekstrakurikuler');
+        $builder->where('status_ekstrakurikuler',$status_ekstrakurikuler);
+        $query = $builder->get();
+        return $query->getNumRows();
     }
 
     // kategori_ekstrakurikuler
@@ -48,6 +85,32 @@ class Ekstrakurikuler_model extends Model
         $builder->orderBy('ekstrakurikuler.id_ekstrakurikuler','DESC');
         $query = $builder->get();
         return $query->getResult();
+    }
+
+    // kategori_ekstrakurikuler_home
+    public function kategori_ekstrakurikuler_status($limit, $start, $id_kategori_ekstrakurikuler,$status_ekstrakurikuler)
+    {
+        $builder = $this->db->table('ekstrakurikuler');
+        $builder->select('ekstrakurikuler.*, kategori_ekstrakurikuler.nama_kategori_ekstrakurikuler, kategori_ekstrakurikuler.slug_kategori_ekstrakurikuler, users.nama');
+        $builder->join('kategori_ekstrakurikuler','kategori_ekstrakurikuler.id_kategori_ekstrakurikuler = ekstrakurikuler.id_kategori_ekstrakurikuler','LEFT');
+        $builder->join('users','users.id_user = ekstrakurikuler.id_user','LEFT');
+        $builder->where(array(  'ekstrakurikuler.id_kategori_ekstrakurikuler' => $id_kategori_ekstrakurikuler,
+                                'ekstrakurikuler.status_ekstrakurikuler'      => $status_ekstrakurikuler
+                        ));
+        $builder->limit($limit,$start);
+        $builder->orderBy('ekstrakurikuler.id_ekstrakurikuler','DESC');
+        $query = $builder->get();
+        return $query->getResult();
+    }
+
+    // total_kategori_ekstrakurikuler
+    public function total_kategori_ekstrakurikuler_status($id_kategori_ekstrakurikuler,$status_ekstrakurikuler)
+    {
+        $builder = $this->db->table('ekstrakurikuler');
+        $builder->where('id_kategori_ekstrakurikuler',$id_kategori_ekstrakurikuler);
+        $builder->where('status_ekstrakurikuler',$status_ekstrakurikuler);
+        $query = $builder->get();
+        return $query->getNumRows();
     }
 
     // Listing

@@ -18,16 +18,21 @@ echo csrf_field();
 </div>
 
 <div class="form-group row">
-	<label class="col-md-3">Nama Penerima Prestasi/Penghargaan</label>
-	<div class="col-md-6">
-		<input type="text" name="nama_penerima" class="form-control" value="<?php echo set_value('nama_penerima') ?>" required>
+	<label class="col-md-3">Penyelenggara dan Hadiah</label>
+	<div class="col-md-5">
+		<input type="text" name="penyelenggara" class="form-control" value="<?php echo set_value('penyelenggara') ?>">
+		<small class="text-secondary">Penyelenggara kegitan. Misal: Kementerian Pendidikan dan Kebudayaan</small>
+	</div>
+	<div class="col-md-4">
+		<input type="text" name="hadiah_prestasi" class="form-control" value="<?php echo set_value('hadiah_prestasi') ?>">
+		<small class="text-secondary">Hadiah dan Penghargaan. Misal: Piala dan Uang Tunai</small>
 	</div>
 </div>
 
 <div class="form-group row">
-	<label class="col-md-3">Upload Gambar Prestasi</label>
+	<label class="col-md-3">Nama Penerima Prestasi/Penghargaan</label>
 	<div class="col-md-6">
-		<input type="file" name="gambar" class="form-control" value="<?php echo set_value('gambar') ?>">
+		<input type="text" name="nama_penerima" class="form-control" value="<?php echo set_value('nama_penerima') ?>" required>
 	</div>
 </div>
 
@@ -46,11 +51,11 @@ echo csrf_field();
 		<small class="text-secondary">Jenjang Prestasi</small>
 	</div>
 	<div class="col-md-2">
-		<input type="number" name="tahun_prestasi" class="form-control" value="<?php echo set_value('tahun_prestasi') ?>">
+		<input type="number" name="tahun_prestasi" class="form-control" value="<?php if(isset($_POST['tahun_prestasi'])) { echo set_value('tahun_prestasi'); }else{ echo date('Y'); } ?>">
 		<small class="text-secondary">Tahun Prestasi</small>
 	</div>
 	<div class="col-md-2">
-		<input type="text" name="tanggal_prestasi" class="form-control tanggal" value="<?php echo set_value('tanggal_prestasi') ?>">
+		<input type="text" name="tanggal_prestasi" class="form-control tanggal" value="<?php if(isset($_POST['tanggal_prestasi'])) { echo set_value('tanggal_prestasi'); }else{ echo date('d-m-Y'); } ?>">
 		<small class="text-secondary">Tanggal Prestasi</small>
 	</div>
 </div>
@@ -82,6 +87,14 @@ echo csrf_field();
 		<small class="text-secondary">Text pada slider</small>
 	</div>
 </div>
+
+<div class="form-group row">
+	<label class="col-md-3">Upload Gambar Prestasi</label>
+	<div class="col-md-6">
+		<input type="file" name="gambar" class="form-control" value="<?php echo set_value('gambar') ?>">
+	</div>
+</div>
+
 
 <div class="form-group row">
 	<label class="col-md-3">Isi Prestasi</label>

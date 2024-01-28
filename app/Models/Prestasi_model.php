@@ -21,13 +21,27 @@ class Prestasi_model extends Model
         return $query->getResult();
     }
 
-    // home
-    public function home($limit)
+    // read
+    public function read($slug_prestasi)
     {
         $builder = $this->db->table('prestasi');
         $builder->select('prestasi.*, kategori_prestasi.nama_kategori_prestasi, kategori_prestasi.slug_kategori_prestasi, users.nama');
         $builder->join('kategori_prestasi','kategori_prestasi.id_kategori_prestasi = prestasi.id_kategori_prestasi','LEFT');
         $builder->join('users','users.id_user = prestasi.id_user','LEFT');
+        $builder->where('prestasi.slug_prestasi',$slug_prestasi);
+        $builder->orderBy('prestasi.id_prestasi','DESC');
+        $query = $builder->get();
+        return $query->getRow();
+    }
+
+    // home
+    public function home($limit,$status_prestasi)
+    {
+        $builder = $this->db->table('prestasi');
+        $builder->select('prestasi.*, kategori_prestasi.nama_kategori_prestasi, kategori_prestasi.slug_kategori_prestasi, users.nama');
+        $builder->join('kategori_prestasi','kategori_prestasi.id_kategori_prestasi = prestasi.id_kategori_prestasi','LEFT');
+        $builder->join('users','users.id_user = prestasi.id_user','LEFT');
+        $builder->where('prestasi.status_prestasi',$status_prestasi);
         $builder->limit($limit);
         $builder->orderBy('prestasi.id_prestasi','DESC');
         $query = $builder->get();
@@ -35,16 +49,26 @@ class Prestasi_model extends Model
     }
 
     // jenis
-    public function jenis_prestasi_depan($jenis_prestasi)
+    public function status_prestasi($limit,$start,$status_prestasi)
     {
         $builder = $this->db->table('prestasi');
         $builder->select('prestasi.*, kategori_prestasi.nama_kategori_prestasi, kategori_prestasi.slug_kategori_prestasi, users.nama');
         $builder->join('kategori_prestasi','kategori_prestasi.id_kategori_prestasi = prestasi.id_kategori_prestasi','LEFT');
         $builder->join('users','users.id_user = prestasi.id_user','LEFT');
-        $builder->where('prestasi.jenis_prestasi',$jenis_prestasi);
+        $builder->where('prestasi.status_prestasi',$status_prestasi);
+        $builder->limit($limit,$start);
         $builder->orderBy('prestasi.id_prestasi','DESC');
         $query = $builder->get();
-        return $query->getRow();
+        return $query->getResult();
+    }
+
+    // total_kategori_prestasi
+    public function total_status_prestasi($status_prestasi)
+    {
+        $builder = $this->db->table('prestasi');
+        $builder->where('status_prestasi',$status_prestasi);
+        $query = $builder->get();
+        return $query->getNumRows();
     }
 
     // kategori_prestasi

@@ -239,3 +239,8 @@ p, h1, h2, h3, h4, h5, h6 {
 .dropdown-item {
 	white-space: normal;
 }
+pre.language-php, pre.language-js, pre.language-markup {
+  background-color: #f5f5f5;
+  border:  solid thin #eee;
+  margin-bottom: 1em;
+}

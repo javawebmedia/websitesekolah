@@ -18,19 +18,14 @@ echo csrf_field();
 </div>
 
 <div class="form-group row">
-	<label class="col-md-3">Nama Penerima Prestasi/Penghargaan</label>
-	<div class="col-md-6">
-		<input type="text" name="nama_penerima" class="form-control" value="<?php echo $prestasi->nama_penerima ?>" required>
-	</div>
-</div>
-
-<div class="form-group row">
-	<label class="col-md-3">Upload Gambar Prestasi</label>
+	<label class="col-md-3">Penyelenggara dan Hadiah</label>
 	<div class="col-md-5">
-		<input type="file" name="gambar" class="form-control" value="<?php echo $prestasi->gambar ?>">
+		<input type="text" name="penyelenggara" class="form-control" value="<?php echo $prestasi->penyelenggara ?>">
+		<small class="text-secondary">Penyelenggara kegitan. Misal: Kementerian Pendidikan dan Kebudayaan</small>
 	</div>
-	<div class="col-md-1">
-		<img src="<?php echo base_url('assets/upload/image/thumbs/'.$prestasi->gambar) ?>" class="img img-thumbnail">
+	<div class="col-md-4">
+		<input type="text" name="hadiah_prestasi" class="form-control" value="<?php echo $prestasi->hadiah_prestasi ?>">
+		<small class="text-secondary">Hadiah dan Penghargaan. Misal: Piala dan Uang Tunai</small>
 	</div>
 </div>
 
@@ -84,6 +79,23 @@ echo csrf_field();
 			<option value="Tidak" <?php if($prestasi->status_text=="Tidak") { echo 'selected'; } ?>>Tidak Aktif</option>
 		</select>
 		<small class="text-secondary">Text pada slider</small>
+	</div>
+</div>
+
+<div class="form-group row">
+	<label class="col-md-3">Nama Penerima Prestasi/Penghargaan</label>
+	<div class="col-md-6">
+		<input type="text" name="nama_penerima" class="form-control" value="<?php echo $prestasi->nama_penerima ?>" required>
+	</div>
+</div>
+
+<div class="form-group row">
+	<label class="col-md-3">Upload Gambar Prestasi</label>
+	<div class="col-md-5">
+		<input type="file" name="gambar" class="form-control" value="<?php echo $prestasi->gambar ?>">
+	</div>
+	<div class="col-md-1">
+		<img src="<?php echo base_url('assets/upload/image/thumbs/'.$prestasi->gambar) ?>" class="img img-thumbnail">
 	</div>
 </div>
 

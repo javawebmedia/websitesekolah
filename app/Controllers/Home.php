@@ -37,7 +37,7 @@ class Home extends BaseController
         $keunggulan = $this->berita_model->jenis_publish('Keunggulan');
         $berita     = $this->berita_model->beranda('Berita',6);
         $staff      = $this->staff_model->home(6);
-        $prestasi   = $this->prestasi_model->home(6);
+        $prestasi   = $this->prestasi_model->home(6,'Publish');
         $video      = $this->video_model->home();
         $client     = $this->client_model->home();
 

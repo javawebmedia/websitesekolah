@@ -80,62 +80,62 @@ foreach($nav_menu as $nav_menu) {
                 <?php } if($site_setting->letak_menu=='Home') { echo $menu_tambahan; } if($site_setting->menu_berita=='Publish') { ?>
                 <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Berita</a>
-                  <ul class="dropdown-menu">
+                  <ul class="dropdown-menu bg-dark">
                     <?php foreach($nav_berita as $nav_berita) { ?>
-                    <li class="nav-item"><a class="dropdown-item" href="<?php echo base_url('berita/kategori/'.$nav_berita->slug_kategori) ?>"><?php echo $nav_berita->nama_kategori ?></a></li>
+                    <li class="nav-item"><a class="dropdown-item text-white" href="<?php echo base_url('berita/kategori/'.$nav_berita->slug_kategori) ?>"><?php echo $nav_berita->nama_kategori ?></a></li>
                     <?php } ?>
-                    <li class="nav-item"><a class="dropdown-item" href="<?php echo base_url('berita') ?>">Indeks Berita</a></li>
+                    <li class="nav-item"><a class="dropdown-item text-warning" href="<?php echo base_url('berita') ?>">Indeks Berita</a></li>
                    
                   </ul>
                 </li>
                 <?php }  if($site_setting->letak_menu=='Berita') { echo $menu_tambahan; } if($site_setting->menu_profil=='Publish') { ?>
                 <li class="nav-item dropdown dropdown-mega">
                   <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Profil</a>
-                  <ul class="dropdown-menu mega-menu">
+                  <ul class="dropdown-menu mega-menu mega-menu-dark">
                     <li class="mega-menu-content">
                       <div class="row gx-0 gx-lg-3">
                         <div class="col-lg-4">
-                          <h6 class="dropdown-header">Profil, Staff &amp; Team</h6>
+                          <h6 class="dropdown-header text-warning">Profil, Staff &amp; Team</h6>
                           <ul class="list-unstyled pb-lg-1">
                             <?php foreach($nav_profil as $nav_profil) { ?>
                             <li><a class="dropdown-item" href="<?php echo base_url('berita/profil/'.$nav_profil->slug_berita) ?>"><?php echo $nav_profil->judul_berita ?></a></li>
                           <?php } ?>
                             <li><a class="dropdown-item" href="<?php echo base_url('staff') ?>">Team &amp; Staff<?php echo $this->website->namaweb() ?></a></li>
                           </ul>
-                          <h6 class="dropdown-header mt-lg-6">Layanan &amp; Produk</h6>
+                          <h6 class="dropdown-header mt-lg-6 text-warning">Layanan &amp; Produk</h6>
                           <ul class="list-unstyled">
                             <?php foreach($nav_layanan2 as $nav_layanan2) { ?>
                             <li><a class="dropdown-item" href="<?php echo base_url('layanan/detail/'.$nav_layanan2->slug_berita) ?>"><?php echo $nav_layanan2->judul_berita ?></a></li>
                             <?php } ?>
-                            <li><a class="dropdown-item"  href="<?php echo base_url('layanan') ?>">Semua Layanan</a></li>
+                            <li><a class="dropdown-item text-warning"  href="<?php echo base_url('layanan') ?>">Semua Layanan</a></li>
                           </ul>
                         </div>
                         <!--/column -->
                         
                         <div class="col-lg-4">
-                          <h6 class="dropdown-header">Prestasi &amp; Penghargaan</h6>
+                          <h6 class="dropdown-header text-warning">Prestasi &amp; Penghargaan</h6>
                           <ul class="list-unstyled">
                             <?php foreach($nav_prestasi as $nav_prestasi) { ?>
                             <li><a class="dropdown-item" href="<?php echo base_url('prestasi/kategori/'.$nav_prestasi->slug_kategori_prestasi) ?>"><?php echo $nav_prestasi->nama_kategori_prestasi ?></a></li>
                             <?php } ?>
-                            <li><a class="dropdown-item"  href="<?php echo base_url('prestasi') ?>">Semua Prestasi</a></li>
+                            <li><a class="dropdown-item text-warning"  href="<?php echo base_url('prestasi') ?>">Semua Prestasi</a></li>
                           </ul>
-                          <h6 class="dropdown-header mt-lg-6">Ekstrakurikuler</h6>
+                          <h6 class="dropdown-header mt-lg-6 text-warning">Ekstrakurikuler</h6>
                           <ul class="list-unstyled">
                             <?php foreach($nav_ekstrakurikuler as $nav_ekstrakurikuler) { ?>
                             <li><a class="dropdown-item" href="<?php echo base_url('ekstrakurikuler/kategori/'.$nav_ekstrakurikuler->slug_kategori_ekstrakurikuler) ?>"><?php echo $nav_ekstrakurikuler->nama_kategori_ekstrakurikuler ?></a></li>
                             <?php } ?>
-                            <li><a class="dropdown-item"  href="<?php echo base_url('prestasi') ?>">Semua Ekstrakurikuler</a></li>
+                            <li><a class="dropdown-item text-warning"  href="<?php echo base_url('ekstrakurikuler') ?>">Semua Ekstrakurikuler</a></li>
                           </ul>
                         </div>
                         <!--/column -->
                         <div class="col-lg-4">
-                          <h6 class="dropdown-header">Fasilitas, Sarana &amp; Prasarana</h6>
+                          <h6 class="dropdown-header text-warning">Fasilitas, Sarana &amp; Prasarana</h6>
                           <ul class="list-unstyled">
                             <?php foreach($nav_fasilitas as $nav_fasilitas) { ?>
                             <li><a class="dropdown-item" href="<?php echo base_url('fasilitas/detail/'.$nav_fasilitas->slug_fasilitas) ?>"><?php echo $nav_fasilitas->judul_fasilitas ?></a></li>
                             <?php } ?>
-                            <li><a class="dropdown-item"  href="<?php echo base_url('fasilitas') ?>">Semua Fasilitas</a></li>
+                            <li><a class="dropdown-item text-warning"  href="<?php echo base_url('fasilitas') ?>">Semua Fasilitas</a></li>
                           </ul>
                         </div>
                         <!--/column -->
@@ -149,34 +149,34 @@ foreach($nav_menu as $nav_menu) {
                 <?php }  if($site_setting->letak_menu=='Profil') { echo $menu_tambahan; } if($site_setting->menu_karya=='Publish') { ?>
                 <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Karya</a>
-                  <ul class="dropdown-menu">
+                  <ul class="dropdown-menu bg-dark">
                     
                     <?php foreach($nav_portfolio as $nav_portfolio) { ?>
-                    <li><a class="dropdown-item" href="<?php echo base_url('portfolio/kategori/'.$nav_portfolio->slug_kategori_portfolio) ?>"><?php echo $nav_portfolio->nama_kategori_portfolio ?></a></li>
+                    <li><a class="dropdown-item text-white" href="<?php echo base_url('portfolio/kategori/'.$nav_portfolio->slug_kategori_portfolio) ?>"><?php echo $nav_portfolio->nama_kategori_portfolio ?></a></li>
                     <?php } ?>
-                    <li><a class="dropdown-item"  href="<?php echo base_url('portfolio') ?>">Semua Karya</a></li>
+                    <li><a class="dropdown-item text-warning"  href="<?php echo base_url('portfolio') ?>">Semua Karya</a></li>
                    
                   </ul>
                 </li>
               <?php }  if($site_setting->letak_menu=='Karya') { echo $menu_tambahan; } if($site_setting->menu_galeri=='Publish') { ?>
                 <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Galeri</a>
-                  <ul class="dropdown-menu">
+                  <ul class="dropdown-menu bg-dark">
                     
-                    <li class="nav-item"><a class="dropdown-item" href="<?php echo base_url('galeri') ?>">Galeri Gambar</a></li>
-                    <li class="nav-item"><a class="dropdown-item" href="<?php echo base_url('video') ?>">Galeri Video</a></li>
+                    <li class="nav-item"><a class="dropdown-item text-white" href="<?php echo base_url('galeri') ?>">Galeri Gambar</a></li>
+                    <li class="nav-item"><a class="dropdown-item text-white" href="<?php echo base_url('video') ?>">Galeri Video</a></li>
                    
                   </ul>
                 </li>
               <?php }  if($site_setting->letak_menu=='Galeri') { echo $menu_tambahan; }  if($site_setting->menu_unduhan=='Publish') { ?>
                 <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Unduhan</a>
-                  <ul class="dropdown-menu">
+                  <ul class="dropdown-menu bg-dark">
                     
                     <?php foreach($nav_download as $nav_download) { ?>
-                    <li><a class="dropdown-item" href="<?php echo base_url('download/kategori/'.$nav_download->slug_kategori_download) ?>"><?php echo $nav_download->nama_kategori_download ?></a></li>
+                    <li><a class="dropdown-item text-white" href="<?php echo base_url('download/kategori/'.$nav_download->slug_kategori_download) ?>"><?php echo $nav_download->nama_kategori_download ?></a></li>
                     <?php } ?>
-                    <li><a class="dropdown-item"  href="<?php echo base_url('download') ?>">Semua Unduhan</a></li>
+                    <li><a class="dropdown-item text-warning"  href="<?php echo base_url('download') ?>">Semua Unduhan</a></li>
                    
                   </ul>
                 </li>
