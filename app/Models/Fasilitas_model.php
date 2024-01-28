@@ -21,17 +21,54 @@ class Fasilitas_model extends Model
         return $query->getResult();
     }
 
-    // jenis
-    public function jenis_fasilitas_depan($jenis_fasilitas)
+    // read
+    public function read($slug_fasilitas)
     {
         $builder = $this->db->table('fasilitas');
         $builder->select('fasilitas.*, kategori_fasilitas.nama_kategori_fasilitas, kategori_fasilitas.slug_kategori_fasilitas, users.nama');
         $builder->join('kategori_fasilitas','kategori_fasilitas.id_kategori_fasilitas = fasilitas.id_kategori_fasilitas','LEFT');
         $builder->join('users','users.id_user = fasilitas.id_user','LEFT');
-        $builder->where('fasilitas.jenis_fasilitas',$jenis_fasilitas);
+        $builder->where('fasilitas.slug_fasilitas',$slug_fasilitas);
         $builder->orderBy('fasilitas.id_fasilitas','DESC');
         $query = $builder->get();
         return $query->getRow();
+    }
+
+    // home
+    public function home($limit,$status_fasilitas)
+    {
+        $builder = $this->db->table('fasilitas');
+        $builder->select('fasilitas.*, kategori_fasilitas.nama_kategori_fasilitas, kategori_fasilitas.slug_kategori_fasilitas, users.nama');
+        $builder->join('kategori_fasilitas','kategori_fasilitas.id_kategori_fasilitas = fasilitas.id_kategori_fasilitas','LEFT');
+        $builder->join('users','users.id_user = fasilitas.id_user','LEFT');
+        $builder->where('fasilitas.status_fasilitas',$status_fasilitas);
+        $builder->limit($limit);
+        $builder->orderBy('fasilitas.id_fasilitas','DESC');
+        $query = $builder->get();
+        return $query->getResult();
+    }
+
+    // jenis
+    public function status_fasilitas($limit,$start,$status_fasilitas)
+    {
+        $builder = $this->db->table('fasilitas');
+        $builder->select('fasilitas.*, kategori_fasilitas.nama_kategori_fasilitas, kategori_fasilitas.slug_kategori_fasilitas, users.nama');
+        $builder->join('kategori_fasilitas','kategori_fasilitas.id_kategori_fasilitas = fasilitas.id_kategori_fasilitas','LEFT');
+        $builder->join('users','users.id_user = fasilitas.id_user','LEFT');
+        $builder->where('fasilitas.status_fasilitas',$status_fasilitas);
+        $builder->limit($limit,$start);
+        $builder->orderBy('fasilitas.id_fasilitas','DESC');
+        $query = $builder->get();
+        return $query->getResult();
+    }
+
+    // total_kategori_fasilitas
+    public function total_status_fasilitas($status_fasilitas)
+    {
+        $builder = $this->db->table('fasilitas');
+        $builder->where('status_fasilitas',$status_fasilitas);
+        $query = $builder->get();
+        return $query->getNumRows();
     }
 
     // kategori_fasilitas
@@ -48,6 +85,32 @@ class Fasilitas_model extends Model
         $builder->orderBy('fasilitas.id_fasilitas','DESC');
         $query = $builder->get();
         return $query->getResult();
+    }
+
+    // kategori_fasilitas_home
+    public function kategori_fasilitas_status($limit, $start, $id_kategori_fasilitas,$status_fasilitas)
+    {
+        $builder = $this->db->table('fasilitas');
+        $builder->select('fasilitas.*, kategori_fasilitas.nama_kategori_fasilitas, kategori_fasilitas.slug_kategori_fasilitas, users.nama');
+        $builder->join('kategori_fasilitas','kategori_fasilitas.id_kategori_fasilitas = fasilitas.id_kategori_fasilitas','LEFT');
+        $builder->join('users','users.id_user = fasilitas.id_user','LEFT');
+        $builder->where(array(  'fasilitas.id_kategori_fasilitas' => $id_kategori_fasilitas,
+                                'fasilitas.status_fasilitas'      => $status_fasilitas
+                        ));
+        $builder->limit($limit,$start);
+        $builder->orderBy('fasilitas.id_fasilitas','DESC');
+        $query = $builder->get();
+        return $query->getResult();
+    }
+
+    // total_kategori_fasilitas
+    public function total_kategori_fasilitas_status($id_kategori_fasilitas,$status_fasilitas)
+    {
+        $builder = $this->db->table('fasilitas');
+        $builder->where('id_kategori_fasilitas',$id_kategori_fasilitas);
+        $builder->where('status_fasilitas',$status_fasilitas);
+        $query = $builder->get();
+        return $query->getNumRows();
     }
 
     // Listing
