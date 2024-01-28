@@ -21,17 +21,54 @@ class Portfolio_model extends Model
         return $query->getResult();
     }
 
-    // jenis
-    public function jenis_portfolio_depan($jenis_portfolio)
+    // read
+    public function read($slug_portfolio)
     {
         $builder = $this->db->table('portfolio');
         $builder->select('portfolio.*, kategori_portfolio.nama_kategori_portfolio, kategori_portfolio.slug_kategori_portfolio, users.nama');
         $builder->join('kategori_portfolio','kategori_portfolio.id_kategori_portfolio = portfolio.id_kategori_portfolio','LEFT');
         $builder->join('users','users.id_user = portfolio.id_user','LEFT');
-        $builder->where('portfolio.jenis_portfolio',$jenis_portfolio);
+        $builder->where('portfolio.slug_portfolio',$slug_portfolio);
         $builder->orderBy('portfolio.id_portfolio','DESC');
         $query = $builder->get();
         return $query->getRow();
+    }
+
+    // home
+    public function home($limit,$status_portfolio)
+    {
+        $builder = $this->db->table('portfolio');
+        $builder->select('portfolio.*, kategori_portfolio.nama_kategori_portfolio, kategori_portfolio.slug_kategori_portfolio, users.nama');
+        $builder->join('kategori_portfolio','kategori_portfolio.id_kategori_portfolio = portfolio.id_kategori_portfolio','LEFT');
+        $builder->join('users','users.id_user = portfolio.id_user','LEFT');
+        $builder->where('portfolio.status_portfolio',$status_portfolio);
+        $builder->limit($limit);
+        $builder->orderBy('portfolio.id_portfolio','DESC');
+        $query = $builder->get();
+        return $query->getResult();
+    }
+
+    // jenis
+    public function status_portfolio($limit,$start,$status_portfolio)
+    {
+        $builder = $this->db->table('portfolio');
+        $builder->select('portfolio.*, kategori_portfolio.nama_kategori_portfolio, kategori_portfolio.slug_kategori_portfolio, users.nama');
+        $builder->join('kategori_portfolio','kategori_portfolio.id_kategori_portfolio = portfolio.id_kategori_portfolio','LEFT');
+        $builder->join('users','users.id_user = portfolio.id_user','LEFT');
+        $builder->where('portfolio.status_portfolio',$status_portfolio);
+        $builder->limit($limit,$start);
+        $builder->orderBy('portfolio.id_portfolio','DESC');
+        $query = $builder->get();
+        return $query->getResult();
+    }
+
+    // total_kategori_portfolio
+    public function total_status_portfolio($status_portfolio)
+    {
+        $builder = $this->db->table('portfolio');
+        $builder->where('status_portfolio',$status_portfolio);
+        $query = $builder->get();
+        return $query->getNumRows();
     }
 
     // kategori_portfolio
@@ -48,6 +85,32 @@ class Portfolio_model extends Model
         $builder->orderBy('portfolio.id_portfolio','DESC');
         $query = $builder->get();
         return $query->getResult();
+    }
+
+    // kategori_portfolio_home
+    public function kategori_portfolio_status($limit, $start, $id_kategori_portfolio,$status_portfolio)
+    {
+        $builder = $this->db->table('portfolio');
+        $builder->select('portfolio.*, kategori_portfolio.nama_kategori_portfolio, kategori_portfolio.slug_kategori_portfolio, users.nama');
+        $builder->join('kategori_portfolio','kategori_portfolio.id_kategori_portfolio = portfolio.id_kategori_portfolio','LEFT');
+        $builder->join('users','users.id_user = portfolio.id_user','LEFT');
+        $builder->where(array(  'portfolio.id_kategori_portfolio' => $id_kategori_portfolio,
+                                'portfolio.status_portfolio'      => $status_portfolio
+                        ));
+        $builder->limit($limit,$start);
+        $builder->orderBy('portfolio.id_portfolio','DESC');
+        $query = $builder->get();
+        return $query->getResult();
+    }
+
+    // total_kategori_portfolio
+    public function total_kategori_portfolio_status($id_kategori_portfolio,$status_portfolio)
+    {
+        $builder = $this->db->table('portfolio');
+        $builder->where('id_kategori_portfolio',$id_kategori_portfolio);
+        $builder->where('status_portfolio',$status_portfolio);
+        $query = $builder->get();
+        return $query->getNumRows();
     }
 
     // Listing

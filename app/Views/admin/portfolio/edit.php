@@ -39,7 +39,7 @@ echo csrf_field();
 		</select>
 		<small class="text-secondary">Kategori</small>
 	</div>
-	<div class="col-md-3">
+	<div class="col-md-2">
 		<select name="jenis_portfolio" class="form-control">
 			<option value="Portfolio">Portfolio</option>
 			<option value="Homepage" <?php if($portfolio->jenis_portfolio=="Homepage") { echo 'selected'; } ?>>Homepage Slider</option>
@@ -49,12 +49,19 @@ echo csrf_field();
 		<small class="text-secondary">Jenis konten</small>
 	</div>
 	
-	<div class="col-md-3">
+	<div class="col-md-2">
 		<select name="status_text" class="form-control">
 			<option value="Ya">Aktif</option>
 			<option value="Tidak" <?php if($portfolio->status_text=="Tidak") { echo 'selected'; } ?>>Tidak Aktif</option>
 		</select>
 		<small class="text-secondary">Text pada slider</small>
+	</div>
+	<div class="col-md-2">
+		<select name="status_portfolio" class="form-control">
+			<option value="Publish">Publish</option>
+			<option value="Draft" <?php if($portfolio->status_portfolio=="Draft") { echo 'selected'; } ?>>Draft</option>
+		</select>
+		<small class="text-secondary">Status status_portfolio</small>
 	</div>
 </div>
 

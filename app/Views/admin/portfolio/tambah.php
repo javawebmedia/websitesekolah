@@ -36,7 +36,7 @@ echo csrf_field();
 		</select>
 		<small class="text-secondary">Kategori</small>
 	</div>
-	<div class="col-md-3">
+	<div class="col-md-2">
 		<select name="jenis_portfolio" class="form-control">
 			<option value="Portfolio">Portfolio</option>
 			<option value="Homepage">Homepage Slider</option>
@@ -45,12 +45,19 @@ echo csrf_field();
 		</select>
 		<small class="text-secondary">Jenis konten</small>
 	</div>
-	<div class="col-md-3">
+	<div class="col-md-2">
 		<select name="status_text" class="form-control">
 			<option value="Ya">Aktif</option>
 			<option value="Tidak">Tidak Aktif</option>
 		</select>
 		<small class="text-secondary">Text pada slider</small>
+	</div>
+	<div class="col-md-2">
+		<select name="status_portfolio" class="form-control">
+			<option value="Publish">Publish</option>
+			<option value="Draft">Draft</option>
+		</select>
+		<small class="text-secondary">Status status_portfolio</small>
 	</div>
 </div>
 

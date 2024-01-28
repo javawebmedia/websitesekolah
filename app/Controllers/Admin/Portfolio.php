@@ -79,30 +79,32 @@ class Portfolio extends BaseController
 			    ->save(WRITEPATH . '../assets/upload/image/thumbs/'.$namabaru);
 	        	// masuk database
 	        	$data = array(
-	        		'id_user'			=> $this->session->get('id_user'),
-					'id_kategori_portfolio'=> $this->request->getVar('id_kategori_portfolio'),
+	        		'id_user'				=> $this->session->get('id_user'),
+					'id_kategori_portfolio'	=> $this->request->getVar('id_kategori_portfolio'),
 					'judul_portfolio'		=> $this->request->getVar('judul_portfolio'),
 					'jenis_portfolio'		=> $this->request->getVar('jenis_portfolio'),
-					'isi'				=> $this->request->getVar('isi'),
-					'gambar' 			=> $namabaru,
-					'website'			=> $this->request->getVar('website'),
-					'text_website'		=> $this->request->getVar('text_website'),
-					'status_text'		=> $this->request->getVar('status_text'),
-					'tanggal_post'		=> date('Y-m-d H:i:s')
+					'isi'					=> $this->request->getVar('isi'),
+					'gambar' 				=> $namabaru,
+					'website'				=> $this->request->getVar('website'),
+					'text_website'			=> $this->request->getVar('text_website'),
+					'status_text'			=> $this->request->getVar('status_text'),
+					'status_portfolio'		=> $this->request->getVar('status_portfolio'),
+					'tanggal_post'			=> date('Y-m-d H:i:s')
 	        	);
 	        	$m_portfolio->tambah($data);
         		return redirect()->to(base_url('admin/portfolio'))->with('sukses', 'Data Berhasil di Simpan');
         	}else{
         		$data = array(
-	        		'id_user'			=> $this->session->get('id_user'),
-					'id_kategori_portfolio'=> $this->request->getVar('id_kategori_portfolio'),
+	        		'id_user'				=> $this->session->get('id_user'),
+					'id_kategori_portfolio'	=> $this->request->getVar('id_kategori_portfolio'),
 					'judul_portfolio'		=> $this->request->getVar('judul_portfolio'),
 					'jenis_portfolio'		=> $this->request->getVar('jenis_portfolio'),
-					'isi'				=> $this->request->getVar('isi'),
-					'website'			=> $this->request->getVar('website'),
-					'text_website'		=> $this->request->getVar('text_website'),
-					'status_text'		=> $this->request->getVar('status_text'),
-					'tanggal_post'		=> date('Y-m-d H:i:s')
+					'isi'					=> $this->request->getVar('isi'),
+					'website'				=> $this->request->getVar('website'),
+					'text_website'			=> $this->request->getVar('text_website'),
+					'status_text'			=> $this->request->getVar('status_text'),
+					'status_portfolio'		=> $this->request->getVar('status_portfolio'),
+					'tanggal_post'			=> date('Y-m-d H:i:s')
 	        	);
 	        	$m_portfolio->tambah($data);
         		return redirect()->to(base_url('admin/portfolio'))->with('sukses', 'Data Berhasil di Simpan');
@@ -200,29 +202,31 @@ class Portfolio extends BaseController
 	        	// masuk database
 			    $data = array(
 	        		'id_portfolio'			=> $id_portfolio,
-	        		'id_user'			=> $this->session->get('id_user'),
-					'id_kategori_portfolio'=> $this->request->getVar('id_kategori_portfolio'),
+	        		'id_user'				=> $this->session->get('id_user'),
+					'id_kategori_portfolio'	=> $this->request->getVar('id_kategori_portfolio'),
 					'judul_portfolio'		=> $this->request->getVar('judul_portfolio'),
 					'jenis_portfolio'		=> $this->request->getVar('jenis_portfolio'),
-					'isi'				=> $this->request->getVar('isi'),
-					'gambar' 			=> $namabaru,
-					'website'			=> $this->request->getVar('website'),
-					'text_website'		=> $this->request->getVar('text_website'),
-					'status_text'		=> $this->request->getVar('status_text'),
+					'isi'					=> $this->request->getVar('isi'),
+					'gambar' 				=> $namabaru,
+					'website'				=> $this->request->getVar('website'),
+					'text_website'			=> $this->request->getVar('text_website'),
+					'status_text'			=> $this->request->getVar('status_text'),
+					'status_portfolio'		=> $this->request->getVar('status_portfolio'),
 	        	);
 	        	$m_portfolio->edit($data);
         		return redirect()->to(base_url('admin/portfolio'))->with('sukses', 'Data Berhasil di Simpan');
 			}else{
 				$data = array(
 	        		'id_portfolio'			=> $id_portfolio,
-	        		'id_user'			=> $this->session->get('id_user'),
-					'id_kategori_portfolio'=> $this->request->getVar('id_kategori_portfolio'),
+	        		'id_user'				=> $this->session->get('id_user'),
+					'id_kategori_portfolio'	=> $this->request->getVar('id_kategori_portfolio'),
 					'judul_portfolio'		=> $this->request->getVar('judul_portfolio'),
 					'jenis_portfolio'		=> $this->request->getVar('jenis_portfolio'),
-					'isi'				=> $this->request->getVar('isi'),
-					'website'			=> $this->request->getVar('website'),
-					'text_website'		=> $this->request->getVar('text_website'),
-					'status_text'		=> $this->request->getVar('status_text'),
+					'isi'					=> $this->request->getVar('isi'),
+					'website'				=> $this->request->getVar('website'),
+					'text_website'			=> $this->request->getVar('text_website'),
+					'status_text'			=> $this->request->getVar('status_text'),
+					'status_portfolio'		=> $this->request->getVar('status_portfolio'),
 	        	);
 	        	$m_portfolio->edit($data);
         		return redirect()->to(base_url('admin/portfolio'))->with('sukses', 'Data Berhasil di Simpan');

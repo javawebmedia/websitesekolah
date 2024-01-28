@@ -58,8 +58,9 @@
         		</button>
 			</th>
 			<th width="8%">Gambar</th>
-			<th width="45%">Judul</th>
+			<th width="35%">Judul</th>
 			<th width="15%">Kategori &amp; Jenis</th>
+			<th width="10%">Status</th>
 			<th width="15%">Author</th>
 			<th></th>
 		</tr>
@@ -89,6 +90,17 @@
 			</td>
 			<td><small><i class="fa fa-tags"></i> <?php echo $portfolio->nama_kategori_portfolio ?>
 				<br><i class="fa fa-home"></i> <?php echo $portfolio->jenis_portfolio ?></small></td>
+			<td><?php if($portfolio->status_portfolio=='Publish') { ?>
+					<span class="badge bg-info">
+						<i class="fa fa-eye"></i> <?php echo $portfolio->status_portfolio ?>
+					</span>
+				<?php }else{ ?>
+					<span class="badge bg-secondary">
+						<i class="fa fa-eye-slash"></i> Not Published
+					</span>
+				<?php } ?>
+				
+			</td>
 			<td><?php echo $portfolio->nama ?></td>
 			<td>
 				
