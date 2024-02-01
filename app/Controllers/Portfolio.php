@@ -84,10 +84,10 @@ class Portfolio extends BaseController
 	}
 
 	// read
-	public function read($slug_portfolio)
+	public function read($id_portfolio)
 	{
 		$m_portfolio 	= new Portfolio_model();
-		$portfolio 		= $m_portfolio->read($slug_portfolio);
+		$portfolio 		= $m_portfolio->detail($id_portfolio);
 		$portfolio_list 	= $m_portfolio->home(10,'Publish');
 		// Update hits
 		$data = [ 	'id_portfolio'	=> $portfolio->id_portfolio,

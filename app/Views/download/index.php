@@ -17,9 +17,9 @@
         <div class="col-lg-10 mx-auto">
             <div class="blog classic-view pt-10">
 
-                <table class="table table-sm table-bordered" id="example2">
+                <table class="table table-sm table-bordered tabelku" id="example2">
                     <thead>
-                        <tr class="text-center bg-secondary">
+                        <tr class="text-center">
                             <th width="5%" class="text-center">No</th>
                             <th width="40%">Judul</th>
                             <th width="10%">Jenis</th>

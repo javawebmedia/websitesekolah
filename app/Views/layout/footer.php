@@ -5,6 +5,31 @@ $m_menu         = new Nav_model();
 $nav_profil     = $m_menu->profil('Profil');
 $site_setting   = $m_site->listing();
 ?>
+<style type="text/css" media="screen">
+  /* Add your custom styles here */
+.whatsapp-link {
+    position: fixed;
+    bottom: 30px;
+    right: 80px;
+    z-index: 9999;
+    transition: transform 0.3s ease-in-out;
+}
+a.whatsapp-link {
+  color: green;
+  background-color: #f5f5f5;
+  border: solid thin #eee;
+  border-radius: 10px;
+  padding: 10px 20px;
+}
+.whatsapp-link:hover {
+    transform: scale(1.1);
+}
+
+</style>
+<a href="https://api.whatsapp.com/send?phone=<?php echo $site_setting->hp ?>" class="whatsapp-link" target="_blank">
+        <i class="fab fa-whatsapp fa-3x"></i>
+    </a>
+
 <!--==============================
 Footer Area
 ==============================-->

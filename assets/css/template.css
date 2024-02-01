@@ -50,20 +50,21 @@ p, h1, h2, h3, h4, h5, h6 {
 	vertical-align: top;
 }
 .tabelku td {
-	border-bottom: solid thin #dee2e6;
+	border-bottom: solid thin #dee2e6 !important;
 }
 .tabelku th {
   vertical-align: middle;
 }
 .tabelku thead {
 	border-radius: 10px !important;
-	border: solid thin #dee2e6;
-	background-color: #f5f5f5;
+	border: solid thin #dee2e6 !important;
+	background-color: #f5f5f5 !important;
+  color: #fff !important;
 }
 
 .tabelku thead tr {
 	border-radius: 10px !important;
-	border: solid thin #dee2e6;
+	border-bottom: solid thin #dee2e6;
 	background-color: #f5f5f5;
 	border-collapse: collapse;
 }
