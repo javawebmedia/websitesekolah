@@ -21,7 +21,7 @@
         <h1 class="display-2 text-dark mb-4"><?php echo $video->judul ?></h1>
         <p class="lead fs-18 lh-sm mb-5 pe-md-18 pe-lg-0 pe-xxl-15"><?php echo word_limiter($video->keterangan,25) ?></p>
         <div>
-          <a class="btn btn-lg btn-primary rounded" href="<?php echo base_url('video/detail/'.$video->id_video) ?>">Lihat detail</a>
+          <a class="btn btn-lg btn-primary rounded" href="<?php echo base_url('video/read/'.$video->slug_video) ?>">Lihat detail</a>
         </div>
       </div>
       <!-- /column -->

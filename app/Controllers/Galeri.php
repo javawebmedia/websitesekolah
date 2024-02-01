@@ -41,18 +41,20 @@ class Galeri extends BaseController
 		$m_galeri		= new Galeri_model();
 		$konfigurasi 	= $m_konfigurasi->listing();
 		$galeri 		= $m_galeri->detail($id_galeri);
+		$galeri_list 	= $m_galeri->home($this->website->paginasi_depan());
 
 		// Update hits
-		$data = [ 	'id_galeri'	=> $galeri['id_galeri'],
-					'hits'		=> $galeri['hits']+1
+		$data = [ 	'id_galeri'	=> $galeri->id_galeri,
+					'hits'		=> $galeri->hits+1
 				];
 		$m_galeri->edit($data);
 		// Update hits
 		
-		$data = [	'title'			=> $galeri['judul_galeri'],
-					'description'	=> $galeri['judul_galeri'],
-					'keywords'		=> $galeri['judul_galeri'],
+		$data = [	'title'			=> $galeri->judul_galeri,
+					'description'	=> $galeri->judul_galeri,
+					'keywords'		=> $galeri->judul_galeri,
 					'galeri'		=> $galeri,
+					'galeri_list'	=> $galeri_list,
 					'content'		=> 'galeri/read'
 				];
 		echo view('layout/wrapper',$data);
