@@ -2,6 +2,7 @@
 namespace App\Libraries;
 use App\Models\User_model;
 use App\Models\Client_model;
+use App\Models\Siswa_model;
 
 class Simple_login
 {
@@ -33,6 +34,52 @@ class Simple_login
 			// jika username password salah
 			$this->session->setFlashdata('warning','Username atau password salah');
 			return redirect()->to(base_url('login'));
+		}
+	}
+
+	// check login
+	public function login_siswa($username,$password)
+	{
+		$this->session  = \Config\Services::session();
+		$uri            = service('uri');
+		$m_siswa 		= new Siswa_model();
+		$user 			= $m_siswa->login($username,sha1($password));
+		$user2 			= $m_siswa->login_nis($username,sha1($password));
+		if($user) 
+		{
+			// Jika username password benar
+			$this->session->set('username_siswa',$username);
+			$this->session->set('id_siswa',$user->id_siswa);
+			$this->session->set('nama_siswa',$user->nama);
+			$this->session->set('akses_level','Client');
+			header("Location: siswa/dasbor");			
+            exit;
+        }elseif($user2) {
+        	// Jika username password benar
+			$this->session->set('username_siswa',$username);
+			$this->session->set('id_siswa',$user2->id_siswa);
+			$this->session->set('nama_siswa',$user2->nama);
+			$this->session->set('akses_level','Client');
+			header("Location: siswa/dasbor");			
+            exit;
+		}else{
+			// jika username password salah
+			$this->session->setFlashdata('warning','Username atau password salah');
+			return redirect()->to(base_url('signin'));
+		}
+	}
+
+	// check login
+	public function checklogin_siswa()
+	{
+		$this->session  = \Config\Services::session();
+		if($this->session->get('username_siswa')=='') 
+		{
+			$pengalihan = str_replace('index.php/','',current_url());
+			$this->session->set('pengalihan',$pengalihan);
+			$this->session->setFlashdata('warning','Anda belum login');
+			header("Location: ".base_url('signin')).'?redirect='.$pengalihan;
+	        exit;
 		}
 	}
 

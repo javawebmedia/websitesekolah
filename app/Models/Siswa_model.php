@@ -159,6 +159,48 @@ class Siswa_model extends Model
         return $query->getRow();
     }
 
+    // listing
+    public function login($username,$password)
+    {
+        $builder = $this->db->table('siswa');
+        $builder->select('siswa.*,
+                        jenjang.nama_jenjang,
+                        kelas.nama_kelas,
+                        agama.nama_agama,
+                        hubungan.nama_hubungan,');
+        $builder->join('jenjang','jenjang.id_jenjang = siswa.id_jenjang','LEFT');
+        $builder->join('kelas','kelas.id_kelas = siswa.id_kelas','LEFT');
+        $builder->join('agama','agama.id_agama = siswa.id_agama','LEFT');
+        $builder->join('hubungan','hubungan.id_hubungan = siswa.id_hubungan','LEFT');
+        $builder->where([   'email'     => $username,
+                            'password'  => $password
+                        ]);
+        $builder->orderBy('siswa.id_siswa','DESC');
+        $query = $builder->get();
+        return $query->getRow();
+    }
+
+    // listing
+    public function login_nis($username,$password)
+    {
+        $builder = $this->db->table('siswa');
+        $builder->select('siswa.*,
+                        jenjang.nama_jenjang,
+                        kelas.nama_kelas,
+                        agama.nama_agama,
+                        hubungan.nama_hubungan,');
+        $builder->join('jenjang','jenjang.id_jenjang = siswa.id_jenjang','LEFT');
+        $builder->join('kelas','kelas.id_kelas = siswa.id_kelas','LEFT');
+        $builder->join('agama','agama.id_agama = siswa.id_agama','LEFT');
+        $builder->join('hubungan','hubungan.id_hubungan = siswa.id_hubungan','LEFT');
+        $builder->where([   'nis'       => $username,
+                            'password'  => $password
+                        ]);
+        $builder->orderBy('siswa.id_siswa','DESC');
+        $query = $builder->get();
+        return $query->getRow();
+    }
+
     // read
     public function read($slug_siswa)
     {

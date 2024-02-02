@@ -22,7 +22,7 @@ class Signin extends BaseController
 			$this->session->set('pengalihan',$_GET['redirect']);
 		}
 		$m_konfigurasi 	= new Konfigurasi_model();
-		$m_client 		= new Client_model();
+		$m_siswa 		= new Client_model();
 		$konfigurasi 	= $m_konfigurasi->listing();
 
 		// Start validasi
@@ -34,16 +34,16 @@ class Signin extends BaseController
         {           
             $username       = $this->request->getPost('username');
             $password       = $this->request->getPost('password');
-            $this->simple_login->login_client($username,$password);
+            $this->simple_login->login_siswa($username,$password);
         }
 		// End validasi
-		$data = [	'title'			=> 'Login Client',
-					'description'	=> 'Login Client '.$konfigurasi->namaweb.', '.$konfigurasi->tentang,
-					'keywords'		=> 'Login Client '.$konfigurasi->namaweb.', '.$konfigurasi->keywords,
+		$data = [	'title'			=> 'Login Siswa/Calon Siswa',
+					'description'	=> 'Login Siswa/Calon Siswa '.$konfigurasi->namaweb.', '.$konfigurasi->tentang,
+					'keywords'		=> 'Login Siswa/Calon Siswa '.$konfigurasi->namaweb.', '.$konfigurasi->keywords,
 					'session'		=> $session,
 					'content'		=> 'signin/index'
 				];
-		echo view('layout/wrapper-2',$data);
+		echo view('layout/wrapper',$data);
 		// End proses
 	}
 

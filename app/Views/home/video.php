@@ -14,7 +14,7 @@
       <div class="col-lg-5 offset-lg-1" data-cues="slideInDown">
         <div class="position-relative">
           <a href="<?php echo $video->video ?>" class="btn btn-circle btn-primary btn-play ripple mx-auto mb-6 position-absolute" style="top:50%; left: 50%; transform: translate(-50%,-50%); z-index:3;" data-glightbox><i class="icn-caret-right"></i></a>
-          <figure class="rounded shadow-lg"><img src="<?php echo base_url('assets/upload/image/'.$video->gambar) ?>" srcset="<?php echo base_url('assets/upload/image/'.$video->gambar) ?> 2x" alt="<?php echo $video->judul ?>"></figure>
+          <figure class="rounded shadow-lg"><img src="<?php echo base_url('assets/upload/image/'.$video->gambar) ?>" srcset="<?php echo base_url('assets/upload/image/'.$video->gambar) ?> 2x" alt="<?php echo $video->judul ?>" class="img-thumbnail"></figure>
         </div>
         <!-- /div -->
       </div>

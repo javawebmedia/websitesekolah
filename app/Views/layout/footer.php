@@ -29,7 +29,36 @@ a.whatsapp-link {
 <a href="https://api.whatsapp.com/send?phone=<?php echo $site_setting->hp ?>" class="whatsapp-link" target="_blank">
         <i class="fab fa-whatsapp fa-3x"></i>
     </a>
-
+<script>
+  <?php if(isset($_GET['logout'])) { ?>
+    Swal.fire({
+      icon: 'success',
+      heightAuto: false,
+      timer: 3000,
+      title: 'Sukses...',
+      text: 'Anda berhasil logout.',
+    })
+  <?php }if(Session()->getFlashdata('warning')) { ?>
+  // Notifikasi
+  Swal.fire({
+    icon: 'warning',
+    title: 'Oops...',
+    timer: 3000,
+    heightAuto: false,
+    text: '<?php echo Session()->getFlashdata('warning'); ?>',
+  })
+  <?php } ?>
+  <?php if(Session()->getFlashdata('sukses')) { ?>
+  // Notifikasi
+  Swal.fire({
+    icon: 'success',
+    heightAuto: false,
+    timer: 3000,
+    title: 'Alhamdulillah...',
+    text: '<?php echo Session()->getFlashdata('sukses'); ?>',
+  })
+  <?php } ?>
+</script>
 <!--==============================
 Footer Area
 ==============================-->
@@ -148,35 +177,6 @@ Footer Area
 
   
 </script>
-<script>
-    <?php if(isset($_GET['logout'])) { ?>
-    Swal.fire({
-      icon: 'success',
-      heightAuto: false,
-      timer: 3000,
-      title: 'Sukses...',
-      text: 'Anda berhasil logout.',
-    })
-  <?php }if(Session()->getFlashdata('warning')) { ?>
-  // Notifikasi
-  Swal.fire({
-    icon: 'warning',
-    title: 'Oops...',
-    timer: 3000,
-    heightAuto: false,
-    text: '<?php echo Session()->getFlashdata('warning'); ?>',
-  })
-  <?php } ?>
-  <?php if(Session()->getFlashdata('sukses')) { ?>
-  // Notifikasi
-  Swal.fire({
-    icon: 'success',
-    heightAuto: false,
-    timer: 3000,
-    title: 'Alhamdulillah...',
-    text: '<?php echo Session()->getFlashdata('sukses'); ?>',
-  })
-  <?php } ?>
-</script>
+
 </body>
 </html>
