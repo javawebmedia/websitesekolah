@@ -5,7 +5,7 @@ echo csrf_field();
 
 
 <div class="form-group row">
-	<label class="col-sm-3 control-label text-right">Nama Even/Agenda</label>
+	<label class="col-sm-3 control-label">Nama Even/Agenda</label>
 	<div class="col-sm-9">
 		<input type="text" name="nama_agenda" class="form-control form-control-lg text-capitalize" required value="<?php echo set_value('nama_agenda') ?>">
 		<small class="text-gray">Nama agenda. Misal: <strong>Agenda Web Design</strong></small>
@@ -13,7 +13,7 @@ echo csrf_field();
 </div>
 
 <div class="form-group row">
-	<label class="col-sm-3 control-label text-right">Upload Foto/ Gambar</label>
+	<label class="col-sm-3 control-label">Upload Foto/ Gambar</label>
 	<div class="col-sm-6">
 		<input type="file" name="gambar" class="form-control" placeholder="Upload gambar" id="file">
 		<div id="imagePreview"></div>
@@ -23,7 +23,7 @@ echo csrf_field();
 </div>
 
 <div class="form-group row">
-	<label class="col-sm-3 control-label text-right">Status, Tanggal Pendaftaran  Dibuka &amp; Ditutup</label>
+	<label class="col-sm-3 control-label">Status, Tanggal Pendaftaran  Dibuka &amp; Ditutup</label>
 	<div class="col-sm-2">
 		<select name="status_pendaftaran" class="form-control">
 			<option value="Buka">Buka</option>
@@ -42,7 +42,7 @@ echo csrf_field();
 </div>
 
 <div class="form-group row">
-	<label class="col-sm-3 control-label text-right">Kategori, Status &amp; Kode</label>
+	<label class="col-sm-3 control-label">Kategori, Status &amp; Kode</label>
 	<div class="col-sm-2">
 		<select name="id_kategori_agenda" class="form-control select2">
 			<?php foreach($kategori_agenda as $kategori_agenda) { ?>
@@ -65,7 +65,7 @@ echo csrf_field();
 </div>
 
 <div class="form-group row">
-	<label class="col-sm-3 control-label text-right">Biaya Pendaftaran  Normal &amp; Diskon</label>
+	<label class="col-sm-3 control-label">Biaya Pendaftaran  Normal &amp; Diskon</label>
 	<div class="col-sm-3">
 		<input type="number" name="harga" class="form-control" required value="<?php echo set_value('harga') ?>">
 		<small class="text-gray">Biaya Pendaftaran  normal</small>
@@ -77,7 +77,7 @@ echo csrf_field();
 </div>
 
 <div class="form-group row">
-	<label class="col-sm-3 control-label text-right">Tanggal Periode Diskon</label>
+	<label class="col-sm-3 control-label">Tanggal Periode Diskon</label>
 	<div class="col-sm-2">
 		<input type="text" name="tanggal_mulai" class="form-control tanggal" required value="<?php echo set_value('tanggal_mulai') ?>">
 		<small class="text-gray">Tanggal mulai</small>
@@ -101,28 +101,28 @@ echo csrf_field();
 <br>
 
 <div class="form-group row">
-	<label class="col-sm-3 control-label text-right">Nama Tempat</label>
+	<label class="col-sm-3 control-label">Nama Tempat</label>
 	<div class="col-sm-9">
 		<input type="text" name="nama_tempat" class="form-control" required value="<?php echo set_value('nama_tempat') ?>">
 	</div>
 </div>
 
 <div class="form-group row">
-	<label class="col-sm-3 control-label text-right">Link Google Map</label>
+	<label class="col-sm-3 control-label">Link Google Map</label>
 	<div class="col-sm-9">
 		<input type="text" name="link_google_map" class="form-control" required value="<?php echo set_value('link_google_map') ?>">
 	</div>
 </div>
 
 <div class="form-group row">
-	<label class="col-sm-3 control-label text-right">Alamat lengkap</label>
+	<label class="col-sm-3 control-label">Alamat lengkap</label>
 	<div class="col-sm-9">
 		<textarea name="alamat" class="form-control nilai" ><?php echo set_value('alamat') ?></textarea>
 	</div>
 </div>
 
 <div class="form-group row">
-	<label class="col-sm-3 control-label text-right">Iframe Google Map</label>
+	<label class="col-sm-3 control-label">Iframe Google Map</label>
 	<div class="col-sm-8">
 		<textarea name="google_map" class="form-control"><?php echo set_value('google_map') ?></textarea>
 	</div>
@@ -131,7 +131,7 @@ echo csrf_field();
 <hr>
 
 <div class="form-group row">
-	<label class="col-sm-3 control-label text-right">Deskripsi Ringkas</label>
+	<label class="col-sm-3 control-label">Deskripsi Ringkas</label>
 	<div class="col-sm-9">
 		<textarea name="deskripsi" class="form-control"><?php echo set_value('deskripsi') ?></textarea>
 		<small class="text-gray">Penjelasan ringkas tentang agenda</small>
@@ -139,14 +139,14 @@ echo csrf_field();
 </div>
 
 <div class="form-group row">
-	<label class="col-sm-3 control-label text-right">Deskripsi Lengkap</label>
+	<label class="col-sm-3 control-label">Deskripsi Lengkap</label>
 	<div class="col-sm-9">
 		<textarea name="isi" id="isi"  class="form-control konten" placeholder="Deskripsi Agenda"><?php echo set_value('isi') ?></textarea>
 	</div>
 </div>
 
 <div class="form-group row">
-	<label class="col-sm-3 control-label text-right">Keywords (untuk pencarian Google)</label>
+	<label class="col-sm-3 control-label">Keywords (untuk pencarian Google)</label>
 	<div class="col-sm-8">
 		<textarea name="keywords" class="form-control"><?php echo set_value('keywords') ?></textarea>
 		<small class="text-gray">Gunakan koma sebagai pemisah, misalnya: <strong>web design, desain grafis, agenda web, agenda android</strong></small>
@@ -154,7 +154,7 @@ echo csrf_field();
 </div>
 
 <div class="form-group row">
-	<label class="col-sm-3 control-label text-right">Urutan</label>
+	<label class="col-sm-3 control-label">Urutan</label>
 	<div class="col-sm-8">
 		<input type="number" name="urutan" class="form-control" placeholder="Urutan" value="<?php echo set_value('urutan') ?>">
 	</div>
@@ -162,7 +162,7 @@ echo csrf_field();
 
 
 <div class="form-group row">
-	<label class="col-sm-3 control-label text-right"></label>
+	<label class="col-sm-3 control-label"></label>
 	<div class="col-sm-8">
 		<div class="form-group btn-group pull-right">
 			<button type="submit" name="submit" class="btn btn-success btn-lg"><i class="fa fa-save"></i> Simpan Data</button>
