@@ -71,12 +71,12 @@ class Client extends BaseController
 				// Image upload
 				$avatar  	= $this->request->getFile('gambar');
 				$nama_clientbaru 	= $avatar->getRandomName();
-	            $avatar->move(WRITEPATH . '../assets/upload/image/',$nama_clientbaru);
+	            $avatar->move(WRITEPATH . '../assets/upload/client/',$nama_clientbaru);
 	            // Create thumb
 	            $image = \Config\Services::image()
-			    ->withFile(WRITEPATH . '../assets/upload/image/'.$nama_clientbaru)
+			    ->withFile(WRITEPATH . '../assets/upload/client/'.$nama_clientbaru)
 			    ->fit(100, 100, 'center')
-			    ->save(WRITEPATH . '../assets/upload/image/thumbs/'.$nama_clientbaru);
+			    ->save(WRITEPATH . '../assets/upload/client/thumbs/'.$nama_clientbaru);
 	        	// masuk database
 	        	$data = array(
 	        		'id_user'			=> $this->session->get('id_user'),
@@ -209,12 +209,12 @@ class Client extends BaseController
 				// Image upload
 				$avatar  	= $this->request->getFile('gambar');
 				$nama_clientbaru 	= $avatar->getRandomName();
-	            $avatar->move(WRITEPATH . '../assets/upload/image/',$nama_clientbaru);
+	            $avatar->move(WRITEPATH . '../assets/upload/client/',$nama_clientbaru);
 	            // Create thumb
 	            $image = \Config\Services::image()
-			    ->withFile(WRITEPATH . '../assets/upload/image/'.$nama_clientbaru)
+			    ->withFile(WRITEPATH . '../assets/upload/client/'.$nama_clientbaru)
 			    ->fit(100, 100, 'center')
-			    ->save(WRITEPATH . '../assets/upload/image/thumbs/'.$nama_clientbaru);
+			    ->save(WRITEPATH . '../assets/upload/client/thumbs/'.$nama_clientbaru);
 	        	// masuk database
 			    $data = array(
 	        		'id_client'			=> $id_client,
