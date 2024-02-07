@@ -1,3 +1,67 @@
+# Website Profil dan Manajemen Sekolah menguunakan CodeIgniter 4 Framework
+Aplikasi website profil dan manajemen sekolah dari [Java Web Media](https://javawebmedia.com/) dengan berbagai fitur yang semoga bermanfaat. 
+
+Demo unofficial sementara http://sekolah.down.my.id/
+
+Spesifikasi Teknis Source Code
+Website ini dikembangkan dengan beberapa spesifikasi:
+1. Dikembangan dengan Codeigniter 4. Pastikan teman-teman membaca Server Requirements dari CI4 ini yah.
+2. Template Admin menggunakan AdminLTE 3.2.0. Bisa diakses di https://adminlte.io/
+3. Template front end menggunakan Sandbox - Modern & Multipurpose Bootstrap 5 Template 3.4.0 dari https://sandbox.elemisthemes.com/.
+4. Notifikasi menggunakan Sweetalert
+5. Datatables dan plugin export
+
+# Fitur-fitur Website meliputi:
+
+## HALAMAN FRONT END:
+
+1. Halaman Beranda/Homepage
+2. Banner
+3. Halaman berita (update,pengumuman,indeks)
+4.  Halaman profile (Profil staf team, Layanan & produk, Prestasi & penghargaan, Ekstrakurikuler, Fasilitas sarana dan prasarana)
+5. Halaman Karya
+6. Halaman galeri gambar
+7. Halaman galeri video
+8. Halaman file download
+9. Halaman Tautan
+10. Halaman kontak
+11. Floating whatsapp button
+12. Login Siswa & Calon Siswa
+13. Pendaftaran
+
+## HALAMAN BACK END:
+1. Login dan logout
+2. Halaman update profile dan ganti password
+3. Halaman Dashboard
+4. Halaman kelola pendaftar
+5. Halaman kelola berita dan kategorinya
+6. Halaman kelola Galeri dan Banner dan kategorinya
+7. Halaman kelola staff and team dan kategorinya
+8. Halaman kelola Peestasi dan penghargaan dan kategorinya
+9. Halaman kelola Event dan Agenda dan kategorinya
+10. Halaman kelola upload/download file dan kategorinya
+11. Halaman kelola video youtube
+12. Halaman kelola Karya dan kategorinya
+13. Halaman kelola Fasilitas dan kategorinya
+14. Halaman kelola Ekstrakurikuler dan kategorinya
+15. Halaman kelola Manajemen Siswa (Rombongan Belajar, Tahun Ajaran, Kelas)
+16. Halaman kelola Mitra dan kategorinya
+17. Halaman kelola Master Data (Link website, Jenjang Pendidikan, Agama, Hubungan Keluarga, Jenis pekerjaan)
+18. Halaman kelola menu front end
+19. Halaman kelola pengguna sistem
+20. Halaman kelola konfigurasi (website, logo dan icon, about us, banner, email, informasi detail sekolah)
+21. Dan fitur lainnya
+
+## Mengakses Halaman Website dan Login ke Admin
+1. Buka browser Anda
+2. Ketik alamat http://websitekamu.com
+3. Untuk Login ke halaman Back End, silakan buka http://websitekamu.com/login
+4. Username admin: andoyo
+6. Password admin: andoyo
+5. Untuk Login siswa dan pendaftar, silahkan buka http://websitekamu.com/signin
+
+Catatan : Beberapa fitur masih dalam tahap pengembangan, dan mungkin belum bekerja dengan baik
+
 # CodeIgniter 4 Framework
 
 ## What is CodeIgniter?
