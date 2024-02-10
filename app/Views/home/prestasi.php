@@ -10,7 +10,7 @@
               <div class="swiper-slide">
                 <article>
                   <figure class="overlay overlay-1 hover-scale rounded mb-5">
-                    <a href="<?php echo base_url('prestasi/detail/'.$prestasi->slug_prestasi) ?>"> 
+                    <a href="<?php echo base_url('prestasi/read/'.$prestasi->slug_prestasi) ?>"> 
                       <img src="<?php echo base_url('assets/upload/image/'.$prestasi->gambar) ?>" alt="" />
                     </a>
                     <figcaption>
@@ -23,7 +23,7 @@
                     </div>
                     <!-- /.post-category -->
                     <h2 class="post-title h3 mt-1 mb-3">
-                      <a class="link-light" href="<?php echo base_url('prestasi/detail/'.$prestasi->slug_prestasi) ?>"><?php echo $prestasi->judul_prestasi ?></a>
+                      <a class="link-light" href="<?php echo base_url('prestasi/read/'.$prestasi->slug_prestasi) ?>"><?php echo $prestasi->judul_prestasi ?></a>
                     </h2>
                   </div>
                   
