@@ -460,6 +460,12 @@
                 </a>
               </li>
               <li class="nav-item">
+                <a href="<?php echo base_url('admin/jenis_dokumen') ?>" class="nav-link <?php if($uri->getSegment(2)=="jenis_dokumen"){echo 'active';}?>">
+                  <i class="fa fa-arrow-right nav-icon"></i>
+                  <p>Jenis Dokumen Pendaftaran</p>
+                </a>
+              </li>
+              <li class="nav-item">
                 <a href="<?php echo base_url('admin/konfigurasi/sekolah') ?>" class="nav-link <?php if($uri->getSegment(3)=="sekolah"){echo 'active';}?>">
                   <i class="fa fa-arrow-right nav-icon"></i>
                   <p>Informasi Sekolah</p>

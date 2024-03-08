@@ -22,7 +22,7 @@
         <div class="card">
           <div class="card-body p-11">
 
-            <h2 class="mb-3 text-start">Membuat akun pendaftaran di <?php echo $this->website->namaweb() ?></h2>
+            <h2 class="mb-3 text-start">Isi Biodata Calon Siswa</h2>
               <p class="lead mb-6 text-start">Masukkan data Anda dengan benar dan lengkap.</p>
 
               <?php 
@@ -80,7 +80,7 @@
               </div>
             </div>
 
-            <div class="form-group row mb-3">
+            <!-- <div class="form-group row mb-3">
               <label class="col-3">NIS dan NISN</label>
               <div class="col-4">
                 <input type="text" name="nis" class="form-control" placeholder="Nomor Induk Siswa (NIS)" value="<?php echo set_value('nis') ?>">
@@ -91,7 +91,7 @@
                 <small class="text-secondary">Nomor Induk Siswa Nasional (NISN)</small>
               </div>
             </div>
-
+ -->
             <div class="form-group row mb-3">
               <label class="col-3">Agama &amp; Status Kewarganegaraan<span class="text-danger">*</span></label>
               <div class="col-3">
@@ -227,7 +227,7 @@
               </div>
             </div>
 
-            <div class="form-group row mb-3">
+            <!-- <div class="form-group row mb-3">
               <label class="col-3">Status Siswa<span class="text-danger">*</span></label>
               <div class="col-9">
                 <div class="form-group">
@@ -250,7 +250,7 @@
                 </div>
               </div>
             </div>
-
+ -->
             <div class="form-group row mb-3">
               <label class="col-3">Tahun Ajaran Saat Masuk<span class="text-danger">*</span></label>
               <div class="col-9">
