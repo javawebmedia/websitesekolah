@@ -36,8 +36,8 @@ echo csrf_field();
                           <label for="letak_menu_3" class="custom-control-label">Profil</label>
                         </div>
                        	<div class="custom-control custom-radio">
-                          <input class="custom-control-input" type="radio" id="letak_menu_7" name="letak_menu" value="Karya" <?php if($konfigurasi->letak_menu=='Karya') { echo 'checked'; } ?>>
-                          <label for="letak_menu_7" class="custom-control-label">Karya</label>
+                          <input class="custom-control-input" type="radio" id="letak_menu_7" name="letak_menu" value="Prestasi" <?php if($konfigurasi->letak_menu=='Prestasi') { echo 'checked'; } ?>>
+                          <label for="letak_menu_7" class="custom-control-label">Prestasi</label>
                         </div>
                         <div class="custom-control custom-radio">
                           <input class="custom-control-input" type="radio" id="letak_menu_4" name="letak_menu" value="Galeri" <?php if($konfigurasi->letak_menu=='Galeri') { echo 'checked'; } ?>>

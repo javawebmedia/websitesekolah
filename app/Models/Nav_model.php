@@ -11,13 +11,14 @@ class Nav_model extends Model
     public function berita()
     {
         $builder = $this->db->table('berita');
-        $builder->select('berita.id_kategori,berita.icon, berita.ringkasan, berita.gambar, kategori.nama_kategori, kategori.slug_kategori');
+        $builder->select('berita.id_kategori, MAX(berita.icon) AS icon, MAX(berita.ringkasan) AS ringkasan, MAX(berita.gambar) AS gambar, kategori.nama_kategori, kategori.slug_kategori');
         $builder->join('kategori', 'kategori.id_kategori = berita.id_kategori');
-        $builder->where(array('status_berita'    => 'Publish','jenis_berita' => 'Berita'));
+        $builder->where(array('status_berita' => 'Publish', 'jenis_berita' => 'Berita'));
         $builder->groupBy('berita.id_kategori');
         $query = $builder->get();
         return $query->getResult();
     }
+
 
     // Nav profil
     public function profil($jenis_berita)
@@ -33,11 +34,10 @@ class Nav_model extends Model
     public function download()
     {
         $builder = $this->db->table('download');
-        $builder->select('download.judul_download, download.hits, download.gambar, download.id_download, kategori_download.nama_kategori_download, kategori_download.slug_kategori_download');
+        $builder->select('download.id_kategori_download, MAX(download.gambar) AS gambar, kategori_download.nama_kategori_download, kategori_download.slug_kategori_download');
         $builder->join('kategori_download', 'kategori_download.id_kategori_download = download.id_kategori_download');
         $builder->where('download.jenis_download','Download');
         $builder->groupBy('download.id_kategori_download');
-        $builder->orderBy('kategori_download.urutan','ASC');
         $query = $builder->get();
         return $query->getResult();
     }
@@ -46,11 +46,10 @@ class Nav_model extends Model
     public function prestasi()
     {
         $builder = $this->db->table('prestasi');
-        $builder->select('prestasi.judul_prestasi, prestasi.hits, prestasi.gambar, prestasi.id_prestasi, kategori_prestasi.nama_kategori_prestasi, kategori_prestasi.slug_kategori_prestasi');
+        $builder->select('prestasi.id_kategori_prestasi, MAX(prestasi.gambar) AS gambar, kategori_prestasi.nama_kategori_prestasi, kategori_prestasi.slug_kategori_prestasi');
         $builder->join('kategori_prestasi', 'kategori_prestasi.id_kategori_prestasi = prestasi.id_kategori_prestasi');
-        $builder->where(array('prestasi.status_prestasi'    => 'Publish'));
+        $builder->where(array('status_prestasi' => 'Publish'));
         $builder->groupBy('prestasi.id_kategori_prestasi');
-        $builder->orderBy('kategori_prestasi.urutan','ASC');
         $query = $builder->get();
         return $query->getResult();
     }
@@ -72,11 +71,10 @@ class Nav_model extends Model
     public function ekstrakurikuler()
     {
         $builder = $this->db->table('ekstrakurikuler');
-        $builder->select('ekstrakurikuler.judul_ekstrakurikuler, ekstrakurikuler.hits, ekstrakurikuler.gambar, ekstrakurikuler.id_ekstrakurikuler, kategori_ekstrakurikuler.nama_kategori_ekstrakurikuler, kategori_ekstrakurikuler.slug_kategori_ekstrakurikuler');
+        $builder->select('ekstrakurikuler.id_kategori_ekstrakurikuler, MAX(ekstrakurikuler.gambar) AS gambar, kategori_ekstrakurikuler.nama_kategori_ekstrakurikuler, kategori_ekstrakurikuler.slug_kategori_ekstrakurikuler');
         $builder->join('kategori_ekstrakurikuler', 'kategori_ekstrakurikuler.id_kategori_ekstrakurikuler = ekstrakurikuler.id_kategori_ekstrakurikuler');
-        $builder->where(array('ekstrakurikuler.status_ekstrakurikuler'    => 'Publish'));
+        $builder->where(array('status_ekstrakurikuler' => 'Publish'));
         $builder->groupBy('ekstrakurikuler.id_kategori_ekstrakurikuler');
-        $builder->orderBy('kategori_ekstrakurikuler.urutan','ASC');
         $query = $builder->get();
         return $query->getResult();
     }
@@ -162,16 +160,14 @@ class Nav_model extends Model
     public function portfolio()
     {
         $builder = $this->db->table('portfolio');
-        $builder->select('portfolio.id_portfolio, 
-                        kategori_portfolio.nama_kategori_portfolio, 
-                        kategori_portfolio.slug_kategori_portfolio');
-        
-        $builder->join('kategori_portfolio','kategori_portfolio.id_kategori_portfolio = portfolio.id_kategori_portfolio');
+        $builder->select('portfolio.id_kategori_portfolio, MAX(portfolio.gambar) AS gambar, kategori_portfolio.nama_kategori_portfolio, kategori_portfolio.slug_kategori_portfolio');
+        $builder->join('kategori_portfolio', 'kategori_portfolio.id_kategori_portfolio = portfolio.id_kategori_portfolio');
+        $builder->where(array('status_portfolio' => 'Publish'));
         $builder->groupBy('portfolio.id_kategori_portfolio');
-        $builder->orderBy('kategori_portfolio.urutan','ASC');
         $query = $builder->get();
         return $query->getResult();
     }
+
 }
 
 

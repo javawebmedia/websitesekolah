@@ -36,7 +36,7 @@ class Menu extends BaseController
 						'menu_home'			=> $this->request->getPost('menu_home'),
 						'menu_berita'		=> $this->request->getPost('menu_berita'),
 						'menu_profil'		=> $this->request->getPost('menu_profil'),
-						'menu_karya'		=> $this->request->getPost('menu_karya'),
+						'menu_prestasi'		=> $this->request->getPost('menu_prestasi'),
 						'menu_galeri'		=> $this->request->getPost('menu_galeri'),
 						'menu_unduhan'		=> $this->request->getPost('menu_unduhan'),
 						'menu_tautan'		=> $this->request->getPost('menu_tautan'),

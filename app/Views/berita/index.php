@@ -14,10 +14,10 @@
 <section class="wrapper bg-light">
   <div class="container pb-14 pb-md-16">
     <div class="row">
-        <div class="col-lg-8 mx-auto">
-            <div class="blog classic-view mt-n17">
+        <div class="col-lg-12 mx-auto">
+            <div class="blog classic-view mt-n17 row justify-content-center">
         <?php foreach($berita as $berita) { ?>
-
+            <div class="col-md-6">
             <article class="post">
                 <div class="card">
                   <figure class="card-img-top overlay overlay-1 hover-scale">
@@ -62,7 +62,7 @@
                 <!-- /.card -->
               </article>
               <!-- /.post -->
-
+            </div>
             
     <?php } ?>
     <div class="col-xxl-10 col-lg-10 offset-1">

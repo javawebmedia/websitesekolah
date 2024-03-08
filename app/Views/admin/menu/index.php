@@ -67,17 +67,17 @@
 							</td>
 						</tr>
 						<tr>
-							<td>Karya</td>
+							<td>Prestasi</td>
 							<td class="text-center" width="25%">
 		                        <div class="custom-control custom-radio">
-		                          <input class="custom-control-input" type="radio" id="menu_karya1" name="menu_karya" value="Publish" <?php if($konfigurasi->menu_karya=='Publish') { echo 'checked'; } ?>>
-		                          <label for="menu_karya1" class="custom-control-label">Ya</label>
+		                          <input class="custom-control-input" type="radio" id="menu_prestasi1" name="menu_prestasi" value="Publish" <?php if($konfigurasi->menu_prestasi=='Publish') { echo 'checked'; } ?>>
+		                          <label for="menu_prestasi1" class="custom-control-label">Ya</label>
 		                        </div>		                       
 							</td>
 							<td class="text-center">
 		                        <div class="custom-control custom-radio">
-		                          <input class="custom-control-input" type="radio" id="menu_karya2" name="menu_karya" value="Draft" value="Publish" <?php if($konfigurasi->menu_karya=='Draft') { echo 'checked'; } ?>>
-		                          <label for="menu_karya2" class="custom-control-label">Tidak</label>
+		                          <input class="custom-control-input" type="radio" id="menu_prestasi2" name="menu_prestasi" value="Draft" value="Publish" <?php if($konfigurasi->menu_prestasi=='Draft') { echo 'checked'; } ?>>
+		                          <label for="menu_prestasi2" class="custom-control-label">Tidak</label>
 		                        </div>
 							</td>
 						</tr>

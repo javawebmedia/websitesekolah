@@ -113,12 +113,14 @@ foreach($nav_menu as $nav_menu) {
                         <!--/column -->
                         
                         <div class="col-lg-4">
-                          <h6 class="dropdown-header text-warning">Prestasi &amp; Penghargaan</h6>
+                          <h6 class="dropdown-header text-warning">Karya &amp; Portfolio</h6>
                           <ul class="list-unstyled">
-                            <?php foreach($nav_prestasi as $nav_prestasi) { ?>
-                            <li><a class="dropdown-item" href="<?php echo base_url('prestasi/kategori/'.$nav_prestasi->slug_kategori_prestasi) ?>"><?php echo $nav_prestasi->nama_kategori_prestasi ?></a></li>
+                            <?php foreach($nav_portfolio as $nav_portfolio) { ?>
+                            <li><a class="dropdown-item" href="<?php echo base_url('portfolio/kategori/'.$nav_portfolio->slug_kategori_portfolio) ?>"><?php echo $nav_portfolio->nama_kategori_portfolio ?></a></li>
                             <?php } ?>
-                            <li><a class="dropdown-item text-warning"  href="<?php echo base_url('prestasi') ?>">Semua Prestasi</a></li>
+                            <li><a class="dropdown-item text-warning"  href="<?php echo base_url('portfolio') ?>">Semua Karya</a></li>
+
+                          
                           </ul>
                           <h6 class="dropdown-header mt-lg-6 text-warning">Ekstrakurikuler</h6>
                           <ul class="list-unstyled">
@@ -146,19 +148,20 @@ foreach($nav_menu as $nav_menu) {
                   </ul>
                   <!--/.dropdown-menu -->
                 </li>
-                <?php }  if($site_setting->letak_menu=='Profil') { echo $menu_tambahan; } if($site_setting->menu_karya=='Publish') { ?>
-                <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Karya</a>
-                  <ul class="dropdown-menu bg-dark">
-                    
-                    <?php foreach($nav_portfolio as $nav_portfolio) { ?>
-                    <li><a class="dropdown-item text-white" href="<?php echo base_url('portfolio/kategori/'.$nav_portfolio->slug_kategori_portfolio) ?>"><?php echo $nav_portfolio->nama_kategori_portfolio ?></a></li>
-                    <?php } ?>
-                    <li><a class="dropdown-item text-warning"  href="<?php echo base_url('portfolio') ?>">Semua Karya</a></li>
-                   
-                  </ul>
-                </li>
-              <?php }  if($site_setting->letak_menu=='Karya') { echo $menu_tambahan; } if($site_setting->menu_galeri=='Publish') { ?>
+                <?php }  if($site_setting->letak_menu=='Profil') { echo $menu_tambahan; } if($site_setting->menu_prestasi=='Publish') { ?>
+
+                  <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Prestasi</a>
+                    <ul class="dropdown-menu bg-dark">
+                        <?php foreach($nav_prestasi as $nav_prestasi) { ?>
+                            <li><a class="dropdown-item text-white" href="<?php echo base_url('prestasi/kategori/'.$nav_prestasi->slug_kategori_prestasi) ?>"><?php echo $nav_prestasi->nama_kategori_prestasi ?></a></li>
+                            <?php } ?>
+                            <li><a class="dropdown-item text-warning"  href="<?php echo base_url('prestasi') ?>">Semua Prestasi</a></li>
+                    </ul>
+                  </li>
+
+                
+              <?php }  if($site_setting->letak_menu=='Prestasi') { echo $menu_tambahan; } if($site_setting->menu_galeri=='Publish') { ?>
                 <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Galeri</a>
                   <ul class="dropdown-menu bg-dark">

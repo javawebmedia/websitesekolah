@@ -16,7 +16,7 @@
       <div class="container pt-12 pt-md-14 pb-13 pb-md-15">
         
         <!--/.row -->
-        <div class="row grid-view gx-md-8 gx-xl-10 gy-8 gy-lg-0">
+        <div class="row grid-view gx-md-8 gx-xl-10 gy-8 gy-lg-0 justify-content-center">
            <?php $no=1; foreach($prestasi as $prestasi) { ?>
           <div class="col-md-4 col-lg-3 mb-8">
             <div class="position-relative">
