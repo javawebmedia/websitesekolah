@@ -26,6 +26,37 @@ a.whatsapp-link {
 }
 
 </style>
+<?php 
+$sek  = date('Y');
+$awal = $sek-100;
+?>
+
+<script>
+  $( ".datepicker" ).datepicker({
+    inline: true,
+    changeYear: true,
+    changeMonth: true,
+    dateFormat: "dd-mm-yy",
+    yearRange: "<?php echo $awal ?>:<?php $tahundepan = date('Y')+2; echo $tahundepan; ?>"
+  });
+
+  $( ".tanggal" ).datepicker({
+    inline: true,
+    changeYear: true,
+    changeMonth: true,
+    dateFormat: "dd-mm-yy",
+    yearRange: "<?php echo $awal ?>:<?php $tahundepan = date('Y')+2; echo $tahundepan; ?>"
+  });
+
+  $( ".tanggalan" ).datepicker({
+    inline: true,
+    changeYear: true,
+    changeMonth: true,
+    dateFormat: "dd-mm-yy",
+    yearRange: "<?php echo $awal ?>:<?php $tahundepan = date('Y')+2; echo $tahundepan; ?>"
+  });
+
+</script>
 <a href="https://api.whatsapp.com/send?phone=<?php echo $site_setting->hp ?>" class="whatsapp-link" target="_blank">
         <i class="fab fa-whatsapp fa-3x"></i>
     </a>
