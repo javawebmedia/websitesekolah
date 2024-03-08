@@ -60,36 +60,7 @@ $awal = $sek-100;
 <a href="https://api.whatsapp.com/send?phone=<?php echo $site_setting->hp ?>" class="whatsapp-link" target="_blank">
         <i class="fab fa-whatsapp fa-3x"></i>
     </a>
-<script>
-  <?php if(isset($_GET['logout'])) { ?>
-    Swal.fire({
-      icon: 'success',
-      heightAuto: false,
-      timer: 3000,
-      title: 'Sukses...',
-      text: 'Anda berhasil logout.',
-    })
-  <?php }if(Session()->getFlashdata('warning')) { ?>
-  // Notifikasi
-  Swal.fire({
-    icon: 'warning',
-    title: 'Oops...',
-    timer: 3000,
-    heightAuto: false,
-    text: '<?php echo Session()->getFlashdata('warning'); ?>',
-  })
-  <?php } ?>
-  <?php if(Session()->getFlashdata('sukses')) { ?>
-  // Notifikasi
-  Swal.fire({
-    icon: 'success',
-    heightAuto: false,
-    timer: 3000,
-    title: 'Alhamdulillah...',
-    text: '<?php echo Session()->getFlashdata('sukses'); ?>',
-  })
-  <?php } ?>
-</script>
+
 <!--==============================
 Footer Area
 ==============================-->
@@ -149,6 +120,109 @@ Footer Area
   </div>
   <script src="<?php echo base_url() ?>assets/template/assets/js/plugins.js"></script>
   <script src="<?php echo base_url() ?>assets/template/assets/js/theme.js"></script>
+  <script>
+$(document).ready(function(){
+    $('input.jam').timepicker({
+        timeFormat: 'HH:mm:ss',
+        // year, month, day and seconds are not important
+        minTime: new Date(0, 0, 0, 8, 0, 0),
+        maxTime: new Date(0, 0, 0, 15, 0, 0),
+        // time entries start being generated at 6AM but the plugin 
+        // shows only those within the [minTime, maxTime] interval
+        startHour: 6,
+        // the value of the first item in the dropdown, when the input
+        // field is empty. This overrides the startHour and startMinute 
+        // options
+        startTime: new Date(0, 0, 0, 8, 20, 0),
+        // items in the dropdown are separated by at interval minutes
+        interval: 10
+    });
+});
+
+  // Popup Delete
+  $(document).on("click", ".delete-link", function(e){
+    e.preventDefault();
+    url = $(this).attr("href");
+    Swal.fire({
+        title: 'Anda yakin?',
+        text: "Jika dihapus, data tidak dapat dikembalikan lagi!",
+        icon: 'info',
+        timer: 5000,
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Ya, Hapus Data!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          $.ajax({
+              url: url,
+              success: function(resp){
+                window.location.href = url;
+              }
+            });
+        }
+      })
+  });
+
+ // Popup Delete
+$(document).on("click", ".disable-link", function(e){
+  e.preventDefault();
+  url = $(this).attr("href");
+  Swal.fire({
+    title:"Yakin akan mengupdate data ini?",
+    type: "warning",
+    showCancelButton: true,
+    confirmButtonClass: 'btn btn-danger',
+    cancelButtonClass: 'btn btn-success',
+    buttonsStyling: false,
+    confirmButtonText: "Delete",
+    cancelButtonText: "Cancel",
+    closeOnConfirm: false,
+    showLoaderOnConfirm: true,
+  },
+  function(isConfirm){
+    if(isConfirm){
+      $.ajax({
+        url: url,
+        success: function(resp){
+          window.location.href = url;
+        }
+      });
+    }
+    return false;
+  });
+});
+
+
+  <?php if(isset($_GET['logout'])) { ?>
+    Swal.fire({
+      icon: 'success',
+      heightAuto: false,
+      timer: 3000,
+      title: 'Sukses...',
+      text: 'Anda berhasil logout.',
+    })
+  <?php }if(Session()->getFlashdata('warning')) { ?>
+  // Notifikasi
+  Swal.fire({
+    icon: 'warning',
+    title: 'Oops...',
+    timer: 3000,
+    heightAuto: false,
+    text: '<?php echo Session()->getFlashdata('warning'); ?>',
+  })
+  <?php } ?>
+  <?php if(Session()->getFlashdata('sukses')) { ?>
+  // Notifikasi
+  Swal.fire({
+    icon: 'success',
+    heightAuto: false,
+    timer: 3000,
+    title: 'Alhamdulillah...',
+    text: '<?php echo Session()->getFlashdata('sukses'); ?>',
+  })
+  <?php } ?>
+  </script>
   <script>
   $(function () {
     $("#example1").DataTable({

@@ -331,4 +331,28 @@ class Pendaftaran extends BaseController
 		}
 	}
 
+	// Unduh
+	public function unduh($kode_dokumen,$kode_siswa)
+	{
+		$m_dokumen 			= new Dokumen_model();
+		$dokumen 			= $m_dokumen->kode_dokumen($kode_dokumen);
+		if(!file_exists('../assets/upload/pendaftaran/'.$dokumen->gambar)) {
+			$this->session->setFlashdata('warning','Mohon maaf, file tidak ditemukan.');
+			return redirect()->to(base_url('pendaftaran/dokumen/'.$kode_siswa));
+		}else{
+			return $this->response->download('../assets/upload/pendaftaran/'.$dokumen->gambar, null);
+		}
+	}
+
+	// hapus
+	public function hapus($kode_dokumen,$kode_siswa)
+	{
+		$m_dokumen = new Dokumen_model();
+		$data = ['kode_dokumen'	=> $kode_dokumen];
+		$m_dokumen->hapus($data);
+		// masuk database
+		$this->session->setFlashdata('sukses','Data telah dihapus');
+		return redirect()->to(base_url('pendaftaran/dokumen/'.$kode_siswa));
+	}
+
 }

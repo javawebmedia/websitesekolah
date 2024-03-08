@@ -132,6 +132,19 @@ class Dokumen_model extends Model
         return $query->getRow();
     }
 
+    // kode_dokumen
+    public function kode_dokumen($kode_dokumen)
+    {
+        $this->table('dokumen');
+        $this->select('dokumen.*, jenis_dokumen.nama_jenis_dokumen, jenis_dokumen.slug_jenis_dokumen, siswa.nama_siswa');
+        $this->join('jenis_dokumen','jenis_dokumen.id_jenis_dokumen = dokumen.id_jenis_dokumen','LEFT');
+        $this->join('siswa','siswa.id_siswa = dokumen.id_siswa','LEFT');
+        $this->where('dokumen.kode_dokumen',$kode_dokumen);
+        $this->orderBy('dokumen.id_dokumen','DESC');
+        $query = $this->get();
+        return $query->getRow();
+    }
+
     // check
     public function check($id_siswa,$id_jenis_dokumen)
     {
@@ -160,6 +173,14 @@ class Dokumen_model extends Model
         $builder = $this->db->table('dokumen');
         $builder->where('id_dokumen',$data['id_dokumen']);
         $builder->update($data);
+    }
+
+    // hapus
+    public function hapus($data)
+    {
+        $builder = $this->db->table('dokumen');
+        $builder->where('kode_dokumen',$data['kode_dokumen']);
+        $builder->delete($data);
     }
 
     // testing

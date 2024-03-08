@@ -92,10 +92,10 @@
                 </td>                
                 <td>
                   <?php if($check_dokumen) { ?>
-                    <a class="btn btn-dark btn-sm" href="#">
+                    <a class="btn btn-dark btn-sm" href="<?php echo base_url('pendaftaran/unduh/'.$check_dokumen->kode_dokumen.'/'.$siswa->slug_siswa) ?>" target="_blank">
                       <i class="fa fa-download"></i>&nbsp;  Unduh
                     </a>
-                    <a class="btn btn-secondary btn-sm" href="#">
+                    <a class="btn btn-secondary btn-sm  delete-link" href="<?php echo base_url('pendaftaran/hapus/'.$check_dokumen->kode_dokumen.'/'.$siswa->slug_siswa) ?>">
                       <i class="fa fa-trash"></i>&nbsp;  Hapus
                     </a>
                   <?php }else{ ?>
