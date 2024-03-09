@@ -140,6 +140,7 @@ class Pendaftaran extends BaseController
 							'id_jenjang'			=> $this->request->getPost('id_jenjang'),
 							'id_hubungan'			=> $this->request->getPost('id_hubungan'),
 							'id_akun'				=> $akun->id_akun,
+							'kode_siswa'			=> strtoupper(random_string('alnum', 8)),
 							'slug_siswa'			=> $slug_siswa,
 							// 'nis'					=> $this->request->getPost('nis'),
 							// 'nisn'					=> $this->request->getPost('nisn'),
@@ -208,6 +209,7 @@ class Pendaftaran extends BaseController
 							'id_jenjang'			=> $this->request->getPost('id_jenjang'),
 							'id_hubungan'			=> $this->request->getPost('id_hubungan'),
 							'id_akun'				=> $akun->id_akun,
+							'kode_siswa'			=> strtoupper(random_string('alnum', 8)),
 							'slug_siswa'			=> $slug_siswa,
 							// 'nis'					=> $this->request->getPost('nis'),
 							// 'nisn'					=> $this->request->getPost('nisn'),
@@ -329,6 +331,69 @@ class Pendaftaran extends BaseController
 					];
 			echo view('layout/wrapper',$data);
 		}
+	}
+
+	// selesai
+	public function selesai($slug_siswa)
+	{
+		$m_konfigurasi 		= new Konfigurasi_model();
+		$m_akun 			= new Akun_model();
+		$m_jenis_dokumen 	= new Jenis_dokumen_model();
+		$m_siswa 			= new Siswa_model();
+		$m_dokumen 			= new Dokumen_model();
+
+		$konfigurasi 		= $m_konfigurasi->listing();
+		$siswa 				= $m_siswa->read($slug_siswa);
+		$jenis_dokumen 		= $m_jenis_dokumen->listing();
+		$akun 				= $m_akun->detail($siswa->id_akun);
+
+		$data = [	'title'				=> 'Pendaftaran Peserta Didik Baru - Pendaftaran Berhasil',
+					'description'		=> 'Pendaftaran Peserta Didik Baru '.$konfigurasi->namaweb.', '.$konfigurasi->tentang,
+					'keywords'			=> 'Pendaftaran Peserta Didik Baru '.$konfigurasi->namaweb.', '.$konfigurasi->keywords,
+					'konfigurasi'		=> $konfigurasi,
+					'akun'				=> $akun,
+					'jenis_dokumen'		=> $jenis_dokumen,
+					'siswa'				=> $siswa,
+					'm_dokumen'			=> $m_dokumen,
+					'content'			=> 'pendaftaran/selesai'
+				];
+		echo view('layout/wrapper',$data);
+	}
+
+	// cetak
+	public function cetak($slug_siswa)
+	{
+		$m_konfigurasi 		= new Konfigurasi_model();
+		$m_akun 			= new Akun_model();
+		$m_jenis_dokumen 	= new Jenis_dokumen_model();
+		$m_siswa 			= new Siswa_model();
+		$m_dokumen 			= new Dokumen_model();
+
+		$konfigurasi 		= $m_konfigurasi->listing();
+		$siswa 				= $m_siswa->read($slug_siswa);
+		$jenis_dokumen 		= $m_jenis_dokumen->listing();
+		$akun 				= $m_akun->detail($siswa->id_akun);
+
+		$data = [	'title'				=> 'Pendaftaran Peserta Didik Baru - Pendaftaran Berhasil',
+					'description'		=> 'Pendaftaran Peserta Didik Baru '.$konfigurasi->namaweb.', '.$konfigurasi->tentang,
+					'keywords'			=> 'Pendaftaran Peserta Didik Baru '.$konfigurasi->namaweb.', '.$konfigurasi->keywords,
+					'konfigurasi'		=> $konfigurasi,
+					'akun'				=> $akun,
+					'jenis_dokumen'		=> $jenis_dokumen,
+					'siswa'				=> $siswa,
+					'm_dokumen'			=> $m_dokumen,
+					'content'			=> 'pendaftaran/selesai'
+				];
+		// echo view('layout/wrapper',$data);
+		$mpdf = new \Mpdf\Mpdf([
+						'default_font_size' => 11,
+						'default_font' => 'nunito-regular'
+					]);
+		$html = view('pendaftaran/cetak',$data);
+		$mpdf->WriteHTML($html);
+		$this->response->setHeader('Content-Type', 'application/pdf');
+		// buka di browser
+		$mpdf->Output('Informasi-Pendaftaran-'.$siswa->nama_siswa.'.pdf','I'); 
 	}
 
 	// Unduh

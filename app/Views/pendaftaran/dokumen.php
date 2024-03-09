@@ -55,11 +55,23 @@
             <tbody>
               <?php 
               $id_siswa     = $siswa->id_siswa;
-              $no=1; foreach($jenis_dokumen as $jenis_dokumen) { 
+              $no           = 1; 
+              $data_total   = 1;
+              foreach($jenis_dokumen as $jenis_dokumen) { 
                 $id_jenis_dokumen     = $jenis_dokumen->id_jenis_dokumen;
-                $check_dokumen = $m_dokumen->check($id_siswa,$id_jenis_dokumen);
+                $check_dokumen        = $m_dokumen->check($id_siswa,$id_jenis_dokumen);
+                if($jenis_dokumen->status_jenis_dokumen=='Wajib') {
+                    if($check_dokumen) {
+                      $data_id = 1;
+                    }else{
+                      $data_id = 0;
+                    }
+                }else{
+                    $data_id = 1;
+                }
+                $data_total+=$data_id;
               ?>
-              <tr>
+              <tr data-id="<?php echo $data_id ?>">
                 <td class="text-center"><?php echo $no ?></td>
                 
                 <td><?php echo $jenis_dokumen->nama_jenis_dokumen ?>
@@ -123,10 +135,25 @@
               </tr>
               <?php $no++; } ?>
             </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="4"></td>
+                <td>
+                  <?php if($no==$data_total) { ?>
+                      <a href="<?php echo base_url('pendaftaran/selesai/'.$siswa->slug_siswa) ?>" class="btn btn-success float-right text-white">
+                        Simpan dan Selesaikan Pendaftaran&nbsp;<i class="fa fa-arrow-right"></i>
+                      </a>
+                  <?php }else{ ?>
+                      <div class="alert alert-info">
+                        Dokumen masih kurang, silakan lengkapi.
+                      </div>
+                  <?php } ?>
+                </td>
+              </tr>
+            </tfoot>
           </table>
-        
-        
-            
+          
+          
           </div>
         </div>
       </div>
