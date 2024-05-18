@@ -11,7 +11,7 @@ class Fasilitas extends BaseController
 	// index
 	public function index()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_fasilitas 			= new Fasilitas_model();
 		$m_kategori_fasilitas 	= new Kategori_fasilitas_model();
 		$kategori_fasilitas 	= $m_kategori_fasilitas->listing();
@@ -52,7 +52,7 @@ class Fasilitas extends BaseController
 	// Tambah
 	public function tambah()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_fasilitas 			= new Fasilitas_model();
 		$m_kategori_fasilitas 	= new Kategori_fasilitas_model();
 		$kategori_fasilitas 	= $m_kategori_fasilitas->listing();
@@ -128,7 +128,7 @@ class Fasilitas extends BaseController
 	// proses
 	public function proses()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori 	= new Kategori_fasilitas_model();
 		$m_fasilitas 		= new Fasilitas_model();
 		// proses
@@ -182,7 +182,7 @@ class Fasilitas extends BaseController
 	// edit
 	public function edit($id_fasilitas)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_fasilitas 	= new Kategori_fasilitas_model();
 		$m_fasilitas 			= new Fasilitas_model();
 		$kategori_fasilitas 	= $m_kategori_fasilitas->listing();
@@ -257,7 +257,7 @@ class Fasilitas extends BaseController
 	// Delete
 	public function delete($id_fasilitas)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_fasilitas = new Fasilitas_model();
 		$data = ['id_fasilitas'	=> $id_fasilitas];
 		$m_fasilitas->delete($data);

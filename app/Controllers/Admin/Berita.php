@@ -12,7 +12,7 @@ class Berita extends BaseController
 	// index
 	public function index()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_berita 		= new Berita_model();
 		$m_kategori 	= new Kategori_model();
 		$kategori 		= $m_kategori->listing();
@@ -53,7 +53,7 @@ class Berita extends BaseController
 	// kategori
 	public function kategori($id_kategori)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_berita 		= new Berita_model();
 		$m_kategori 	= new Kategori_model();
 		$kategori 		= $m_kategori->detail($id_kategori);
@@ -76,7 +76,7 @@ class Berita extends BaseController
 	// jenis_berita
 	public function jenis_berita($jenis_berita)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_berita 		= new Berita_model();
 		$m_kategori 	= new Kategori_model();
 		$total 			= $m_berita->total_jenis_berita($jenis_berita);
@@ -99,7 +99,7 @@ class Berita extends BaseController
 	// status_berita
 	public function status_berita($status_berita)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_berita 		= new Berita_model();
 		$m_kategori 	= new Kategori_model();
 		$total 			= $m_berita->total_status_berita($status_berita);
@@ -122,7 +122,7 @@ class Berita extends BaseController
 	// author
 	public function author($id_user)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_berita 		= new Berita_model();
 		$m_kategori 	= new Kategori_model();
 		$m_user 		= new User_model();
@@ -140,7 +140,7 @@ class Berita extends BaseController
 	// Tambah
 	public function tambah()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori 	= new Kategori_model();
 		$m_berita 		= new Berita_model();
 		$kategori 		= $m_kategori->listing();
@@ -215,7 +215,7 @@ class Berita extends BaseController
 	// edit
 	public function edit($id_berita)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori 	= new Kategori_model();
 		$m_berita 		= new Berita_model();
 		$kategori 		= $m_kategori->listing();
@@ -290,7 +290,7 @@ class Berita extends BaseController
 	// proses
 	public function proses()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori 	= new Kategori_model();
 		$m_berita 		= new Berita_model();
 		// proses
@@ -344,7 +344,7 @@ class Berita extends BaseController
 	// Delete
 	public function delete($id_berita)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_berita = new Berita_model();
 		$data = ['id_berita'	=> $id_berita];
 		$m_berita->delete($data);

@@ -56,5 +56,6 @@ abstract class BaseController extends Controller
         $uri                    = service('uri');
         $this->simple_login     = new Simple_login(); 
         $this->website          = new Website(); 
+        $this->simple_login->checklogin();
     }
 }

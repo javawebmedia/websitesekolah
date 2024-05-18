@@ -10,7 +10,7 @@ class Jenjang extends BaseController
 	// mainpage
 	public function index()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_jenjang = new Jenjang_model();
 		$jenjang 	= $m_jenjang->listing();
 		$total 	= $m_jenjang->total();
@@ -43,7 +43,7 @@ class Jenjang extends BaseController
 	// edit
 	public function edit($id_jenjang)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_jenjang = new Jenjang_model();
 		$jenjang 	= $m_jenjang->detail($id_jenjang);
 
@@ -76,7 +76,7 @@ class Jenjang extends BaseController
 	// delete
 	public function delete($id_jenjang)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_jenjang = new Jenjang_model();
 		$data = ['id_jenjang'	=> $id_jenjang];
 		$m_jenjang->delete($data);

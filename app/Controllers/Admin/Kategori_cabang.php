@@ -10,7 +10,7 @@ class Kategori_cabang extends BaseController
 	// mainpage
 	public function index()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_cabang 	= new Kategori_cabang_model();
 		$kategori_cabang 	= $m_kategori_cabang->listing();
 		$total 				= $m_kategori_cabang->total();
@@ -78,7 +78,7 @@ class Kategori_cabang extends BaseController
 	// edit
 	public function edit($id_kategori_cabang)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_cabang 	= new Kategori_cabang_model();
 		$kategori_cabang 	= $m_kategori_cabang->detail($id_kategori_cabang);
 
@@ -144,7 +144,7 @@ class Kategori_cabang extends BaseController
 	// delete
 	public function delete($id_kategori_cabang)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_cabang = new Kategori_cabang_model();
 		$data = ['id_kategori_cabang'	=> $id_kategori_cabang];
 		$m_kategori_cabang->delete($data);

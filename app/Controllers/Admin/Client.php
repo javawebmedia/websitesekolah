@@ -11,7 +11,7 @@ class Client extends BaseController
 	// index
 	public function index()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_client 			= new Client_model();
 		$m_kategori_client 	= new Kategori_client_model();
 		$kategori_client 	= $m_kategori_client->listing();
@@ -52,7 +52,7 @@ class Client extends BaseController
 	// Tambah
 	public function tambah()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_client 			= new Client_model();
 		$m_kategori_client 	= new Kategori_client_model();
 		$kategori_client 	= $m_kategori_client->listing();
@@ -137,7 +137,7 @@ class Client extends BaseController
 	// proses
 	public function proses()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori 	= new Kategori_client_model();
 		$m_client 		= new Client_model();
 		// proses
@@ -191,7 +191,7 @@ class Client extends BaseController
 	// edit
 	public function edit($id_client)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_client 	= new Kategori_client_model();
 		$m_client 			= new Client_model();
 		$kategori_client 	= $m_kategori_client->listing();
@@ -276,7 +276,7 @@ class Client extends BaseController
 	// Delete
 	public function delete($id_client)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_client = new Client_model();
 		$data = ['id_client'	=> $id_client];
 		$m_client->delete($data);

@@ -10,7 +10,7 @@ class Kategori_prestasi extends BaseController
 	// mainpage
 	public function index()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_prestasi 	= new Kategori_prestasi_model();
 		$kategori_prestasi 	= $m_kategori_prestasi->listing();
 		$total 				= $m_kategori_prestasi->total();
@@ -78,7 +78,7 @@ class Kategori_prestasi extends BaseController
 	// edit
 	public function edit($id_kategori_prestasi)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_prestasi 	= new Kategori_prestasi_model();
 		$kategori_prestasi 	= $m_kategori_prestasi->detail($id_kategori_prestasi);
 
@@ -144,7 +144,7 @@ class Kategori_prestasi extends BaseController
 	// delete
 	public function delete($id_kategori_prestasi)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_prestasi = new Kategori_prestasi_model();
 		$data = ['id_kategori_prestasi'	=> $id_kategori_prestasi];
 		$m_kategori_prestasi->delete($data);

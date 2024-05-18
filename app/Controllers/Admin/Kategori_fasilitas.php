@@ -10,7 +10,7 @@ class Kategori_fasilitas extends BaseController
 	// mainpage
 	public function index()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_fasilitas 	= new Kategori_fasilitas_model();
 		$kategori_fasilitas 	= $m_kategori_fasilitas->listing();
 		$total 				= $m_kategori_fasilitas->total();
@@ -78,7 +78,7 @@ class Kategori_fasilitas extends BaseController
 	// edit
 	public function edit($id_kategori_fasilitas)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_fasilitas 	= new Kategori_fasilitas_model();
 		$kategori_fasilitas 	= $m_kategori_fasilitas->detail($id_kategori_fasilitas);
 
@@ -144,7 +144,7 @@ class Kategori_fasilitas extends BaseController
 	// delete
 	public function delete($id_kategori_fasilitas)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_fasilitas = new Kategori_fasilitas_model();
 		$data = ['id_kategori_fasilitas'	=> $id_kategori_fasilitas];
 		$m_kategori_fasilitas->delete($data);

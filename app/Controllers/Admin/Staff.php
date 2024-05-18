@@ -11,7 +11,7 @@ class Staff extends BaseController
 	// mainpage
 	public function index()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_staff 			= new Staff_model();
 		$m_kategori_staff 	= new Kategori_staff_model();
 		$kategori_staff 	= $m_kategori_staff->listing();
@@ -53,7 +53,7 @@ class Staff extends BaseController
 	// proses
 	public function proses()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori 	= new Kategori_staff_model();
 		$m_staff 		= new Staff_model();
 		// proses
@@ -107,7 +107,7 @@ class Staff extends BaseController
 	// tambah
 	public function tambah()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_staff 			= new Staff_model();
 		$m_kategori_staff 	= new Kategori_staff_model();
 		$staff 				= $m_staff->listing();
@@ -192,7 +192,7 @@ class Staff extends BaseController
 	// edit
 	public function edit($id_staff)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_staff 	= new Kategori_staff_model();
 		$m_staff 			= new Staff_model();
 		$staff 				= $m_staff->detail($id_staff);
@@ -277,7 +277,7 @@ class Staff extends BaseController
 	// delete
 	public function delete($id_staff)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_staff = new Staff_model();
 		$data = ['id_staff'	=> $id_staff];
 		$m_staff->delete($data);

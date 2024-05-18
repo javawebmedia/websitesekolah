@@ -11,7 +11,7 @@ class Konfigurasi extends BaseController
 	// mainpage
 	public function index()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_konfigurasi 	= new Konfigurasi_model();
 		$konfigurasi 	= $m_konfigurasi->listing();
 		$id_konfigurasi = $konfigurasi->id_konfigurasi;
@@ -70,7 +70,7 @@ class Konfigurasi extends BaseController
 	// email
 	public function email()
 	{
-		$this->simple_login->checklogin();
+		
 		// $this->simple_login->checkadmin();
 		$m_site     = new Konfigurasi_model();
         $site       = $m_site->listing();
@@ -107,7 +107,7 @@ class Konfigurasi extends BaseController
 	// sekolah
 	public function sekolah()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_sekolah 		= new Sekolah_model();
 		$sekolah 		= $m_sekolah->listing();
 		$id_sekolah 	= $sekolah->id_sekolah;
@@ -171,7 +171,7 @@ class Konfigurasi extends BaseController
 	// banner
 	public function banner()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_konfigurasi 	= new Konfigurasi_model();
 		$konfigurasi 	= $m_konfigurasi->listing();
 		$id_konfigurasi = $konfigurasi->id_konfigurasi;
@@ -231,7 +231,7 @@ class Konfigurasi extends BaseController
 	// unduh
 	public function unduh()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_sekolah 		= new Sekolah_model();
 		$sekolah 		= $m_sekolah->listing();
 		$id_sekolah 	= $sekolah->id_sekolah;
@@ -253,7 +253,7 @@ class Konfigurasi extends BaseController
 	// seo
 	public function seo()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_konfigurasi 	= new Konfigurasi_model();
 		$konfigurasi 	= $m_konfigurasi->listing();
 		$id_konfigurasi = $konfigurasi->id_konfigurasi;
@@ -284,7 +284,7 @@ class Konfigurasi extends BaseController
 	// logo
 	public function logo()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_konfigurasi 	= new Konfigurasi_model();
 		$konfigurasi 	= $m_konfigurasi->listing();
 		$id_konfigurasi = $konfigurasi->id_konfigurasi;
@@ -328,7 +328,7 @@ class Konfigurasi extends BaseController
 	// icon
 	public function icon()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_konfigurasi 	= new Konfigurasi_model();
 		$konfigurasi 	= $m_konfigurasi->listing();
 		$id_konfigurasi = $konfigurasi->id_konfigurasi;

@@ -10,7 +10,7 @@ class Kategori_staff extends BaseController
 	// mainpage
 	public function index()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_staff 	= new Kategori_staff_model();
 		$kategori_staff 	= $m_kategori_staff->listing();
 		$total 				= $m_kategori_staff->total();
@@ -78,7 +78,7 @@ class Kategori_staff extends BaseController
 	// edit
 	public function edit($id_kategori_staff)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_staff 	= new Kategori_staff_model();
 		$kategori_staff 	= $m_kategori_staff->detail($id_kategori_staff);
 
@@ -144,7 +144,7 @@ class Kategori_staff extends BaseController
 	// delete
 	public function delete($id_kategori_staff)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_staff = new Kategori_staff_model();
 		$data = ['id_kategori_staff'	=> $id_kategori_staff];
 		$m_kategori_staff->delete($data);

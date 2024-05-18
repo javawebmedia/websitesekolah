@@ -33,6 +33,13 @@
               <p>Data Pendaftar</p>
             </a>
           </li>
+
+          <li class="nav-item">
+            <a href="<?php echo base_url('admin/akun_pendaftar') ?>" class="nav-link <?php if($uri->getSegment(2)=="akun"){echo 'active';}?>">
+              <i class="nav-icon fas fa-users"></i>
+              <p>Akun Pendaftar</p>
+            </a>
+          </li>
         <?php } ?>
           
 

@@ -10,7 +10,7 @@ class Agama extends BaseController
 	// mainpage
 	public function index()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_agama = new Agama_model();
 		$agama 	= $m_agama->listing();
 		$total 	= $m_agama->total();
@@ -41,7 +41,7 @@ class Agama extends BaseController
 	// edit
 	public function edit($id_agama)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_agama = new Agama_model();
 		$agama 	= $m_agama->detail($id_agama);
 
@@ -72,7 +72,7 @@ class Agama extends BaseController
 	// delete
 	public function delete($id_agama)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_agama = new Agama_model();
 		$data = ['id_agama'	=> $id_agama];
 		$m_agama->delete($data);

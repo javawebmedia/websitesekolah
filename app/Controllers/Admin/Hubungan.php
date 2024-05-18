@@ -10,7 +10,7 @@ class Hubungan extends BaseController
 	// mainpage
 	public function index()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_hubungan = new Hubungan_model();
 		$hubungan 	= $m_hubungan->listing();
 		$total 	= $m_hubungan->total();
@@ -42,7 +42,7 @@ class Hubungan extends BaseController
 	// edit
 	public function edit($id_hubungan)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_hubungan = new Hubungan_model();
 		$hubungan 	= $m_hubungan->detail($id_hubungan);
 
@@ -74,7 +74,7 @@ class Hubungan extends BaseController
 	// delete
 	public function delete($id_hubungan)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_hubungan = new Hubungan_model();
 		$data = ['id_hubungan'	=> $id_hubungan];
 		$m_hubungan->delete($data);

@@ -12,7 +12,7 @@ class Menu extends BaseController
 	// mainpage
 	public function index()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_menu 		= new Menu_model();
 		$m_sub_menu 	= new Sub_menu_model();
 		$m_konfigurasi 	= new Konfigurasi_model();

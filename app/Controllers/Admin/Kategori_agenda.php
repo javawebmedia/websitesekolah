@@ -9,7 +9,7 @@ class Kategori_agenda extends BaseController
 	// mainpage
 	public function index()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_agenda = new Kategori_agenda_model();
 		$kategori_agenda 	= $m_kategori_agenda->listing();
 		$total 	= $m_kategori_agenda->total();
@@ -76,7 +76,7 @@ class Kategori_agenda extends BaseController
 	// edit
 	public function edit($id_kategori_agenda)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_agenda 	= new Kategori_agenda_model();
 		$kategori_agenda 	= $m_kategori_agenda->detail($id_kategori_agenda);
 
@@ -142,7 +142,7 @@ class Kategori_agenda extends BaseController
 	// delete
 	public function delete($id_kategori_agenda)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_agenda = new Kategori_agenda_model();
 		$data = ['id_kategori_agenda'	=> $id_kategori_agenda];
 		$m_kategori_agenda->delete($data);

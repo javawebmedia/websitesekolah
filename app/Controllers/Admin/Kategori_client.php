@@ -10,7 +10,7 @@ class Kategori_client extends BaseController
 	// mainpage
 	public function index()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_client 	= new Kategori_client_model();
 		$kategori_client 	= $m_kategori_client->listing();
 		$total 				= $m_kategori_client->total();
@@ -78,7 +78,7 @@ class Kategori_client extends BaseController
 	// edit
 	public function edit($id_kategori_client)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_client 	= new Kategori_client_model();
 		$kategori_client 	= $m_kategori_client->detail($id_kategori_client);
 
@@ -144,7 +144,7 @@ class Kategori_client extends BaseController
 	// delete
 	public function delete($id_kategori_client)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_client = new Kategori_client_model();
 		$data = ['id_kategori_client'	=> $id_kategori_client];
 		$m_kategori_client->delete($data);

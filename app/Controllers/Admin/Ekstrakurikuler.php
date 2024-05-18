@@ -11,7 +11,7 @@ class Ekstrakurikuler extends BaseController
 	// index
 	public function index()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_ekstrakurikuler 			= new Ekstrakurikuler_model();
 		$m_kategori_ekstrakurikuler 	= new Kategori_ekstrakurikuler_model();
 		$kategori_ekstrakurikuler 	= $m_kategori_ekstrakurikuler->listing();
@@ -52,7 +52,7 @@ class Ekstrakurikuler extends BaseController
 	// Tambah
 	public function tambah()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_ekstrakurikuler 			= new Ekstrakurikuler_model();
 		$m_kategori_ekstrakurikuler	= new Kategori_ekstrakurikuler_model();
 		$kategori_ekstrakurikuler 	= $m_kategori_ekstrakurikuler->listing();
@@ -122,7 +122,7 @@ class Ekstrakurikuler extends BaseController
 	// proses
 	public function proses()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori 		= new Kategori_ekstrakurikuler_model();
 		$m_ekstrakurikuler	= new Ekstrakurikuler_model();
 		// proses
@@ -176,7 +176,7 @@ class Ekstrakurikuler extends BaseController
 	// edit
 	public function edit($id_ekstrakurikuler)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_ekstrakurikuler	= new Kategori_ekstrakurikuler_model();
 		$m_ekstrakurikuler 			= new Ekstrakurikuler_model();
 		$kategori_ekstrakurikuler 	= $m_kategori_ekstrakurikuler->listing();
@@ -247,7 +247,7 @@ class Ekstrakurikuler extends BaseController
 	// Delete
 	public function delete($id_ekstrakurikuler)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_ekstrakurikuler = new Ekstrakurikuler_model();
 		$data = ['id_ekstrakurikuler'	=> $id_ekstrakurikuler];
 		$m_ekstrakurikuler->delete($data);

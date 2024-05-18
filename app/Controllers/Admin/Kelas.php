@@ -11,7 +11,7 @@ class Kelas extends BaseController
 	// mainpage
 	public function index()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kelas 		= new Kelas_model();
 		$m_jenjang 		= new Jenjang_model();
 		$jenjang 		= $m_jenjang->listing();
@@ -49,7 +49,7 @@ class Kelas extends BaseController
 	// edit
 	public function edit($id_kelas)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kelas 	= new Kelas_model();
 		$m_jenjang 	= new Jenjang_model();
 		$kelas 		= $m_kelas->detail($id_kelas);
@@ -86,7 +86,7 @@ class Kelas extends BaseController
 	// delete
 	public function delete($id_kelas)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kelas = new Kelas_model();
 		$data = ['id_kelas'	=> $id_kelas];
 		$m_kelas->delete($data);

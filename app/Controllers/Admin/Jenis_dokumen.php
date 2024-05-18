@@ -10,7 +10,7 @@ class Jenis_dokumen extends BaseController
 	// mainpage
 	public function index()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_jenis_dokumen 	= new Jenis_dokumen_model();
 		$jenis_dokumen 	= $m_jenis_dokumen->listing();
 		$total 				= $m_jenis_dokumen->total();
@@ -78,7 +78,7 @@ class Jenis_dokumen extends BaseController
 	// edit
 	public function edit($id_jenis_dokumen)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_jenis_dokumen 	= new Jenis_dokumen_model();
 		$jenis_dokumen 	= $m_jenis_dokumen->detail($id_jenis_dokumen);
 
@@ -144,7 +144,7 @@ class Jenis_dokumen extends BaseController
 	// delete
 	public function delete($id_jenis_dokumen)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_jenis_dokumen = new Jenis_dokumen_model();
 		$data = ['id_jenis_dokumen'	=> $id_jenis_dokumen];
 		$m_jenis_dokumen->delete($data);

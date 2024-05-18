@@ -10,7 +10,7 @@ class Media extends BaseController
 	// mainpage
 	public function index()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_media = new Media_model();
 		$media 	= $m_media->listing();
 		$total 	= $m_media->total();
@@ -48,7 +48,7 @@ class Media extends BaseController
 	// unggah
 	public function unggah()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_media 			= new Media_model();
 
 		// Start tambah
@@ -95,7 +95,7 @@ class Media extends BaseController
 	// edit
 	public function edit($id_media)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_media = new Media_model();
 		$media 	= $m_media->detail($id_media);
 
@@ -128,7 +128,7 @@ class Media extends BaseController
 	// delete
 	public function delete($id_media)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_media = new Media_model();
 		$data = ['id_media'	=> $id_media];
 		$m_media->delete($data);

@@ -10,7 +10,7 @@ class Tahun extends BaseController
 	// mainpage
 	public function index()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_tahun = new Tahun_model();
 		$tahun 	= $m_tahun->listing();
 		$total 	= $m_tahun->total();
@@ -43,7 +43,7 @@ class Tahun extends BaseController
 	// edit
 	public function edit($id_tahun)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_tahun = new Tahun_model();
 		$tahun 	= $m_tahun->detail($id_tahun);
 
@@ -76,7 +76,7 @@ class Tahun extends BaseController
 	// delete
 	public function delete($id_tahun)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_tahun = new Tahun_model();
 		$data = ['id_tahun'	=> $id_tahun];
 		$m_tahun->delete($data);

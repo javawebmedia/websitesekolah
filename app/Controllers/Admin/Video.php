@@ -10,7 +10,7 @@ class Video extends BaseController
 	// mainpage
 	public function index()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_video 	= new Video_model();
 		$video 		= $m_video->listing();
 		$total 		= $m_video->total();
@@ -82,7 +82,7 @@ class Video extends BaseController
 	// edit
 	public function edit($id_video)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_video 	= new Video_model();
 		$video 	= $m_video->detail($id_video);
 
@@ -152,7 +152,7 @@ class Video extends BaseController
 	// delete
 	public function delete($id_video)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_video = new Video_model();
 		$data = ['id_video'	=> $id_video];
 		$m_video->delete($data);

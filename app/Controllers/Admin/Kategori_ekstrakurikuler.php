@@ -10,7 +10,7 @@ class Kategori_ekstrakurikuler extends BaseController
 	// mainpage
 	public function index()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_ekstrakurikuler 	= new Kategori_ekstrakurikuler_model();
 		$kategori_ekstrakurikuler 	= $m_kategori_ekstrakurikuler->listing();
 		$total 				= $m_kategori_ekstrakurikuler->total();
@@ -78,7 +78,7 @@ class Kategori_ekstrakurikuler extends BaseController
 	// edit
 	public function edit($id_kategori_ekstrakurikuler)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_ekstrakurikuler 	= new Kategori_ekstrakurikuler_model();
 		$kategori_ekstrakurikuler 	= $m_kategori_ekstrakurikuler->detail($id_kategori_ekstrakurikuler);
 
@@ -144,7 +144,7 @@ class Kategori_ekstrakurikuler extends BaseController
 	// delete
 	public function delete($id_kategori_ekstrakurikuler)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_ekstrakurikuler = new Kategori_ekstrakurikuler_model();
 		$data = ['id_kategori_ekstrakurikuler'	=> $id_kategori_ekstrakurikuler];
 		$m_kategori_ekstrakurikuler->delete($data);

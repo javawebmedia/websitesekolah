@@ -21,7 +21,7 @@ class Siswa extends BaseController
 	// mainpage
 	public function index()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_siswa 	= new Siswa_model();
 		$siswa 	= $m_siswa->listing();
 		$pager 				= service('pager'); 
@@ -61,7 +61,7 @@ class Siswa extends BaseController
 	// detail
 	public function detail($id_siswa)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_siswa 	= new Siswa_model();
 		$siswa 		= $m_siswa->detail($id_siswa);
 
@@ -76,7 +76,7 @@ class Siswa extends BaseController
 	// cetak
 	public function cetak($id_siswa)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_siswa 	= new Siswa_model();
 		$siswa 		= $m_siswa->detail($id_siswa);
 
@@ -91,7 +91,7 @@ class Siswa extends BaseController
 	// unduh
 	public function unduh($id_siswa)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_siswa 	= new Siswa_model();
 		$siswa 		= $m_siswa->detail($id_siswa);
 
@@ -106,7 +106,7 @@ class Siswa extends BaseController
 	// import
 	public function import()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_siswa 			= new Siswa_model();
 		$m_rombel 			= new Rombel_model();
 		$m_siswa_rombel 	= new Siswa_rombel_model();
@@ -300,7 +300,7 @@ class Siswa extends BaseController
 	// proses
 	public function proses()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_siswa	= new Siswa_model();
 		$pengalihan = $this->request->getVar('pengalihan');
 		$submit 	= $this->request->getVar('submit');
@@ -330,7 +330,7 @@ class Siswa extends BaseController
 	// tambah
 	public function tambah()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_siswa 	= new Siswa_model();
 		$siswa 	= $m_siswa->last_id();
 		if($siswa) {
@@ -528,7 +528,7 @@ class Siswa extends BaseController
 	// edit
 	public function edit($id_siswa)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_siswa 	= new Siswa_model();
 		$siswa 	= $m_siswa->detail($id_siswa);
 
@@ -717,7 +717,7 @@ class Siswa extends BaseController
 	// delete
 	public function delete($id_siswa)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_siswa = new Siswa_model();
 		$data = ['id_siswa'	=> $id_siswa];
 		$m_siswa->delete($data);

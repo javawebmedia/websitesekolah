@@ -14,7 +14,7 @@ class Agenda extends BaseController
 	// index
 	public function index()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_agenda 			= new Agenda_model();
 		$m_kategori_agenda 	= new Kategori_agenda_model();
 		$agenda 			= $m_agenda->listing();
@@ -32,7 +32,7 @@ class Agenda extends BaseController
 	// index
 	public function cari()
 	{
-		$this->simple_login->checklogin();
+		
 		$keywords 			= $_GET['keywords'];
 		$m_agenda 			= new Agenda_model();
 		$m_kategori_agenda 	= new Kategori_agenda_model();
@@ -51,7 +51,7 @@ class Agenda extends BaseController
 	// kategori_agenda
 	public function kategori($id_kategori_agenda)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_agenda 			= new Agenda_model();
 		$m_kategori_agenda 	= new Kategori_agenda_model();
 		$kategori_agenda 		= $m_kategori_agenda->listing();
@@ -70,7 +70,7 @@ class Agenda extends BaseController
 	// jenis_agenda
 	public function jenis_agenda($jenis_agenda)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_agenda 			= new Agenda_model();
 		$m_kategori_agenda 	= new Kategori_agenda_model();
 		$agenda 				= $m_agenda->jenis_agenda_all($jenis_agenda);
@@ -87,7 +87,7 @@ class Agenda extends BaseController
 	// status_agenda
 	public function status_agenda($status_agenda)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_agenda 			= new Agenda_model();
 		$m_kategori_agenda 	= new Kategori_agenda_model();
 		$kategori_agenda 		= $m_kategori_agenda->listing();
@@ -105,7 +105,7 @@ class Agenda extends BaseController
 	// author
 	public function author($id_user)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_agenda 			= new Agenda_model();
 		$m_kategori_agenda 	= new Kategori_agenda_model();
 		$m_user 				= new User_model();
@@ -123,7 +123,7 @@ class Agenda extends BaseController
 	// Tambah
 	public function tambah()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_agenda 	= new Kategori_agenda_model();
 		$m_agenda 			= new Agenda_model();
 		$kategori_agenda 	= $m_kategori_agenda->listing();
@@ -224,7 +224,7 @@ class Agenda extends BaseController
 	// edit
 	public function edit($id_agenda)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_agenda 	= new Kategori_agenda_model();
 		$m_agenda 			= new Agenda_model();
 		$kategori_agenda 	= $m_kategori_agenda->listing();
@@ -324,7 +324,7 @@ class Agenda extends BaseController
 	// gambar
 	public function gambar($id_agenda)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_agenda 	= new Kategori_agenda_model();
 		$m_agenda 			= new Agenda_model();
 		$m_gambar_agenda	= new Gambar_agenda_model();
@@ -419,7 +419,7 @@ class Agenda extends BaseController
 	// jadwal
 	public function jadwal($id_agenda)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_agenda 	= new Kategori_agenda_model();
 		$m_agenda 			= new Agenda_model();
 		$m_jadwal			= new Jadwal_model();
@@ -484,7 +484,7 @@ class Agenda extends BaseController
 	// Lokasi
 	public function lokasi($id_agenda)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_desa 			= new Desa_model();
 		$m_agenda 			= new Agenda_model();
 		$m_lokasi_agenda	= new Lokasi_agenda_model();
@@ -590,7 +590,7 @@ class Agenda extends BaseController
 	// Delete
 	public function delete($id_agenda)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_agenda = new Agenda_model();
 		$data = ['id_agenda'	=> $id_agenda];
 		$m_agenda->delete($data);
@@ -602,7 +602,7 @@ class Agenda extends BaseController
 	// Delete
 	public function delete_gambar($id_gambar_agenda,$id_agenda)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_gambar_agenda = new Gambar_agenda_model();
 		$data = ['id_gambar_agenda'	=> $id_gambar_agenda];
 		$m_gambar_agenda->delete($data);
@@ -614,7 +614,7 @@ class Agenda extends BaseController
 	// Delete Lokasi
 	public function delete_lokasi($id_lokasi_agenda,$id_agenda)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_lokasi_agenda = new Lokasi_agenda_model();
 		$data = ['id_lokasi_agenda'	=> $id_lokasi_agenda];
 		$m_lokasi_agenda->delete($data);

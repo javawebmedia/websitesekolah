@@ -11,7 +11,7 @@ class User extends BaseController
 	// mainpage
 	public function index()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_user 	= new User_model();
 		$m_staff 	= new Staff_model();
 		$user 		= $m_user->listing();
@@ -50,7 +50,7 @@ class User extends BaseController
 	// edit
 	public function edit($id_user)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_user = new User_model();
 		$user 	= $m_user->detail($id_user);
 		$m_staff 	= new Staff_model();
@@ -97,7 +97,7 @@ class User extends BaseController
 	// delete
 	public function delete($id_user)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_user = new User_model();
 		$data = ['id_user'	=> $id_user];
 		$m_user->delete($data);

@@ -10,7 +10,7 @@ class Kategori_portfolio extends BaseController
 	// mainpage
 	public function index()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_portfolio 	= new Kategori_portfolio_model();
 		$kategori_portfolio 	= $m_kategori_portfolio->listing();
 		$total 				= $m_kategori_portfolio->total();
@@ -78,7 +78,7 @@ class Kategori_portfolio extends BaseController
 	// edit
 	public function edit($id_kategori_portfolio)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_portfolio 	= new Kategori_portfolio_model();
 		$kategori_portfolio 	= $m_kategori_portfolio->detail($id_kategori_portfolio);
 
@@ -144,7 +144,7 @@ class Kategori_portfolio extends BaseController
 	// delete
 	public function delete($id_kategori_portfolio)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_portfolio = new Kategori_portfolio_model();
 		$data = ['id_kategori_portfolio'	=> $id_kategori_portfolio];
 		$m_kategori_portfolio->delete($data);

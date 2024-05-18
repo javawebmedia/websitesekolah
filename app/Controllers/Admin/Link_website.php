@@ -10,7 +10,7 @@ class Link_website extends BaseController
 	// mainpage
 	public function index()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_link_website 	= new Link_website_model();
 		$link_website 		= $m_link_website->listing();
 		$total 				= $m_link_website->total();
@@ -83,7 +83,7 @@ class Link_website extends BaseController
 	// edit
 	public function edit($id_link_website)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_link_website 	= new Link_website_model();
 		$link_website 	= $m_link_website->detail($id_link_website);
 
@@ -153,7 +153,7 @@ class Link_website extends BaseController
 	// delete
 	public function delete($id_link_website)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_link_website = new Link_website_model();
 		$data = ['id_link_website'	=> $id_link_website];
 		$m_link_website->delete($data);

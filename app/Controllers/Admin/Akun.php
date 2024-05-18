@@ -12,7 +12,7 @@ class Akun extends BaseController
 	// mainpage
 	public function index()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_user 			= new User_model();
 		$m_staff 			= new Staff_model();
 		$m_kategori_staff 	= new Kategori_staff_model();

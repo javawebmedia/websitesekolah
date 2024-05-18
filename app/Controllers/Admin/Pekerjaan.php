@@ -10,7 +10,7 @@ class Pekerjaan extends BaseController
 	// mainpage
 	public function index()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_pekerjaan = new Pekerjaan_model();
 		$pekerjaan 	= $m_pekerjaan->listing();
 		$total 	= $m_pekerjaan->total();
@@ -41,7 +41,7 @@ class Pekerjaan extends BaseController
 	// edit
 	public function edit($id_pekerjaan)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_pekerjaan = new Pekerjaan_model();
 		$pekerjaan 	= $m_pekerjaan->detail($id_pekerjaan);
 
@@ -72,7 +72,7 @@ class Pekerjaan extends BaseController
 	// delete
 	public function delete($id_pekerjaan)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_pekerjaan = new Pekerjaan_model();
 		$data = ['id_pekerjaan'	=> $id_pekerjaan];
 		$m_pekerjaan->delete($data);

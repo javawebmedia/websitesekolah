@@ -19,7 +19,7 @@ class Rombel extends BaseController
 	// mainpage
 	public function index()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_rombel 		= new Rombel_model();
 		$m_jenjang 		= new Jenjang_model();
 		$m_tahun 		= new Tahun_model();
@@ -69,7 +69,7 @@ class Rombel extends BaseController
 	// anggota
 	public function anggota($id_rombel)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_rombel 		= new Rombel_model();
 		$m_jenjang 		= new Jenjang_model();
 		$m_tahun 		= new Tahun_model();
@@ -113,7 +113,7 @@ class Rombel extends BaseController
 	// kelola
 	public function kelola()
 	{
-		$this->simple_login->checklogin();
+		
 		if(isset($_GET['lihat'])) {
 			return redirect()->to(base_url('admin/rombel?id_tahun='.$this->request->getVar('id_tahun')));
 		}
@@ -173,7 +173,7 @@ class Rombel extends BaseController
 	// edit
 	public function edit($id_rombel)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_rombel 	= new Rombel_model();
 		$m_jenjang 	= new Jenjang_model();
 		$rombel 		= $m_rombel->detail($id_rombel);
@@ -210,7 +210,7 @@ class Rombel extends BaseController
 	// tambah_siswa
 	public function tambah_siswa()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_siswa_rombel 	= new Siswa_rombel_model();
 		$data = [	'id_user'				=> $this->request->getPost('id_user'),
 					'id_rombel'				=> $this->request->getPost('id_rombel'),
@@ -230,7 +230,7 @@ class Rombel extends BaseController
 	// siswa_rombel
 	public function siswa_rombel($id_rombel)
 	{
-		$this->simple_login->checklogin();
+		
 		header('Content-Type: application/json; charset=utf-8');
 		$m_rombel 				= new Rombel_model();
 		$m_siswa_rombel 		= new Siswa_rombel_model();
@@ -306,7 +306,7 @@ class Rombel extends BaseController
 	// guru_rombel
 	public function guru_rombel($id_rombel)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_rombel 			= new Rombel_model();
 		$m_siswa_rombel 	= new Siswa_rombel_model();
 		$siswa_rombel 		= $m_siswa_rombel->rombel($id_rombel);
@@ -329,7 +329,7 @@ class Rombel extends BaseController
 	// cetak
 	public function cetak($id_rombel)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_rombel 		= new Rombel_model();
 		$m_jenjang 		= new Jenjang_model();
 		$m_tahun 		= new Tahun_model();
@@ -357,7 +357,7 @@ class Rombel extends BaseController
 	// unduh
 	public function unduh($id_rombel)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_rombel 		= new Rombel_model();
 		$m_jenjang 		= new Jenjang_model();
 		$m_tahun 		= new Tahun_model();
@@ -394,7 +394,7 @@ class Rombel extends BaseController
 	// excel
 	public function excel($id_rombel)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_rombel 		= new Rombel_model();
 		$m_jenjang 		= new Jenjang_model();
 		$m_tahun 		= new Tahun_model();
@@ -422,7 +422,7 @@ class Rombel extends BaseController
 	// delete_staff
 	public function delete_staff($id_staff_rombel,$id_rombel)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_rombel 			= new Rombel_model();
 		$m_staff_rombel 	= new Staff_rombel_model();
 		$data = ['id_staff_rombel' => $id_staff_rombel];
@@ -434,7 +434,7 @@ class Rombel extends BaseController
 	// hapus
 	public function hapus()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_rombel 			= new Rombel_model();
 		$m_siswa_rombel 	= new Siswa_rombel_model();
 		$data = ['id_siswa_rombel' => $this->request->getPost('id_siswa_rombel')];
@@ -445,7 +445,7 @@ class Rombel extends BaseController
 	// delete
 	public function delete($id_rombel)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_rombel 		= new Rombel_model();
 		$m_siswa_rombel = new Siswa_rombel_model();
 		$siswa 			= $m_siswa_rombel->rombel($id_rombel);

@@ -11,7 +11,7 @@ class Portfolio extends BaseController
 	// index
 	public function index()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_portfolio 			= new Portfolio_model();
 		$m_kategori_portfolio 	= new Kategori_portfolio_model();
 		$kategori_portfolio 	= $m_kategori_portfolio->listing();
@@ -52,7 +52,7 @@ class Portfolio extends BaseController
 	// Tambah
 	public function tambah()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_portfolio 			= new Portfolio_model();
 		$m_kategori_portfolio 	= new Kategori_portfolio_model();
 		$kategori_portfolio 	= $m_kategori_portfolio->listing();
@@ -121,7 +121,7 @@ class Portfolio extends BaseController
 	// proses
 	public function proses()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori 	= new Kategori_portfolio_model();
 		$m_portfolio 		= new Portfolio_model();
 		// proses
@@ -175,7 +175,7 @@ class Portfolio extends BaseController
 	// edit
 	public function edit($id_portfolio)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_portfolio 	= new Kategori_portfolio_model();
 		$m_portfolio 			= new Portfolio_model();
 		$kategori_portfolio 	= $m_kategori_portfolio->listing();
@@ -244,7 +244,7 @@ class Portfolio extends BaseController
 	// Delete
 	public function delete($id_portfolio)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_portfolio = new Portfolio_model();
 		$data = ['id_portfolio'	=> $id_portfolio];
 		$m_portfolio->delete($data);

@@ -11,7 +11,7 @@ class Prestasi extends BaseController
 	// index
 	public function index()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_prestasi 			= new Prestasi_model();
 		$m_kategori_prestasi 	= new Kategori_prestasi_model();
 		$kategori_prestasi 	= $m_kategori_prestasi->listing();
@@ -52,7 +52,7 @@ class Prestasi extends BaseController
 	// Tambah
 	public function tambah()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_prestasi 			= new Prestasi_model();
 		$m_kategori_prestasi 	= new Kategori_prestasi_model();
 		$kategori_prestasi 	= $m_kategori_prestasi->listing();
@@ -132,7 +132,7 @@ class Prestasi extends BaseController
 	// proses
 	public function proses()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori 	= new Kategori_prestasi_model();
 		$m_prestasi 		= new Prestasi_model();
 		// proses
@@ -186,7 +186,7 @@ class Prestasi extends BaseController
 	// edit
 	public function edit($id_prestasi)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_prestasi 	= new Kategori_prestasi_model();
 		$m_prestasi 			= new Prestasi_model();
 		$kategori_prestasi 	= $m_kategori_prestasi->listing();
@@ -267,7 +267,7 @@ class Prestasi extends BaseController
 	// Delete
 	public function delete($id_prestasi)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_prestasi = new Prestasi_model();
 		$data = ['id_prestasi'	=> $id_prestasi];
 		$m_prestasi->delete($data);

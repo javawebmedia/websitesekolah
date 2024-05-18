@@ -10,7 +10,7 @@ class Kategori_galeri extends BaseController
 	// mainpage
 	public function index()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_galeri 	= new Kategori_galeri_model();
 		$kategori_galeri 	= $m_kategori_galeri->listing();
 		$total 				= $m_kategori_galeri->total();
@@ -78,7 +78,7 @@ class Kategori_galeri extends BaseController
 	// edit
 	public function edit($id_kategori_galeri)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_galeri 	= new Kategori_galeri_model();
 		$kategori_galeri 	= $m_kategori_galeri->detail($id_kategori_galeri);
 
@@ -144,7 +144,7 @@ class Kategori_galeri extends BaseController
 	// delete
 	public function delete($id_kategori_galeri)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_galeri = new Kategori_galeri_model();
 		$data = ['id_kategori_galeri'	=> $id_kategori_galeri];
 		$m_kategori_galeri->delete($data);

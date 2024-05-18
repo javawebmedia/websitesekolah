@@ -11,7 +11,7 @@ class Galeri extends BaseController
 	// index
 	public function index()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_galeri 			= new Galeri_model();
 		$m_kategori_galeri 	= new Kategori_galeri_model();
 		$kategori_galeri 	= $m_kategori_galeri->listing();
@@ -62,7 +62,7 @@ class Galeri extends BaseController
 	// Tambah
 	public function tambah()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_galeri 			= new Galeri_model();
 		$m_kategori_galeri 	= new Kategori_galeri_model();
 		$kategori_galeri 	= $m_kategori_galeri->listing();
@@ -129,7 +129,7 @@ class Galeri extends BaseController
 	// proses
 	public function proses()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori 	= new Kategori_galeri_model();
 		$m_galeri 		= new Galeri_model();
 		// proses
@@ -183,7 +183,7 @@ class Galeri extends BaseController
 	// edit
 	public function edit($id_galeri)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_galeri 	= new Kategori_galeri_model();
 		$m_galeri 			= new Galeri_model();
 		$kategori_galeri 	= $m_kategori_galeri->listing();
@@ -250,7 +250,7 @@ class Galeri extends BaseController
 	// Delete
 	public function delete($id_galeri)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_galeri = new Galeri_model();
 		$data = ['id_galeri'	=> $id_galeri];
 		$m_galeri->delete($data);

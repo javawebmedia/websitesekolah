@@ -12,7 +12,7 @@ class Download extends BaseController
 	// index
 	public function index()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_download 			= new Download_model();
 		$m_kategori_download 	= new Kategori_download_model();
 		$kategori_download 		= $m_kategori_download->listing();
@@ -63,7 +63,7 @@ class Download extends BaseController
 	// kategori_download
 	public function kategori_download($id_kategori_download)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_download 			= new Download_model();
 		$m_kategori_download 	= new Kategori_download_model();
 		$kategori_download 		= $m_kategori_download->detail($id_kategori_download);
@@ -86,7 +86,7 @@ class Download extends BaseController
 	// jenis_download
 	public function jenis_download($jenis_download)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_download 			= new Download_model();
 		$m_kategori_download 	= new Kategori_download_model();
 		$total 					= $m_download->total_jenis_download($jenis_download);
@@ -109,7 +109,7 @@ class Download extends BaseController
 	// author
 	public function author($id_user)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_download 			= new Download_model();
 		$m_kategori_download 	= new Kategori_download_model();
 		$m_user 				= new User_model();
@@ -127,7 +127,7 @@ class Download extends BaseController
 	// Tambah
 	public function tambah()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_download 	= new Kategori_download_model();
 		$m_download 			= new Download_model();
 		$kategori_download 		= $m_kategori_download->listing();
@@ -192,7 +192,7 @@ class Download extends BaseController
 	// edit
 	public function edit($id_download)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_download 	= new Kategori_download_model();
 		$m_download 			= new Download_model();
 		$kategori_download 		= $m_kategori_download->listing();
@@ -256,7 +256,7 @@ class Download extends BaseController
 	// proses
 	public function proses()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_download 	= new Kategori_download_model();
 		$m_download 			= new Download_model();
 		// proses
@@ -310,7 +310,7 @@ class Download extends BaseController
 	// unduh
 	public function unduh($id_download)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori_download 	= new Kategori_download_model();
 		$m_download 			= new Download_model();
 		$kategori_download 		= $m_kategori_download->listing();
@@ -326,7 +326,7 @@ class Download extends BaseController
 	// Delete
 	public function delete($id_download)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_download = new Download_model();
 		$data = ['id_download'	=> $id_download];
 		$m_download->delete($data);

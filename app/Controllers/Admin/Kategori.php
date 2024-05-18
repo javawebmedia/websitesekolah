@@ -10,7 +10,7 @@ class Kategori extends BaseController
 	// mainpage
 	public function index()
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori = new Kategori_model();
 		$kategori 	= $m_kategori->listing();
 		$total 		= $m_kategori->total();
@@ -43,7 +43,7 @@ class Kategori extends BaseController
 	// edit
 	public function edit($id_kategori)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori = new Kategori_model();
 		$kategori 	= $m_kategori->detail($id_kategori);
 		$total 		= $m_kategori->total();
@@ -77,7 +77,7 @@ class Kategori extends BaseController
 	// delete
 	public function delete($id_kategori)
 	{
-		$this->simple_login->checklogin();
+		
 		$m_kategori = new Kategori_model();
 		$data = ['id_kategori'	=> $id_kategori];
 		$m_kategori->delete($data);
