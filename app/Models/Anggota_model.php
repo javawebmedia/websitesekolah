@@ -41,7 +41,7 @@ class Anggota_model extends Model
         $this->select('anggota.*, pekerjaan.nama_pekerjaan, users.nama');
         $this->join('pekerjaan','pekerjaan.id_pekerjaan = anggota.id_pekerjaan','LEFT');
         $this->join('users','users.id_user = anggota.id_user','LEFT');
-        $this->limit($limit,$start);
+        $this->limit((int)$limit,(int)$start);
         $this->orderBy('anggota.id_anggota','DESC');
         $query = $this->get();
         return $query->getResult();
@@ -57,7 +57,7 @@ class Anggota_model extends Model
         $this->like('anggota.judul_anggota',$keywords,'BOTH');
         $this->orLike('anggota.website',$keywords,'BOTH');
         $this->orLike('anggota.isi',$keywords,'BOTH');
-        $this->limit($limit,$start);
+        $this->limit((int)$limit,(int)$start);
         $this->orderBy('anggota.id_anggota','DESC');
         $query = $this->get();
         return $query->getResult();

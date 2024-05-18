@@ -42,7 +42,7 @@ class Fasilitas_model extends Model
         $builder->join('kategori_fasilitas','kategori_fasilitas.id_kategori_fasilitas = fasilitas.id_kategori_fasilitas','LEFT');
         $builder->join('users','users.id_user = fasilitas.id_user','LEFT');
         $builder->where('fasilitas.status_fasilitas',$status_fasilitas);
-        $builder->limit($limit);
+        $this->limit((int)$limit);
         $builder->orderBy('fasilitas.id_fasilitas','DESC');
         $query = $builder->get();
         return $query->getResult();
@@ -120,7 +120,7 @@ class Fasilitas_model extends Model
         $this->select('fasilitas.*, kategori_fasilitas.nama_kategori_fasilitas, kategori_fasilitas.slug_kategori_fasilitas, users.nama');
         $this->join('kategori_fasilitas','kategori_fasilitas.id_kategori_fasilitas = fasilitas.id_kategori_fasilitas','LEFT');
         $this->join('users','users.id_user = fasilitas.id_user','LEFT');
-        $this->limit($limit,$start);
+        $this->limit((int)$limit,(int)$start);
         $this->orderBy('fasilitas.id_fasilitas','DESC');
         $query = $this->get();
         return $query->getResult();
@@ -136,7 +136,7 @@ class Fasilitas_model extends Model
         $this->like('fasilitas.judul_fasilitas',$keywords,'BOTH');
         $this->orLike('fasilitas.website',$keywords,'BOTH');
         $this->orLike('fasilitas.isi',$keywords,'BOTH');
-        $this->limit($limit,$start);
+        $this->limit((int)$limit,(int)$start);
         $this->orderBy('fasilitas.id_fasilitas','DESC');
         $query = $this->get();
         return $query->getResult();

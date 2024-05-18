@@ -104,7 +104,7 @@ class Agenda_model extends Model
         $builder->join('users','users.id_user = agenda.id_user','LEFT');
         $builder->where( [  'status_agenda' => 'Publish']);
         $builder->orderBy('agenda.id_agenda','DESC');
-        $builder->limit($limit);
+        $this->limit((int)$limit);
         $query = $builder->get();
         return $query->getResultArray();
     }

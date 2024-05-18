@@ -29,7 +29,7 @@ class Cabang_model extends Model
         $this->select('cabang.*, kategori_cabang.nama_kategori_cabang, kategori_cabang.slug_kategori_cabang, users.nama');
         $this->join('kategori_cabang','kategori_cabang.id_kategori_cabang = cabang.id_kategori_cabang','LEFT');
         $this->join('users','users.id_user = cabang.id_user','LEFT');
-        $this->limit($limit,$start);
+        $this->limit((int)$limit,(int)$start);
         $this->orderBy('cabang.id_cabang','DESC');
         $query = $this->get();
         return $query->getResult();
@@ -46,7 +46,7 @@ class Cabang_model extends Model
         $this->orLike('cabang.isi',$keywords,'BOTH');
         $this->orLike('cabang.keywords',$keywords,'BOTH');
         $this->orLike('cabang.ringkasan',$keywords,'BOTH');
-        $this->limit($limit,$start);
+        $this->limit((int)$limit,(int)$start);
         $this->orderBy('cabang.id_cabang','DESC');
         $query = $this->get();
         return $query->getResult();
@@ -163,7 +163,7 @@ class Cabang_model extends Model
         $this->join('kategori_cabang','kategori_cabang.id_kategori_cabang = cabang.id_kategori_cabang','LEFT');
         $this->join('users','users.id_user = cabang.id_user','LEFT');
         $this->where( [  'cabang.id_kategori_cabang'    => $id_kategori_cabang]);
-        $this->limit($limit,$start);
+        $this->limit((int)$limit,(int)$start);
         $this->orderBy('cabang.tanggal_publish','DESC');
         $query = $this->get();
         return $query->getResult();
@@ -206,7 +206,7 @@ class Cabang_model extends Model
         $this->join('kategori_cabang','kategori_cabang.id_kategori_cabang = cabang.id_kategori_cabang','LEFT');
         $this->join('users','users.id_user = cabang.id_user','LEFT');
         $this->where( [  'cabang.jenis_cabang'    => $jenis_cabang]);
-        $this->limit($limit,$start);
+        $this->limit((int)$limit,(int)$start);
         $this->orderBy('cabang.id_cabang','DESC');
         $query = $this->get();
         return $query->getResult();
@@ -228,7 +228,7 @@ class Cabang_model extends Model
         $this->join('kategori_cabang','kategori_cabang.id_kategori_cabang = cabang.id_kategori_cabang','LEFT');
         $this->join('users','users.id_user = cabang.id_user','LEFT');
         $this->where( [  'cabang.status_cabang'    => $status_cabang]);
-        $this->limit($limit,$start);
+        $this->limit((int)$limit,(int)$start);
         $this->orderBy('cabang.id_cabang','DESC');
         $query = $this->get();
         return $query->getResult();

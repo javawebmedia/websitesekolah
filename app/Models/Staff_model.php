@@ -43,7 +43,7 @@ class Staff_model extends Model
         $this->select('staff.*, kategori_staff.nama_kategori_staff, kategori_staff.slug_kategori_staff, users.nama AS nama_user');
         $this->join('kategori_staff','kategori_staff.id_kategori_staff = staff.id_kategori_staff','LEFT');
         $this->join('users','users.id_user = staff.id_user','LEFT');
-        $this->limit($limit,$start);
+        $this->limit((int)$limit,(int)$start);
         $this->orderBy('staff.id_staff','DESC');
         $query = $this->get();
         return $query->getResult();
@@ -62,7 +62,7 @@ class Staff_model extends Model
         $this->orLike('staff.email',$keywords,'BOTH');
         $this->orLike('staff.alamat',$keywords,'BOTH');
         $this->orLike('staff.telepon',$keywords,'BOTH');
-        $this->limit($limit,$start);
+        $this->limit((int)$limit,(int)$start);
         $this->orderBy('staff.id_staff','DESC');
         $query = $this->get();
         return $query->getResult();
@@ -123,7 +123,7 @@ class Staff_model extends Model
         $this->join('kategori_staff','kategori_staff.id_kategori_staff = staff.id_kategori_staff','LEFT');
         $this->join('users','users.id_user = staff.id_user','LEFT');
         $this->where( [  'staff.id_kategori_staff'    => $id_kategori_staff]);
-        $this->limit($limit,$start);
+        $this->limit((int)$limit,(int)$start);
         $this->orderBy('staff.urutan','ASC');
         $query = $this->get();
         return $query->getResult();
@@ -166,7 +166,7 @@ class Staff_model extends Model
         $this->join('kategori_staff','kategori_staff.id_kategori_staff = staff.id_kategori_staff','LEFT');
         $this->join('users','users.id_user = staff.id_user','LEFT');
         $this->where( [  'staff.jenis_staff'    => $jenis_staff]);
-        $this->limit($limit,$start);
+        $this->limit((int)$limit,(int)$start);
         $this->orderBy('staff.id_staff','DESC');
         $query = $this->get();
         return $query->getResult();
@@ -188,7 +188,7 @@ class Staff_model extends Model
         $this->join('kategori_staff','kategori_staff.id_kategori_staff = staff.id_kategori_staff','LEFT');
         $this->join('users','users.id_user = staff.id_user','LEFT');
         $this->where( [  'staff.status_staff'    => $status_staff]);
-        $this->limit($limit,$start);
+        $this->limit((int)$limit,(int)$start);
         $this->orderBy('staff.id_staff','DESC');
         $query = $this->get();
         return $query->getResult();

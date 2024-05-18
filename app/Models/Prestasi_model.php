@@ -42,7 +42,7 @@ class Prestasi_model extends Model
         $builder->join('kategori_prestasi','kategori_prestasi.id_kategori_prestasi = prestasi.id_kategori_prestasi','LEFT');
         $builder->join('users','users.id_user = prestasi.id_user','LEFT');
         $builder->where('prestasi.status_prestasi',$status_prestasi);
-        $builder->limit($limit);
+        $this->limit((int)$limit);
         $builder->orderBy('prestasi.id_prestasi','DESC');
         $query = $builder->get();
         return $query->getResult();
@@ -120,7 +120,7 @@ class Prestasi_model extends Model
         $this->select('prestasi.*, kategori_prestasi.nama_kategori_prestasi, kategori_prestasi.slug_kategori_prestasi, users.nama');
         $this->join('kategori_prestasi','kategori_prestasi.id_kategori_prestasi = prestasi.id_kategori_prestasi','LEFT');
         $this->join('users','users.id_user = prestasi.id_user','LEFT');
-        $this->limit($limit,$start);
+        $this->limit((int)$limit,(int)$start);
         $this->orderBy('prestasi.id_prestasi','DESC');
         $query = $this->get();
         return $query->getResult();
@@ -136,7 +136,7 @@ class Prestasi_model extends Model
         $this->like('prestasi.judul_prestasi',$keywords,'BOTH');
         $this->orLike('prestasi.website',$keywords,'BOTH');
         $this->orLike('prestasi.isi',$keywords,'BOTH');
-        $this->limit($limit,$start);
+        $this->limit((int)$limit,(int)$start);
         $this->orderBy('prestasi.id_prestasi','DESC');
         $query = $this->get();
         return $query->getResult();

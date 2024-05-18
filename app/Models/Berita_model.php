@@ -29,7 +29,7 @@ class Berita_model extends Model
         $this->select('berita.*, kategori.nama_kategori, kategori.slug_kategori, users.nama');
         $this->join('kategori','kategori.id_kategori = berita.id_kategori','LEFT');
         $this->join('users','users.id_user = berita.id_user','LEFT');
-        $this->limit($limit,$start);
+        $this->limit((int)$limit,(int)$start);
         $this->orderBy('berita.id_berita','DESC');
         $query = $this->get();
         return $query->getResult();
@@ -46,7 +46,7 @@ class Berita_model extends Model
         $this->orLike('berita.isi',$keywords,'BOTH');
         $this->orLike('berita.keywords',$keywords,'BOTH');
         $this->orLike('berita.ringkasan',$keywords,'BOTH');
-        $this->limit($limit,$start);
+        $this->limit((int)$limit,(int)$start);
         $this->orderBy('berita.id_berita','DESC');
         $query = $this->get();
         return $query->getResult();
@@ -166,7 +166,7 @@ class Berita_model extends Model
                         'berita.jenis_berita'   => $jenis_berita,
                         'berita.status_berita'  => $status_berita,
                     ]);
-        $this->limit($limit,$start);
+        $this->limit((int)$limit,(int)$start);
         $this->orderBy('berita.tanggal_publish','DESC');
         $query = $this->get();
         return $query->getResult();
@@ -192,7 +192,7 @@ class Berita_model extends Model
         $this->join('kategori','kategori.id_kategori = berita.id_kategori','LEFT');
         $this->join('users','users.id_user = berita.id_user','LEFT');
         $this->where( [  'berita.id_kategori'    => $id_kategori]);
-        $this->limit($limit,$start);
+        $this->limit((int)$limit,(int)$start);
         $this->orderBy('berita.tanggal_publish','DESC');
         $query = $this->get();
         return $query->getResult();
@@ -235,7 +235,7 @@ class Berita_model extends Model
         $this->join('kategori','kategori.id_kategori = berita.id_kategori','LEFT');
         $this->join('users','users.id_user = berita.id_user','LEFT');
         $this->where( [  'berita.jenis_berita'    => $jenis_berita]);
-        $this->limit($limit,$start);
+        $this->limit((int)$limit,(int)$start);
         $this->orderBy('berita.id_berita','DESC');
         $query = $this->get();
         return $query->getResult();
@@ -257,7 +257,7 @@ class Berita_model extends Model
         $this->join('kategori','kategori.id_kategori = berita.id_kategori','LEFT');
         $this->join('users','users.id_user = berita.id_user','LEFT');
         $this->where( [  'berita.status_berita'    => $status_berita]);
-        $this->limit($limit,$start);
+        $this->limit((int)$limit,(int)$start);
         $this->orderBy('berita.id_berita','DESC');
         $query = $this->get();
         return $query->getResult();
@@ -273,7 +273,7 @@ class Berita_model extends Model
         $this->where( [     'berita.jenis_berita'   => $jenis_berita,
                             'berita.status_berita'  => $status_berita,  
                         ]);
-        $this->limit($limit,$start);
+        $this->limit((int)$limit,(int)$start);
         $this->orderBy('berita.id_berita','DESC');
         $query = $this->get();
         return $query->getResult();

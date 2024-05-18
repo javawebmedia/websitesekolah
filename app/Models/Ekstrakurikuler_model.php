@@ -42,7 +42,7 @@ class Ekstrakurikuler_model extends Model
         $builder->join('kategori_ekstrakurikuler','kategori_ekstrakurikuler.id_kategori_ekstrakurikuler = ekstrakurikuler.id_kategori_ekstrakurikuler','LEFT');
         $builder->join('users','users.id_user = ekstrakurikuler.id_user','LEFT');
         $builder->where('ekstrakurikuler.status_ekstrakurikuler',$status_ekstrakurikuler);
-        $builder->limit($limit);
+        $this->limit((int)$limit);
         $builder->orderBy('ekstrakurikuler.id_ekstrakurikuler','DESC');
         $query = $builder->get();
         return $query->getResult();
@@ -120,7 +120,7 @@ class Ekstrakurikuler_model extends Model
         $this->select('ekstrakurikuler.*, kategori_ekstrakurikuler.nama_kategori_ekstrakurikuler, kategori_ekstrakurikuler.slug_kategori_ekstrakurikuler, users.nama');
         $this->join('kategori_ekstrakurikuler','kategori_ekstrakurikuler.id_kategori_ekstrakurikuler = ekstrakurikuler.id_kategori_ekstrakurikuler','LEFT');
         $this->join('users','users.id_user = ekstrakurikuler.id_user','LEFT');
-        $this->limit($limit,$start);
+        $this->limit((int)$limit,(int)$start);
         $this->orderBy('ekstrakurikuler.id_ekstrakurikuler','DESC');
         $query = $this->get();
         return $query->getResult();
@@ -136,7 +136,7 @@ class Ekstrakurikuler_model extends Model
         $this->like('ekstrakurikuler.judul_ekstrakurikuler',$keywords,'BOTH');
         $this->orLike('ekstrakurikuler.website',$keywords,'BOTH');
         $this->orLike('ekstrakurikuler.isi',$keywords,'BOTH');
-        $this->limit($limit,$start);
+        $this->limit((int)$limit,(int)$start);
         $this->orderBy('ekstrakurikuler.id_ekstrakurikuler','DESC');
         $query = $this->get();
         return $query->getResult();

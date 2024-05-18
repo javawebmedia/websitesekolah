@@ -54,7 +54,7 @@ class Akun_model extends Model
         $this->select('akun.*, siswa.nama_siswa, siswa.slug_siswa, users.nama');
         $this->join('siswa','siswa.nis = akun.nis','LEFT');
         $this->join('users','users.id_user = akun.id_user','LEFT');
-        $this->limit($limit,$start);
+        $this->limit((int)$limit,(int)$start);
         $this->orderBy('akun.id_akun','DESC');
         $query = $this->get();
         return $query->getResult();
@@ -70,7 +70,7 @@ class Akun_model extends Model
         $this->like('akun.judul_akun',$keywords,'BOTH');
         $this->orLike('akun.website',$keywords,'BOTH');
         $this->orLike('akun.isi',$keywords,'BOTH');
-        $this->limit($limit,$start);
+        $this->limit((int)$limit,(int)$start);
         $this->orderBy('akun.id_akun','DESC');
         $query = $this->get();
         return $query->getResult();
@@ -107,7 +107,7 @@ class Akun_model extends Model
         $this->join('siswa','siswa.nis = akun.nis','LEFT');
         $this->join('users','users.id_user = akun.id_user','LEFT');
         $this->where('akun.status_akun',$status_akun);
-        $this->limit($limit,$start);
+        $this->limit((int)$limit,(int)$start);
         $this->orderBy('akun.id_akun','DESC');
         $query = $this->get();
         return $query->getResult();

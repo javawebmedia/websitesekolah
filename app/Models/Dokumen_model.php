@@ -29,7 +29,7 @@ class Dokumen_model extends Model
         $this->select('dokumen.*, jenis_dokumen.nama_jenis_dokumen, jenis_dokumen.slug_jenis_dokumen, siswa.nama_siswa');
         $this->join('jenis_dokumen','jenis_dokumen.id_jenis_dokumen = dokumen.id_jenis_dokumen','LEFT');
         $this->join('siswa','siswa.id_siswa = dokumen.id_siswa','LEFT');
-        $this->limit($limit,$start);
+        $this->limit((int)$limit,(int)$start);
         $this->orderBy('dokumen.id_dokumen','DESC');
         $query = $this->get();
         return $query->getResult();
@@ -44,7 +44,7 @@ class Dokumen_model extends Model
         $this->join('siswa','siswa.id_siswa = dokumen.id_siswa','LEFT');
         $this->like('dokumen.judul_dokumen',$keywords,'BOTH');
         $this->orLike('dokumen.isi',$keywords,'BOTH');
-        $this->limit($limit,$start);
+        $this->limit((int)$limit,(int)$start);
         $this->orderBy('dokumen.id_dokumen','DESC');
         $query = $this->get();
         return $query->getResult();
@@ -89,7 +89,7 @@ class Dokumen_model extends Model
         $this->where( [ 'dokumen.id_jenis_dokumen' => $id_jenis_dokumen,
                         'dokumen.jenis_dokumen'       => $jenis_dokumen
                     ]);
-        $this->limit($limit,$start);
+        $this->limit((int)$limit,(int)$start);
         $this->orderBy('dokumen.id_dokumen','DESC');
         $query = $this->get();
         return $query->getResult();

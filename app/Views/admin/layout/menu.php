@@ -527,6 +527,9 @@ $validation = \Config\Services::validation();
     }
 ?>
 
+<?= session()->getFlashdata('error') ?>
+<?= validation_list_errors() ?>
+
 <?php if (session('msg')) : ?>
      <div class="alert alert-info alert-dismissible">
          <?= session('msg') ?>

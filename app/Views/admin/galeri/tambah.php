@@ -5,6 +5,9 @@
 </p>
 <hr>
 
+<?= session()->getFlashdata('error') ?>
+<?= validation_list_errors() ?>
+
 <form action="<?php echo base_url('admin/galeri/tambah') ?>" method="post" accept-charset="utf-8" enctype="multipart/form-data">
 <?php 
 echo csrf_field(); 

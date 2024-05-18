@@ -54,7 +54,7 @@ class Client_model extends Model
         $this->select('client.*, kategori_client.nama_kategori_client, kategori_client.slug_kategori_client, users.nama');
         $this->join('kategori_client','kategori_client.id_kategori_client = client.id_kategori_client','LEFT');
         $this->join('users','users.id_user = client.id_user','LEFT');
-        $this->limit($limit,$start);
+        $this->limit((int)$limit,(int)$start);
         $this->orderBy('client.id_client','DESC');
         $query = $this->get();
         return $query->getResult();
@@ -70,7 +70,7 @@ class Client_model extends Model
         $this->like('client.judul_client',$keywords,'BOTH');
         $this->orLike('client.website',$keywords,'BOTH');
         $this->orLike('client.isi',$keywords,'BOTH');
-        $this->limit($limit,$start);
+        $this->limit((int)$limit,(int)$start);
         $this->orderBy('client.id_client','DESC');
         $query = $this->get();
         return $query->getResult();
@@ -107,7 +107,7 @@ class Client_model extends Model
         $this->join('kategori_client','kategori_client.id_kategori_client = client.id_kategori_client','LEFT');
         $this->join('users','users.id_user = client.id_user','LEFT');
         $this->where('client.status_client',$status_client);
-        $this->limit($limit,$start);
+        $this->limit((int)$limit,(int)$start);
         $this->orderBy('client.id_client','DESC');
         $query = $this->get();
         return $query->getResult();

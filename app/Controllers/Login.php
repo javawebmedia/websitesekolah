@@ -31,6 +31,15 @@ class Login extends BaseController
         return view('login/wrapper',$data);
     }
 
+    // coba
+    public function coba()
+    {
+        $username       = 'andoyo';
+        $password       = 'andoyo';
+        $pengalihan     = '';
+        $this->simple_login->login($username,$password,$pengalihan);
+    }
+
     // lupa
     public function lupa()
     {
