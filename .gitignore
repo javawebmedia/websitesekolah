@@ -7,8 +7,11 @@
 *.zip
 *.txt
 
+
 # Config file
 # app/Config/
+app/Config/Database.php
+app/Config/App.php
 writable/
 writable/debugbar/
 writable/logs
