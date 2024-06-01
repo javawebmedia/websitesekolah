@@ -2,11 +2,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Dosis:wght@200..800&display=swap');
 
 body {
-/* 	font-family: 'Varela Round', sans-serif; */
-  font-family: "Dosis", sans-serif;
+	font-family: 'Varela Round', sans-serif;
+  /* font-family: "Dosis", sans-serif;
   font-optical-sizing: auto;
   font-weight: normal;
-  font-style: normal;
+  font-style: normal; */
 }
 
 p, h1, h2, h3, h4, h5, h6 {
