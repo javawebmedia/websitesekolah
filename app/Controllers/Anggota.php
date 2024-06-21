@@ -2,6 +2,7 @@
 namespace App\Controllers;
 
 use CodeIgniter\Controller;
+// load model
 use App\Models\Konfigurasi_model;
 use App\Models\Anggota_model;
 use App\Models\Menu_model;
