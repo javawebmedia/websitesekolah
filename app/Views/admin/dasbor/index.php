@@ -1,5 +1,5 @@
 <div class="callout callout-info bg-light">
-	Hai <strong><em class="text-success"><?php echo Session()->get('nama') ?></em></strong>, Selamat datang di <strong><?php echo $this->website->namasekolah() ?></strong>
+	Hai <strong><em class="text-success"><?php echo Session()->get('nama') ?></em></strong>, Selamat datang di <strong><?php echo $this->website->namasekolah() ?>. Semoga Anda senang.</strong>
 </div>
 
 <!-- Info boxes -->
