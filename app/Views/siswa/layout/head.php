@@ -2,7 +2,12 @@
 use App\Models\Konfigurasi_model;
 $konfigurasi  = new Konfigurasi_model;
 $site         = $konfigurasi->listing();
+
+// website
+use App\Libraries\Website;
+$this->website  = new Website();
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -11,8 +16,8 @@ $site         = $konfigurasi->listing();
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title><?php echo $title ?></title>
   <!-- Favicons -->
-  <link href="<?php echo icon() ?>" rel="icon">
-  <link href="<?php echo icon() ?>" rel="apple-touch-icon">
+  <link href="<?php echo $this->website->icon() ?>" rel="icon">
+  <link href="<?php echo $this->website->icon() ?>" rel="apple-touch-icon">
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
   <!-- Font Awesome -->
@@ -49,7 +54,4 @@ $site         = $konfigurasi->listing();
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
 
-  <!-- Preloader -->
-  <!-- <div class="preloader flex-column justify-content-center align-items-center">
-    <img class="animation__shake" src="<?php echo base_url('assets/upload/image/'.$site['icon']) ?>" alt="AdminLTELogo" height="60" width="60">
-  </div> -->
+

@@ -32,7 +32,7 @@
 			<td class="text-center"><?php if($client) { echo $client->total; }else{ echo 0; } ?> Client</td>
 			<td class="text-center"><?php echo $kategori_client->urutan ?></td>
 			<td>
-				<a href="<?php echo base_url('admin/kategori_client/edit/'.$kategori_client->id_kategori_client) ?>" class="btn btn-success btn-sm"><i class="fa fa-edit"></i></a>
+				<a href="<?php echo base_url('admin/kategori_client/edit/'.$kategori_client->id_kategori_client) ?>" class="btn btn-success btn-xs mb-1"><i class="fa fa-edit"></i></a>
 				<a href="<?php echo base_url('admin/kategori_client/delete/'.$kategori_client->id_kategori_client) ?>" class="btn btn-dark btn-sm delete-link"><i class="fa fa-trash"></i></a>
 			</td>
 		</tr>

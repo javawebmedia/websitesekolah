@@ -1,4 +1,7 @@
 <?php 
+use App\Libraries\Website;
+$this->website = new Website();
+
 $uri = service('uri');
  ?>
 <!DOCTYPE html>

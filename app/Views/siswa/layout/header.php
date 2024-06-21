@@ -28,14 +28,10 @@ $site         = $konfigurasi->listing();
           <i class="fas fa-expand-arrows-alt"></i>
         </a>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
-          <i class="fas fa-th-large"></i>
-        </a>
-      </li>
+      
       <li class="nav-item">
         <a href="<?php echo base_url('siswa/akun') ?>" class="nav-link">
-          <i class="fa fa-user"></i> <?php echo $session->get('nama_lengkap') ?> (NISN: <?php echo $session->get('nisn') ?>)</a>
+          <i class="fa fa-user"></i> <?php echo Session()->get('nama_siswa') ?></a>
       </li>
       <li class="nav-item">
         <a href="<?php echo base_url('signin/logout') ?>" class="nav-link text-danger">

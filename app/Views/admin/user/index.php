@@ -24,7 +24,7 @@
 			<td><?php echo $user->username ?></td>
 			<td><?php echo $user->akses_level ?></td>
 			<td>
-				<a href="<?php echo base_url('admin/user/edit/'.$user->id_user) ?>" class="btn btn-success btn-sm"><i class="fa fa-edit"></i></a>
+				<a href="<?php echo base_url('admin/user/edit/'.$user->id_user) ?>" class="btn btn-success btn-xs mb-1"><i class="fa fa-edit"></i></a>
 				<a href="<?php echo base_url('admin/user/delete/'.$user->id_user) ?>" class="btn btn-dark btn-sm delete-link"><i class="fa fa-trash"></i></a>
 			</td>
 		</tr>

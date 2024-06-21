@@ -47,7 +47,7 @@
 			</td>
 			<td class="text-center"><?php echo $video->urutan ?></td>
 			<td>
-				<a href="<?php echo base_url('admin/video/edit/'.$video->id_video) ?>" class="btn btn-success btn-sm"><i class="fa fa-edit"></i></a>
+				<a href="<?php echo base_url('admin/video/edit/'.$video->id_video) ?>" class="btn btn-success btn-xs mb-1"><i class="fa fa-edit"></i></a>
 				<a href="<?php echo base_url('admin/video/delete/'.$video->id_video) ?>" class="btn btn-dark btn-sm delete-link"><i class="fa fa-trash"></i></a>
 			</td>
 		</tr>

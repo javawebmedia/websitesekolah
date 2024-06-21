@@ -28,7 +28,7 @@
 			<td><?php echo $kelasnya->status_kelas ?></td>
 			<td><?php echo $kelasnya->urutan ?></td>
 			<td>
-				<a href="<?php echo base_url('admin/kelas/edit/'.$kelasnya->id_kelas) ?>" class="btn btn-success btn-sm"><i class="fa fa-edit"></i></a>
+				<a href="<?php echo base_url('admin/kelas/edit/'.$kelasnya->id_kelas) ?>" class="btn btn-success btn-xs mb-1"><i class="fa fa-edit"></i></a>
 				<a href="<?php echo base_url('admin/kelas/delete/'.$kelasnya->id_kelas) ?>" class="btn btn-dark btn-sm delete-link"><i class="fa fa-trash"></i></a>
 			</td>
 		</tr>

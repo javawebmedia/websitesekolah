@@ -121,7 +121,7 @@ Header Area
                                                     <i class="fa fa-sign-out-alt"></i>
                                                 </a>
                                             <?php }}else{ ?>
-                                                <a href="https://wa.me/<?php echo $this->website->whatsapp() ?>?text=<?php echo $this->website->pesan_whatsapp() ?>" class="btn btn-success btn-sm" target="_blank"><i class="fab fa-whatsapp"></i> Chat WA</a>
+                                                <a href="https://wa.me/<?php echo $this->website->whatsapp() ?>?text=<?php echo $this->website->pesan_whatsapp() ?>" class="btn btn-success btn-xs mb-1" target="_blank"><i class="fab fa-whatsapp"></i> Chat WA</a>
                                                 <?php if($this->website->fitur_pendaftaran()=='On') { ?>
                                                 <a href="<?php echo base_url('signin') ?>" class="btn btn-primary btn-sm"><i class="fa fa-lock"></i> Masuk</a>
                                                 <a href="<?php echo base_url('register') ?>" class="btn btn-danger btn-sm"><i class="fa fa-edit"></i> Daftar</a>

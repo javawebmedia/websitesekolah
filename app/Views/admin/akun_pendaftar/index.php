@@ -102,8 +102,8 @@
 			</td>
 			<td>
 				
-				<a href="<?php echo base_url('admin/akun_pendaftar/edit/'.$akun->id_akun) ?>" class="btn btn-success btn-sm"><i class="fa fa-edit"></i></a>
-				<a href="<?php echo base_url('admin/akun_pendaftar/delete/'.$akun->id_akun) ?>" class="btn btn-dark btn-sm" onclick="confirmation(event)"><i class="fa fa-trash"></i></a>
+				<a href="<?php echo base_url('admin/akun_pendaftar/edit/'.$akun->id_akun) ?>" class="btn btn-success btn-xs mb-1"><i class="fa fa-edit"></i></a>
+				<a href="<?php echo base_url('admin/akun_pendaftar/delete/'.$akun->id_akun) ?>" class="btn btn-dark btn-xs mb-1" onclick="confirmation(event)"><i class="fa fa-trash"></i></a>
 			</td>
 		</tr>
 		<?php $no++; } ?>

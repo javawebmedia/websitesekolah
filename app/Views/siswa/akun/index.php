@@ -1,86 +1,97 @@
-<form action="<?php echo base_url('siswa/akun') ?>" method="post" accept-charset="utf-8" enctype="multipart/form-data">
-    <?php 
-    echo csrf_field(); 
-    ?>
-    <input type="hidden" name="id_siswa" value="<?php echo $siswa['id_siswa'] ?>">
-    <table class="table table-bordered">
-       <tbody>
-          <tr>
-             <td class="bg-light" width="25%">Nama lengkap</td>
-             <td><?php echo $siswa['nama_lengkap'] ?></td>
-         </tr>
-         <tr>
-             <td colspan="2" class="text-center bg-dark">Ganti Password dan Upload Foto</td>
-         </tr>
-         <tr>
-             <td class="bg-light">Password</td>
-             <td><input type="password" name="password" class="form-control" value="">
-                <span class="text-danger">Minimal 6 karakter dan maksimal 32 karakter atau biarkan kosong jika tidak ingin mengganti password</span>
-             </td>
-         </tr>
-         <tr>
-             <td class="bg-light">Konfirmasi Password</td>
-             <td><input type="password" name="konfirmasi_password" class="form-control" value="">
-                <span class="text-danger">Minimal 6 karakter dan maksimal 32 karakter atau biarkan kosong jika tidak ingin mengganti password</span>
-             </td>
-         </tr>
-         <tr>
-             <td class="bg-light">Upload foto</td>
-             <td><input type="file" name="gambar" class="form-control"></td>
-         </tr>
-         <tr>
-             <td></td>
-             <td>
-                 <button class="btn btn-success" type="submit" name="submit">
-                     <i class="fa fa-save"></i> Simpan
-                 </button>
-             </td>
-         </tr>
-         <tr>
-             <td class="bg-light">Nama panggilan</td>
-             <td><?php echo $siswa['nama_panggilan'] ?></td>
-         </tr>
-         <tr>
-             <td class="bg-light">NIS/NISN</td>
-             <td><?php echo $siswa['nis'] ?> / <?php echo $siswa['nisn'] ?></td>
-         </tr>
-         <tr>
-             <td class="bg-light">Jurusan/Kelas/ABS</td>
-             <td><?php echo $siswa['jurusan'] ?> / <?php echo $siswa['kelas'] ?> / <?php echo $siswa['abs'] ?></td>
-         </tr>
-         <tr>
-             <td class="bg-light">Nomor Peserta</td>
-             <td><?php echo $siswa['no_peserta'] ?></td>
-         </tr>
-         <tr>
-             <td class="bg-light">Tempat lahir</td>
-             <td><?php echo $siswa['tempat_lahir'] ?></td>
-         </tr>
-         <tr>
-             <td class="bg-light">Tanggal lahir</td>
-             <td><?php echo hari($siswa['tanggal_lahir']) ?></td>
-         </tr>
-         <tr>
-             <td class="bg-light">Nama Wali</td>
-             <td><?php echo $siswa['nama_wali'] ?></td>
-         </tr>
-         <tr>
-             <td class="bg-light">Telepon/HP</td>
-             <td><?php echo $siswa['telepon'] ?></td>
-         </tr>
-         <tr>
-             <td class="bg-light">Email</td>
-             <td><?php echo $siswa['email'] ?></td>
-         </tr>
-         <tr>
-             <td class="bg-light">Alamat</td>
-             <td><?php echo $siswa['alamat'] ?></td>
-         </tr>
-         <tr>
-             <td class="bg-light">Info lain</td>
-             <td><?php echo $siswa['keterangan'] ?></td>
-         </tr>
-         
-     </tbody>
- </table>
-</form>
+<div class="row">
+	<div class="col-md-5">
+		<div class="card">
+			<div class="card-header bg-light">
+				<strong>DETAIL AKUN</strong>
+			</div>
+			<div class="card-body">
+
+				<table class="table table-sm table-bordered">
+					<thead>
+						<tr>
+							<th>Nama</th>
+							<th><?php echo $akun->nama ?></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>Email</td>
+							<td><?php echo $akun->email ?></td>
+						</tr>
+						<tr>
+							<td>Username</td>
+							<td><?php echo $akun->username ?></td>
+						</tr>
+						<tr>
+							<td>Status</td>
+							<td><?php echo $akun->status_akun ?></td>
+						</tr>
+						<tr>
+							<td>Jenis</td>
+							<td><?php echo $akun->jenis_akun ?></td>
+						</tr>
+						<tr>
+							<td>Telepon</td>
+							<td><?php echo $akun->telepon ?></td>
+						</tr>
+						<tr>
+							<td>Alamat</td>
+							<td><?php echo $akun->alamat ?></td>
+						</tr>
+					</tbody>
+				</table>
+
+			</div>
+		</div>
+	</div>
+
+	<div class="col-md-7">
+		<div class="card">
+			<div class="card-header bg-light">
+				<strong>UPDATE AKUN</strong>
+			</div>
+			<div class="card-body">
+				<?php echo form_open(base_url('siswa/akun')) ?>
+                <div class="form-group mb-4">
+                  <input type="text" class="form-control" name="nama" value="<?php echo $akun->nama ?>"  placeholder="Name" id="loginName">
+                  <label for="loginName" class="text-primary">Nama</label>
+                </div>
+
+                <div class="form-group mb-4">
+                  <input type="email" class="form-control" name="email" value="<?php echo $akun->email ?>"  placeholder="Email" id="loginEmail">
+                  <label for="loginEmail" class="text-primary">Email (Username)</label>
+                </div>
+
+                
+                  <div class="form-group password-field mb-4">
+                    <input type="password" class="form-control" name="password" placeholder="Password" id="loginPassword" minlength="6" maxlength="32">
+                    <span class="password-toggle"><i class="uil uil-eye"></i></span>
+                    <label for="loginPassword" class="text-primary">Password minimal 6 dan maksimal 32 karakter</label>
+                  </div>
+
+                  <div class="form-group password-field mb-4">
+                    <input type="password" class="form-control" name="konfirmasi_password" placeholder="Konfirmasi Password" id="loginPasswordConfirm" minlength="6" maxlength="32">
+                    <span class="password-toggle"><i class="uil uil-eye"></i></span>
+                    <label for="loginPasswordConfirm" class="text-primary">Konfirmasi Password</label>
+                  </div>
+
+                
+                <div class="form-group mb-4">
+                  <input type="text" class="form-control" name="telepon"  value="<?php echo $akun->telepon ?>" placeholder="Telepon/HP" id="Telepon">
+                  <label for="loginEmail" class="text-primary">Telepon/HP</label>
+                </div>
+
+                <div class="form-group mb-4">
+                  <textarea name="alamat" class="form-control" placeholder="Alamat" required="required"><?php echo $akun->alamat ?></textarea>
+                  <label for="loginEmail" class="text-primary">Alamat lengkap</label>
+                </div>
+
+                <p>
+                  <button type="reset" name="reset" value="reset" class="btn btn-warning rounded-pill btn-login w-40 mb-2">Reset &nbsp; <i class="fa fa-times-circle"></i></button>
+                  <button type="submit" name="submit" value="submit" class="btn btn-primary rounded-pill btn-login w-60 mb-2">Buat Akun dan Lanjutkan &nbsp; <i class="fa fa-arrow-circle-right"></i></button>
+                </p>
+              </form>
+			</div>
+		</div>
+	</div>
+</div>

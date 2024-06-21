@@ -92,8 +92,8 @@
 			<td><?php echo $galeri->nama ?></td>
 			<td>
 				
-				<a href="<?php echo base_url('admin/galeri/edit/'.$galeri->id_galeri) ?>" class="btn btn-success btn-sm"><i class="fa fa-edit"></i></a>
-				<a href="<?php echo base_url('admin/galeri/delete/'.$galeri->id_galeri) ?>" class="btn btn-dark btn-sm" onclick="confirmation(event)"><i class="fa fa-trash"></i></a>
+				<a href="<?php echo base_url('admin/galeri/edit/'.$galeri->id_galeri) ?>" class="btn btn-success btn-xs mb-1"><i class="fa fa-edit"></i></a>
+				<a href="<?php echo base_url('admin/galeri/delete/'.$galeri->id_galeri) ?>" class="btn btn-dark btn-xs mb-1" onclick="confirmation(event)"><i class="fa fa-trash"></i></a>
 			</td>
 		</tr>
 		<?php $no++; } ?>

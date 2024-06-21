@@ -104,7 +104,7 @@
                 </td>                
                 <td>
                   <?php if($check_dokumen) { ?>
-                    <a class="btn btn-dark btn-sm" href="<?php echo base_url('pendaftaran/unduh/'.$check_dokumen->kode_dokumen.'/'.$siswa->slug_siswa) ?>" target="_blank">
+                    <a class="btn btn-dark btn-xs mb-1" href="<?php echo base_url('pendaftaran/unduh/'.$check_dokumen->kode_dokumen.'/'.$siswa->slug_siswa) ?>" target="_blank">
                       <i class="fa fa-download"></i>&nbsp;  Unduh
                     </a>
                     <a class="btn btn-secondary btn-sm  delete-link" href="<?php echo base_url('pendaftaran/hapus/'.$check_dokumen->kode_dokumen.'/'.$siswa->slug_siswa) ?>">
@@ -123,7 +123,7 @@
                         <input type="file" name="gambar" class="form-control form-control-sm" placeholder="Unggah" value="" required>
                       </div>
                       <div class="col-md-4">
-                        <button type="submit" name="submit" value="Cari" class="btn btn-dark btn-sm">
+                        <button type="submit" name="submit" value="Cari" class="btn btn-dark btn-xs mb-1">
                           <i class="fa fa-upload"></i>&nbsp; Submit
                         </button>
                     

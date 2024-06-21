@@ -163,7 +163,7 @@
 					<button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#modal-posisi">
 						<i class="fa fa-sitemap"></i> Setting Posisi Menu
 					</button>
-					<button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#modal-basic">
+					<button type="button" class="btn btn-success btn-xs mb-1" data-toggle="modal" data-target="#modal-basic">
 						<i class="fa fa-plus-circle"></i> Tambah Menu
 					</button>
 					<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modal-sub">

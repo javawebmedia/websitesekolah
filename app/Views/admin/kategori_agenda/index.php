@@ -24,8 +24,8 @@
 			<td><?php echo $kategori_agenda['slug_kategori_agenda'] ?></td>
 			<td><?php echo $kategori_agenda['urutan'] ?></td>
 			<td>
-				<a href="<?php echo base_url('admin/kategori_agenda/edit/'.$kategori_agenda['id_kategori_agenda']) ?>" class="btn btn-success btn-sm"><i class="fa fa-edit"></i></a>
-				<a href="<?php echo base_url('admin/kategori_agenda/delete/'.$kategori_agenda['id_kategori_agenda']) ?>" class="btn btn-dark btn-sm" onclick="confirmation(event)"><i class="fa fa-trash"></i></a>
+				<a href="<?php echo base_url('admin/kategori_agenda/edit/'.$kategori_agenda['id_kategori_agenda']) ?>" class="btn btn-success btn-xs mb-1"><i class="fa fa-edit"></i></a>
+				<a href="<?php echo base_url('admin/kategori_agenda/delete/'.$kategori_agenda['id_kategori_agenda']) ?>" class="btn btn-dark btn-xs mb-1" onclick="confirmation(event)"><i class="fa fa-trash"></i></a>
 			</td>
 		</tr>
 		<?php $no++; } ?>

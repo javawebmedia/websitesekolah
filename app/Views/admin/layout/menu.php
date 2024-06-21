@@ -27,20 +27,36 @@
             </a>
           </li>
           <?php if($this->website->fitur_pendaftaran()=='On') { ?>
-          <li class="nav-item">
-            <a href="<?php echo base_url('admin/pendaftar') ?>" class="nav-link <?php if($uri->getSegment(2)=="pendaftar"){echo 'active';}?>">
-              <i class="nav-icon fas fa-child"></i>
-              <p>Data Pendaftar</p>
+            
+            <!-- berita -->
+          <li class="nav-item <?php if($uri->getSegment(2)=="pendaftar" || $uri->getSegment(2)=="kategori"){echo 'menu-open';}?>">
+            <a href="#" class="nav-link <?php if($uri->getSegment(2)=="pendaftar" || $uri->getSegment(2)=="kategori"){echo 'active';}?>">
+              <i class="nav-icon fas fa-graduation-cap"></i>
+              <p>PSB Online <i class="right fas fa-angle-left"></i></p>
             </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="<?php echo base_url('admin/pendaftar') ?>" class="nav-link" >
+                  <i class="fa fa-arrow-right nav-icon"></i>
+                  <p>Data Calon Siswa</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="<?php echo base_url('admin/akun_pendaftar') ?>" class="nav-link">
+                  <i class="fa fa-arrow-right nav-icon"></i>
+                  <p>Akun Calon Siswa</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="<?php echo base_url('admin/gelombang') ?>" class="nav-link">
+                  <i class="fa fa-arrow-right nav-icon"></i>
+                  <p>Gelombang/Periode PSB</p>
+                </a>
+              </li>
+            </ul>
           </li>
 
-          <li class="nav-item">
-            <a href="<?php echo base_url('admin/akun_pendaftar') ?>" class="nav-link <?php if($uri->getSegment(2)=="akun"){echo 'active';}?>">
-              <i class="nav-icon fas fa-users"></i>
-              <p>Akun Pendaftar</p>
-            </a>
-          </li>
-        <?php } ?>
+          <?php } ?>
           
 
          <!-- berita -->

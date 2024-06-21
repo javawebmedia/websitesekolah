@@ -32,7 +32,7 @@
 			<td class="text-center"><?php if($ekstrakurikuler) { echo $ekstrakurikuler->total; }else{ echo 0; } ?> Ekstrakurikuler</td>
 			<td class="text-center"><?php echo $kategori_ekstrakurikuler->urutan ?></td>
 			<td>
-				<a href="<?php echo base_url('admin/kategori_ekstrakurikuler/edit/'.$kategori_ekstrakurikuler->id_kategori_ekstrakurikuler) ?>" class="btn btn-success btn-sm"><i class="fa fa-edit"></i></a>
+				<a href="<?php echo base_url('admin/kategori_ekstrakurikuler/edit/'.$kategori_ekstrakurikuler->id_kategori_ekstrakurikuler) ?>" class="btn btn-success btn-xs mb-1"><i class="fa fa-edit"></i></a>
 				<a href="<?php echo base_url('admin/kategori_ekstrakurikuler/delete/'.$kategori_ekstrakurikuler->id_kategori_ekstrakurikuler) ?>" class="btn btn-dark btn-sm delete-link"><i class="fa fa-trash"></i></a>
 			</td>
 		</tr>

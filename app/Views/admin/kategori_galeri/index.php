@@ -32,7 +32,7 @@
 			<td class="text-center"><?php if($galeri) { echo $galeri->total; }else{ echo 0; } ?> Galeri</td>
 			<td class="text-center"><?php echo $kategori_galeri->urutan ?></td>
 			<td>
-				<a href="<?php echo base_url('admin/kategori_galeri/edit/'.$kategori_galeri->id_kategori_galeri) ?>" class="btn btn-success btn-sm"><i class="fa fa-edit"></i></a>
+				<a href="<?php echo base_url('admin/kategori_galeri/edit/'.$kategori_galeri->id_kategori_galeri) ?>" class="btn btn-success btn-xs mb-1"><i class="fa fa-edit"></i></a>
 				<a href="<?php echo base_url('admin/kategori_galeri/delete/'.$kategori_galeri->id_kategori_galeri) ?>" class="btn btn-dark btn-sm delete-link"><i class="fa fa-trash"></i></a>
 			</td>
 		</tr>

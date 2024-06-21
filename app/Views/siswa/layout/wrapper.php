@@ -4,9 +4,15 @@ if($session->get('username_siswa')=="") {
 	$session->setFlashdata('sukses','Ooops... Anda belum login');
 	return redirect()->to(base_url('signin'));
 }
+
 // gabungkan semua bagian file
-require_once('head.php');
+echo view('admin/layout/head');
+
 require_once('header.php');
 require_once('menu.php');
-require_once('content.php');
-require_once('footer.php');
+
+if($content) {
+	echo view($content);
+}
+
+echo view('admin/layout/footer');

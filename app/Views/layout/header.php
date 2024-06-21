@@ -240,12 +240,33 @@ foreach($nav_menu as $nav_menu) {
           <div class="navbar-other w-100 d-flex ms-auto">
             <ul class="navbar-nav flex-row align-items-center ms-auto">
               
-              <li class="nav-item d-none d-md-block">
-                <a href="<?php echo base_url('pendaftaran') ?>" class="btn btn-sm btn-primary px-2 py-1 text-sm">Pendaftaran</a>
-              </li>
-              <li class="nav-item d-none d-md-block">
-                <a href="<?php echo base_url('signin') ?>" class="btn btn-sm btn-danger px-2 py-1 text-sm">Login</a>
-              </li>
+              
+
+              <?php if(Session()->get('username_siswa') !='') { ?>
+                <li class="nav-item d-none d-md-block">
+                  <a href="<?php echo base_url('siswa/dasbor') ?>" class="btn btn-sm btn-danger px-2 py-1 text-sm">
+                    <i class="fa fa-user"></i>&nbsp; Dasbor Siswa
+                  </a>
+                </li>
+
+                <li class="nav-item d-none d-md-block">
+                  <a href="<?php echo base_url('signin/logout') ?>" class="btn btn-sm btn-outline-danger px-2 py-1 text-sm">
+                    <i class="fa fa-sign-out-alt"></i>
+                  </a>
+                </li>
+
+              <?php }else{ ?>
+
+                <li class="nav-item d-none d-md-block">
+                  <a href="<?php echo base_url('pendaftaran') ?>" class="btn btn-sm btn-primary px-2 py-1 text-sm">Pendaftaran</a>
+                </li>
+
+                <li class="nav-item d-none d-md-block">
+                  <a href="<?php echo base_url('signin') ?>" class="btn btn-sm btn-danger px-2 py-1 text-sm">Login</a>
+                </li>
+
+              <?php } ?>
+
               <li class="nav-item d-lg-none">
                 <button class="hamburger offcanvas-nav-btn"><span></span></button>
               </li>

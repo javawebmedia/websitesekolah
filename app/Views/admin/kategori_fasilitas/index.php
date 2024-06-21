@@ -32,7 +32,7 @@
 			<td class="text-center"><?php if($fasilitas) { echo $fasilitas->total; }else{ echo 0; } ?> Fasilitas</td>
 			<td class="text-center"><?php echo $kategori_fasilitas->urutan ?></td>
 			<td>
-				<a href="<?php echo base_url('admin/kategori_fasilitas/edit/'.$kategori_fasilitas->id_kategori_fasilitas) ?>" class="btn btn-success btn-sm"><i class="fa fa-edit"></i></a>
+				<a href="<?php echo base_url('admin/kategori_fasilitas/edit/'.$kategori_fasilitas->id_kategori_fasilitas) ?>" class="btn btn-success btn-xs mb-1"><i class="fa fa-edit"></i></a>
 				<a href="<?php echo base_url('admin/kategori_fasilitas/delete/'.$kategori_fasilitas->id_kategori_fasilitas) ?>" class="btn btn-dark btn-sm delete-link"><i class="fa fa-trash"></i></a>
 			</td>
 		</tr>

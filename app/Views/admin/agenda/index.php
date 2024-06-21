@@ -27,7 +27,7 @@ echo form_open(base_url('admin/agenda/proses'));
 <div class="row">
   <div class="col-md-4">
     <div class="input-group input-group-sm">
-      <button class="btn btn-dark btn-sm" type="submit" name="hapus" onClick="check();" >
+      <button class="btn btn-dark btn-xs mb-1" type="submit" name="hapus" onClick="check();" >
           <i class="fa fa-trash"></i>
         </button> 
       <select name="id_kategori_agenda" class="form-control">
@@ -48,7 +48,7 @@ echo form_open(base_url('admin/agenda/proses'));
           <i class="fa fa-eye-slash"></i> Jangan Publikasikan
         </button>
 
-        <button class="btn btn-dark btn-sm" type="submit" name="publish" onClick="check();" >
+        <button class="btn btn-dark btn-xs mb-1" type="submit" name="publish" onClick="check();" >
           <i class="fa fa-eye"></i> Publish
         </button>
 
