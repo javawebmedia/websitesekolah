@@ -53,6 +53,45 @@ class Siswa_model extends Model
         return $query->getResult();
     }
 
+    // gelombang_status_siswa
+    public function gelombang_status_siswa($id_gelombang,$status_siswa)
+    {
+        $builder = $this->db->table('siswa');
+        $builder->select('siswa.*,
+                        jenjang.nama_jenjang,
+                        kelas.nama_kelas,
+                        agama.nama_agama,
+                        hubungan.nama_hubungan,');
+        $builder->join('jenjang','jenjang.id_jenjang = siswa.id_jenjang','LEFT');
+        $builder->join('kelas','kelas.id_kelas = siswa.id_kelas','LEFT');
+        $builder->join('agama','agama.id_agama = siswa.id_agama','LEFT');
+        $builder->join('hubungan','hubungan.id_hubungan = siswa.id_hubungan','LEFT');
+        $builder->where('id_gelombang',$id_gelombang);
+
+        if($status_siswa != 'Semua') {
+            $builder->where('status_siswa',$status_siswa);
+        }
+
+        $builder->orderBy('siswa.id_siswa','DESC');
+        $query = $builder->get();
+        return $query->getResult();
+    }
+
+    // status_siswa_gelombang
+    public function status_siswa_gelombang($status_siswa,$id_gelombang)
+    {
+        $builder = $this->db->table('siswa');
+        $builder->select('COUNT(*) AS total');
+
+        if($status_siswa != 'Semua') {
+            $builder->where('status_siswa',$status_siswa);
+        }
+        
+        $builder->where('id_gelombang',$id_gelombang);
+        $query = $builder->get();
+        return $query->getRow();
+    }
+
     // paginasi
     public function paginasi($limit,$start)
     {
