@@ -106,7 +106,6 @@ class Siswa extends BaseController
 	// import
 	public function import()
 	{
-		
 		$m_siswa 			= new Siswa_model();
 		$m_rombel 			= new Rombel_model();
 		$m_siswa_rombel 	= new Siswa_rombel_model();
