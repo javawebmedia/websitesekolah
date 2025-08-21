@@ -62,7 +62,7 @@ $awal = $sek-100;
   });
 // KONTEN
   tinymce.init({
-    selector: '.konten',
+    selector: '.konten-berita',
     relative_urls: false,
     remove_script_host: false,
     convert_urls: true,
