@@ -466,7 +466,12 @@
                   <p>Agama</p>
                 </a>
               </li>
-              
+              <li class="nav-item">
+                <a href="<?php echo base_url('admin/kategori_jurusan') ?>" class="nav-link">
+                  <i class="fa fa-arrow-right nav-icon"></i>
+                  <p>Kategori Jurusan</p>
+                </a>
+              </li>
             </ul>
           </li>
 
