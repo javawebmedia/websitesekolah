@@ -37,7 +37,7 @@ class Connection extends BaseConnection
     /**
      * Identifier escape character
      *
-     * @var string
+     * @var list<string>|string
      */
     public $escapeChar = '"';
 
@@ -46,13 +46,16 @@ class Connection extends BaseConnection
      *
      * Identifiers that must NOT be escaped.
      *
-     * @var array
+     * @var list<string>
      */
     protected $reservedIdentifiers = [
         '*',
         'rownum',
     ];
 
+    /**
+     * @var array<string, string>
+     */
     protected $validDSNs = [
         // TNS
         'tns' => '/^\(DESCRIPTION=(\(.+\)){2,}\)$/',
@@ -79,6 +82,8 @@ class Connection extends BaseConnection
      *
      * Used by storedProcedure() to prevent execute() from
      * re-setting the statement ID.
+     *
+     * @var bool
      */
     protected $resetStmtId = true;
 
@@ -150,21 +155,6 @@ class Connection extends BaseConnection
             : $func($this->username, $this->password, $this->DSN, $this->charset);
     }
 
-    /**
-     * Keep or establish the connection if no queries have been sent for
-     * a length of time exceeding the server's idle timeout.
-     *
-     * @return void
-     */
-    public function reconnect()
-    {
-    }
-
-    /**
-     * Close the database connection.
-     *
-     * @return void
-     */
     protected function _close()
     {
         if (is_resource($this->cursorId)) {
@@ -174,6 +164,20 @@ class Connection extends BaseConnection
             oci_free_statement($this->stmtId);
         }
         oci_close($this->connID);
+    }
+
+    /**
+     * Ping the database connection.
+     */
+    protected function _ping(): bool
+    {
+        try {
+            $result = $this->simpleQuery('SELECT 1 FROM DUAL');
+
+            return $result !== false;
+        } catch (DatabaseException) {
+            return false;
+        }
     }
 
     /**
@@ -193,9 +197,14 @@ class Connection extends BaseConnection
             return $this->dataCache['version'];
         }
 
-        if (! $this->connID || ($versionString = oci_server_version($this->connID)) === false) {
+        if ($this->connID === false) {
+            $this->initialize();
+        }
+
+        if (($versionString = oci_server_version($this->connID)) === false) {
             return '';
         }
+
         if (preg_match('#Release\s(\d+(?:\.\d+)+)#', $versionString, $match)) {
             return $this->dataCache['version'] = $match[1];
         }
@@ -226,7 +235,14 @@ class Connection extends BaseConnection
 
             return $result;
         } catch (ErrorException $e) {
-            log_message('error', (string) $e);
+            $trace = array_slice($e->getTrace(), 2); // remove call to error handler
+
+            log_message('error', "{message}\nin {exFile} on line {exLine}.\n{trace}", [
+                'message' => $e->getMessage(),
+                'exFile'  => clean_path($e->getFile()),
+                'exLine'  => $e->getLine(),
+                'trace'   => render_backtrace($trace),
+            ]);
 
             if ($this->DBDebug) {
                 throw new DatabaseException($e->getMessage(), $e->getCode(), $e);
@@ -262,11 +278,6 @@ class Connection extends BaseConnection
         return oci_num_rows($this->stmtId);
     }
 
-    /**
-     * Generates the SQL for listing tables in a platform-dependent manner.
-     *
-     * @param string|null $tableName If $tableName is provided will return only this table if exists.
-     */
     protected function _listTables(bool $prefixLimit = false, ?string $tableName = null): string
     {
         $sql = 'SELECT "TABLE_NAME" FROM "USER_TABLES"';
@@ -283,11 +294,6 @@ class Connection extends BaseConnection
         return $sql;
     }
 
-    /**
-     * Generates a platform-specific query string so that the column names can be fetched.
-     *
-     * @param string|TableName $table
-     */
     protected function _listColumns($table = ''): string
     {
         if ($table instanceof TableName) {
@@ -307,10 +313,6 @@ class Connection extends BaseConnection
     }
 
     /**
-     * Returns an array of objects with field data
-     *
-     * @return list<stdClass>
-     *
      * @throws DatabaseException
      */
     protected function _fieldData(string $table): array
@@ -344,17 +346,26 @@ class Connection extends BaseConnection
             $retval[$i]->max_length = $length;
 
             $retval[$i]->nullable = $query[$i]->NULLABLE === 'Y';
-            $retval[$i]->default  = $query[$i]->DATA_DEFAULT;
+            $retval[$i]->default  = $this->normalizeDefault($query[$i]->DATA_DEFAULT);
         }
 
         return $retval;
     }
 
     /**
-     * Returns an array of objects with index data
-     *
-     * @return array<string, stdClass>
-     *
+     * Removes trailing whitespace from default values
+     * returned in database column metadata queries.
+     */
+    private function normalizeDefault(?string $default): ?string
+    {
+        if ($default === null) {
+            return $default;
+        }
+
+        return rtrim($default);
+    }
+
+    /**
      * @throws DatabaseException
      */
     protected function _indexData(string $table): array
@@ -400,10 +411,6 @@ class Connection extends BaseConnection
     }
 
     /**
-     * Returns an array of objects with Foreign key data
-     *
-     * @return array<string, stdClass>
-     *
      * @throws DatabaseException
      */
     protected function _foreignKeyData(string $table): array
@@ -510,14 +517,8 @@ class Connection extends BaseConnection
     /**
      * Executes a stored procedure
      *
-     * @param string $procedureName procedure name to execute
-     * @param array  $params        params array keys
-     *                              KEY      OPTIONAL  NOTES
-     *                              name     no        the name of the parameter should be in :<param_name> format
-     *                              value    no        the value of the parameter.  If this is an OUT or IN OUT parameter,
-     *                              this should be a reference to a variable
-     *                              type     yes       the type of the parameter
-     *                              length   yes       the max size of the parameter
+     * @param string                                                            $procedureName Procedure name to execute
+     * @param list<array{name: string, value: mixed, type?: int, length?: int}> $params        `name` must be in `:<param_name>` format. `value` is bound by reference.
      *
      * @return bool|Query|Result
      */
@@ -531,7 +532,7 @@ class Connection extends BaseConnection
         $sql = sprintf(
             'BEGIN %s (' . substr(str_repeat(',%s', count($params)), 1) . '); END;',
             $procedureName,
-            ...array_map(static fn ($row) => $row['name'], $params),
+            ...array_map(static fn (array $row): string => $row['name'], $params),
         );
 
         $this->resetStmtId = false;
@@ -546,7 +547,7 @@ class Connection extends BaseConnection
     /**
      * Bind parameters
      *
-     * @param array $params
+     * @param list<array{name: string, value: mixed, type?: int, length?: int}> $params
      *
      * @return void
      */
@@ -599,7 +600,7 @@ class Connection extends BaseConnection
 
     public function insertID(): int
     {
-        if (empty($this->lastInsertedTableName)) {
+        if ($this->lastInsertedTableName === null || $this->lastInsertedTableName === '') {
             return 0;
         }
 
@@ -700,9 +701,6 @@ class Connection extends BaseConnection
         $this->DSN = '';
     }
 
-    /**
-     * Begin Transaction
-     */
     protected function _transBegin(): bool
     {
         $this->commitMode = OCI_NO_AUTO_COMMIT;
@@ -710,9 +708,6 @@ class Connection extends BaseConnection
         return true;
     }
 
-    /**
-     * Commit Transaction
-     */
     protected function _transCommit(): bool
     {
         $this->commitMode = OCI_COMMIT_ON_SUCCESS;
@@ -720,9 +715,6 @@ class Connection extends BaseConnection
         return oci_commit($this->connID);
     }
 
-    /**
-     * Rollback Transaction
-     */
     protected function _transRollback(): bool
     {
         $this->commitMode = OCI_COMMIT_ON_SUCCESS;
@@ -735,7 +727,7 @@ class Connection extends BaseConnection
      */
     public function getDatabase(): string
     {
-        if (! empty($this->database)) {
+        if (is_string($this->database) && $this->database !== '') {
             return $this->database;
         }
 

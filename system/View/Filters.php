@@ -71,14 +71,14 @@ class Filters
      */
     public static function default($value, string $default): string
     {
-        return empty($value) ? $default : $value;
+        return in_array($value, [null, false, 0, 0.0, '', '0', []], true) ? $default : $value;
     }
 
     /**
      * Escapes the given value with our `esc()` helper function.
      *
-     * @param         string                               $value
-     * @phpstan-param 'html'|'js'|'css'|'url'|'attr'|'raw' $context
+     * @param string                               $value
+     * @param 'attr'|'css'|'html'|'js'|'raw'|'url' $context
      */
     public static function esc($value, string $context = 'html'): string
     {

@@ -112,7 +112,7 @@ class DOMParser
         if ($element === null) {
             $content = $this->dom->saveHTML($this->dom->documentElement);
 
-            return mb_strpos($content, $search) !== false;
+            return str_contains($content, $search);
         }
 
         $result = $this->doXPath($search, $element);
@@ -198,6 +198,8 @@ class DOMParser
     /**
      * Search the DOM using an XPath expression.
      *
+     * @param list<string> $paths
+     *
      * @return DOMNodeList|false
      */
     protected function doXPath(?string $search, string $element, array $paths = [])
@@ -233,10 +235,8 @@ class DOMParser
 
         // $paths might contain a number of different
         // ready to go xpath portions to tack on.
-        if ($paths !== [] && is_array($paths)) {
-            foreach ($paths as $extra) {
-                $path .= $extra;
-            }
+        foreach ($paths as $extra) {
+            $path .= $extra;
         }
 
         if ($search !== null) {

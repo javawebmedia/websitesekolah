@@ -21,16 +21,13 @@ use stdClass;
  */
 class MockResult extends BaseResult
 {
-    /**
-     * Gets the number of fields in the result set.
-     */
     public function getFieldCount(): int
     {
         return 0;
     }
 
     /**
-     * Generates an array of column names in the result set.
+     * @return array{}
      */
     public function getFieldNames(): array
     {
@@ -38,42 +35,27 @@ class MockResult extends BaseResult
     }
 
     /**
-     * Generates an array of objects representing field meta-data.
+     * @return array{}
      */
     public function getFieldData(): array
     {
         return [];
     }
 
-    /**
-     * Frees the current result.
-     *
-     * @return void
-     */
     public function freeResult()
     {
     }
 
     /**
-     * Moves the internal pointer to the desired offset. This is called
-     * internally before fetching results to make sure the result set
-     * starts at zero.
-     *
-     * @param int $n
-     *
-     * @return bool
+     * @return true
      */
-    public function dataSeek($n = 0)
+    public function dataSeek(int $n = 0)
     {
         return true;
     }
 
     /**
-     * Returns the result set as an array.
-     *
-     * Overridden by driver classes.
-     *
-     * @return mixed
+     * @return array{}
      */
     protected function fetchAssoc()
     {
@@ -81,22 +63,13 @@ class MockResult extends BaseResult
     }
 
     /**
-     * Returns the result set as an object.
-     *
-     * Overridden by child classes.
-     *
-     * @param string $className
-     *
-     * @return object|stdClass
+     * @return object
      */
-    protected function fetchObject($className = 'stdClass')
+    protected function fetchObject(string $className = stdClass::class)
     {
         return new $className();
     }
 
-    /**
-     * Gets the number of fields in the result set.
-     */
     public function getNumRows(): int
     {
         return 0;

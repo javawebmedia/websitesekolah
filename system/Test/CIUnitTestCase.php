@@ -19,6 +19,7 @@ use CodeIgniter\Database\BaseConnection;
 use CodeIgniter\Database\MigrationRunner;
 use CodeIgniter\Database\Seeder;
 use CodeIgniter\Events\Events;
+use CodeIgniter\HTTP\Header;
 use CodeIgniter\Router\RouteCollection;
 use CodeIgniter\Session\Handlers\ArrayHandler;
 use CodeIgniter\Test\Mock\MockCache;
@@ -72,6 +73,8 @@ abstract class CIUnitTestCase extends TestCase
 
     /**
      * Store of identified traits.
+     *
+     * @var array<class-string, class-string>|null
      */
     private ?array $traits = null;
 
@@ -109,9 +112,9 @@ abstract class CIUnitTestCase extends TestCase
 
     /**
      * The seed file(s) used for all tests within this test case.
-     * Should be fully-namespaced or relative to $basePath
+     * Should be fully-namespaced or relative to $basePath.
      *
-     * @var class-string<Seeder>|list<class-string<Seeder>>
+     * @var ''|class-string<Seeder>|list<class-string<Seeder>>
      */
     protected $seed = '';
 
@@ -121,15 +124,15 @@ abstract class CIUnitTestCase extends TestCase
      *
      * @var string
      */
-    protected $basePath = SUPPORTPATH . 'Database';
+    protected $basePath = TESTPATH . '_support/Database';
 
     /**
      * The namespace(s) to help us find the migration classes.
      * `null` is equivalent to running `spark migrate --all`.
      * Note that running "all" runs migrations in date order,
-     * but specifying namespaces runs them in namespace order (then date)
+     * but specifying namespaces runs them in namespace order (then date).
      *
-     * @var array|string|null
+     * @var list<string>|string|null
      */
     protected $namespace = 'Tests\Support';
 
@@ -156,17 +159,17 @@ abstract class CIUnitTestCase extends TestCase
     protected $migrations;
 
     /**
-     * Seeder instance
+     * Seeder instance.
      *
-     * @var Seeder
+     * @var Seeder|null
      */
     protected $seeder;
 
     /**
      * Stores information needed to remove any
-     * rows inserted via $this->hasInDatabase();
+     * rows inserted via $this->hasInDatabase().
      *
-     * @var array
+     * @var list<array<array-key, mixed>>
      */
     protected $insertCache = [];
 
@@ -186,27 +189,27 @@ abstract class CIUnitTestCase extends TestCase
      * Values to be set in the SESSION global
      * before running the test.
      *
-     * @var array
+     * @var array<array-key, mixed>
      */
     protected $session = [];
 
     /**
-     * Enabled auto clean op buffer after request call
+     * Enabled auto clean op buffer after request call.
      *
      * @var bool
      */
     protected $clean = true;
 
     /**
-     * Custom request's headers
+     * Custom request's headers.
      *
-     * @var array
+     * @var array<string, Header|list<Header>>
      */
     protected $headers = [];
 
     /**
      * Allows for formatting the request body to what
-     * the controller is going to expect
+     * the controller is going to expect.
      *
      * @var string
      */
@@ -270,19 +273,19 @@ abstract class CIUnitTestCase extends TestCase
 
         // Check for other trait methods
         $this->callTraitMethods('tearDown');
+
+        $this->resetIsWindowsMock();
     }
 
     /**
      * Checks for traits with corresponding
      * methods for setUp or tearDown.
      *
-     * @param string $stage 'setUp' or 'tearDown'
+     * @param 'setUp'|'tearDown' $stage
      */
     private function callTraitMethods(string $stage): void
     {
-        if ($this->traits === null) {
-            $this->traits = class_uses_recursive($this);
-        }
+        $this->traits ??= class_uses_recursive($this);
 
         foreach ($this->traits as $trait) {
             $method = $stage . class_basename($trait);
@@ -298,7 +301,9 @@ abstract class CIUnitTestCase extends TestCase
     // --------------------------------------------------------------------
 
     /**
-     * Resets shared instanced for all Factories components
+     * Resets shared instanced for all Factories components.
+     *
+     * @return void
      */
     protected function resetFactories()
     {
@@ -306,7 +311,9 @@ abstract class CIUnitTestCase extends TestCase
     }
 
     /**
-     * Resets shared instanced for all Services
+     * Resets shared instanced for all Services.
+     *
+     * @return void
      */
     protected function resetServices(bool $initAutoloader = true)
     {
@@ -314,7 +321,17 @@ abstract class CIUnitTestCase extends TestCase
     }
 
     /**
-     * Injects the mock Cache driver to prevent filesystem collisions
+     * Resets the mocked is_windows() function back to default state.
+     */
+    protected function resetIsWindowsMock(): void
+    {
+        is_windows(null);
+    }
+
+    /**
+     * Injects the mock Cache driver to prevent filesystem collisions.
+     *
+     * @return void
      */
     protected function mockCache()
     {
@@ -322,7 +339,9 @@ abstract class CIUnitTestCase extends TestCase
     }
 
     /**
-     * Injects the mock email driver so no emails really send
+     * Injects the mock email driver so no emails really send.
+     *
+     * @return void
      */
     protected function mockEmail()
     {
@@ -330,7 +349,9 @@ abstract class CIUnitTestCase extends TestCase
     }
 
     /**
-     * Injects the mock session driver into Services
+     * Injects the mock session driver into Services.
+     *
+     * @return void
      */
     protected function mockSession()
     {
@@ -442,6 +463,8 @@ abstract class CIUnitTestCase extends TestCase
      * expected time, for reasons beyond our control.
      *
      * @param float|int $actual
+     *
+     * @return void
      *
      * @throws Exception
      */

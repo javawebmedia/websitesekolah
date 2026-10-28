@@ -24,9 +24,10 @@ if (! function_exists('directory_map')) {
      * directory will be mapped as well.
      *
      * @param string $sourceDir      Path to source
-     * @param int    $directoryDepth Depth of directories to traverse
-     *                               (0 = fully recursive, 1 = current dir, etc)
+     * @param int    $directoryDepth Depth of directories to traverse (0 = fully recursive, 1 = current dir, etc)
      * @param bool   $hidden         Whether to show hidden files
+     *
+     * @return array<array-key, array<array-key, mixed>|string>
      */
     function directory_map(string $sourceDir, int $directoryDepth = 0, bool $hidden = false): array
     {
@@ -84,9 +85,7 @@ if (! function_exists('directory_mirror')) {
 
         $dirLen = strlen($originDir);
 
-        /**
-         * @var SplFileInfo $file
-         */
+        /** @var SplFileInfo $file */
         foreach (new RecursiveIteratorIterator(
             new RecursiveDirectoryIterator($originDir, FilesystemIterator::SKIP_DOTS),
             RecursiveIteratorIterator::SELF_FIRST,
@@ -123,7 +122,9 @@ if (! function_exists('write_file')) {
 
             flock($fp, LOCK_EX);
 
-            for ($result = $written = 0, $length = strlen($data); $written < $length; $written += $result) {
+            $result = 0;
+
+            for ($written = 0, $length = strlen($data); $written < $length; $written += $result) {
                 if (($result = fwrite($fp, substr($data, $written))) === false) {
                     break;
                 }
@@ -155,8 +156,9 @@ if (! function_exists('delete_files')) {
      */
     function delete_files(string $path, bool $delDir = false, bool $htdocs = false, bool $hidden = false): bool
     {
-        $path = realpath($path) ?: $path;
-        $path = rtrim($path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        $realPath = realpath($path);
+        $path     = $realPath === false ? $path : $realPath;
+        $path     = rtrim($path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
 
         try {
             foreach (new RecursiveIteratorIterator(
@@ -199,6 +201,8 @@ if (! function_exists('get_filenames')) {
      * @param bool|null $includePath Whether to include the path as part of the filename; false for no path, null for a relative path, true for full path
      * @param bool      $hidden      Whether to include hidden files (files beginning with a period)
      * @param bool      $includeDir  Whether to include directories
+     *
+     * @return list<string>
      */
     function get_filenames(
         string $sourceDir,
@@ -208,7 +212,8 @@ if (! function_exists('get_filenames')) {
     ): array {
         $files = [];
 
-        $sourceDir = realpath($sourceDir) ?: $sourceDir;
+        $realPath  = realpath($sourceDir);
+        $sourceDir = $realPath === false ? $sourceDir : $realPath;
         $sourceDir = rtrim($sourceDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
 
         try {
@@ -253,6 +258,14 @@ if (! function_exists('get_dir_file_info')) {
      * @param string $sourceDir    Path to source
      * @param bool   $topLevelOnly Look only at the top level directory specified?
      * @param bool   $recursion    Internal variable to determine recursion status - do not use in calls
+     *
+     * @return array<string, array{
+     *  name: string,
+     *  server_path: string,
+     *  size: int,
+     *  date: int,
+     *  relative_path: string,
+     * }>
      */
     function get_dir_file_info(string $sourceDir, bool $topLevelOnly = true, bool $recursion = false): array
     {
@@ -273,8 +286,11 @@ if (! function_exists('get_dir_file_info')) {
                 if (is_dir($sourceDir . $file) && $file[0] !== '.' && $topLevelOnly === false) {
                     get_dir_file_info($sourceDir . $file . DIRECTORY_SEPARATOR, $topLevelOnly, true);
                 } elseif ($file[0] !== '.') {
-                    $fileData[$file]                  = get_file_info($sourceDir . $file);
-                    $fileData[$file]['relative_path'] = $relativePath;
+                    $info = get_file_info($sourceDir . $file);
+                    if ($info !== null) {
+                        $fileData[$file]                  = $info;
+                        $fileData[$file]['relative_path'] = $relativePath;
+                    }
                 }
             }
 
@@ -296,12 +312,21 @@ if (! function_exists('get_file_info')) {
      * Options are: name, server_path, size, date, readable, writable, executable, fileperms
      * Returns false if the file cannot be found.
      *
-     * @param string       $file           Path to file
-     * @param array|string $returnedValues Array or comma separated string of information returned
+     * @param string              $file           Path to file
+     * @param list<string>|string $returnedValues Array or comma separated string of information returned
      *
-     * @return array|null
+     * @return array{
+     *  name?: string,
+     *  server_path?: string,
+     *  size?: int,
+     *  date?: int,
+     *  readable?: bool,
+     *  writable?: bool,
+     *  executable?: bool,
+     *  fileperms?: int
+     * }|null
      */
-    function get_file_info(string $file, $returnedValues = ['name', 'server_path', 'size', 'date'])
+    function get_file_info(string $file, $returnedValues = ['name', 'server_path', 'size', 'date']): ?array
     {
         if (! is_file($file)) {
             return null;

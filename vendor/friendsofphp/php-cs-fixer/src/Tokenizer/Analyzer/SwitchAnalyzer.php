@@ -19,10 +19,12 @@ use PhpCsFixer\Tokenizer\Tokens;
 
 /**
  * @internal
+ *
+ * @no-named-arguments Parameter names are not covered by the backward compatibility promise.
  */
 final class SwitchAnalyzer
 {
-    /** @var array<string, array<int>> */
+    /** @var array<non-empty-string, list<int>> */
     private static array $cache = [];
 
     public static function belongsToSwitch(Tokens $tokens, int $index): bool
@@ -31,24 +33,26 @@ final class SwitchAnalyzer
             return false;
         }
 
-        $codeHash = $tokens->getCodeHash();
+        $collectionHash = $tokens->getCollectionHash();
 
-        if (!\array_key_exists($codeHash, self::$cache)) {
-            self::$cache[$codeHash] = self::getColonIndicesForSwitch(clone $tokens);
+        if (!\array_key_exists($collectionHash, self::$cache)) {
+            self::$cache[$collectionHash] = self::getColonIndicesForSwitch(clone $tokens);
         }
 
-        return \in_array($index, self::$cache[$codeHash], true);
+        $arr = self::$cache[$collectionHash];
+
+        return \in_array($index, $arr, true);
     }
 
     /**
-     * @return int[]
+     * @return list<int>
      */
     private static function getColonIndicesForSwitch(Tokens $tokens): array
     {
         $colonIndices = [];
 
         /** @var SwitchAnalysis $analysis */
-        foreach (ControlCaseStructuresAnalyzer::findControlStructures($tokens, [T_SWITCH]) as $analysis) {
+        foreach (ControlCaseStructuresAnalyzer::findControlStructures($tokens, [\T_SWITCH]) as $analysis) {
             if ($tokens[$analysis->getOpenIndex()]->equals(':')) {
                 $colonIndices[] = $analysis->getOpenIndex();
             }

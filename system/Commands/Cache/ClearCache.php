@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace CodeIgniter\Commands\Cache;
 
-use CodeIgniter\Cache\CacheFactory;
+use CodeIgniter\Autoloader\FileLocatorCached;
 use CodeIgniter\CLI\BaseCommand;
 use CodeIgniter\CLI\CLI;
 use Config\Cache;
@@ -69,22 +69,27 @@ class ClearCache extends BaseCommand
         $handler = $params[0] ?? $config->handler;
 
         if (! array_key_exists($handler, $config->validHandlers)) {
-            CLI::error($handler . ' is not a valid cache handler.');
+            CLI::error(lang('Cache.invalidHandler', [$handler]));
 
-            return;
+            return EXIT_ERROR;
         }
 
         $config->handler = $handler;
-        $cache           = CacheFactory::getHandler($config);
 
-        if (! $cache->clean()) {
-            // @codeCoverageIgnoreStart
+        if (! service('cache', $config)->clean()) {
             CLI::error('Error while clearing the cache.');
 
-            return;
-            // @codeCoverageIgnoreEnd
+            return EXIT_ERROR;
+        }
+
+        $locator = service('locator');
+
+        if ($handler === 'file' && $locator instanceof FileLocatorCached) {
+            $locator->deleteCache();
         }
 
         CLI::write(CLI::color('Cache cleared.', 'green'));
+
+        return EXIT_SUCCESS;
     }
 }

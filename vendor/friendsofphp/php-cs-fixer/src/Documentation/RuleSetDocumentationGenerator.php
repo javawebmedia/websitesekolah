@@ -16,11 +16,17 @@ namespace PhpCsFixer\Documentation;
 
 use PhpCsFixer\Fixer\FixerInterface;
 use PhpCsFixer\Preg;
-use PhpCsFixer\RuleSet\RuleSetDescriptionInterface;
+use PhpCsFixer\RuleSet\AutomaticRuleSetDefinitionInterface;
+use PhpCsFixer\RuleSet\DeprecatedRuleSetDefinitionInterface;
+use PhpCsFixer\RuleSet\RuleSetDefinitionInterface;
 use PhpCsFixer\Utils;
 
 /**
+ * @readonly
+ *
  * @internal
+ *
+ * @no-named-arguments Parameter names are not covered by the backward compatibility promise.
  */
 final class RuleSetDocumentationGenerator
 {
@@ -32,9 +38,9 @@ final class RuleSetDocumentationGenerator
     }
 
     /**
-     * @param FixerInterface[] $fixers
+     * @param list<FixerInterface> $fixers
      */
-    public function generateRuleSetsDocumentation(RuleSetDescriptionInterface $definition, array $fixers): string
+    public function generateRuleSetsDocumentation(RuleSetDefinitionInterface $definition, array $fixers): string
     {
         $fixerNames = [];
 
@@ -46,11 +52,36 @@ final class RuleSetDocumentationGenerator
         $titleLine = str_repeat('=', \strlen($title));
         $doc = "{$titleLine}\n{$title}\n{$titleLine}\n\n".$definition->getDescription();
 
-        if ($definition->isRisky()) {
-            $doc .= ' This set contains rules that are risky.';
+        $header = static function (string $message, string $underline = '-'): string {
+            $line = str_repeat($underline, \strlen($message));
+
+            return "{$message}\n{$line}\n";
+        };
+
+        $tags = DocumentationTagGenerator::analyseRuleSet($definition);
+        $warnings = array_map(
+            static function (DocumentationTag $tag): string {
+                $titleLine = str_repeat('~', \strlen($tag->title));
+
+                return \sprintf(
+                    "\n%s\n%s\n\n%s",
+                    $tag->title,
+                    $titleLine,
+                    null === $tag->description ? '' : RstUtils::toRst($tag->description, 0),
+                );
+            },
+            $tags,
+        );
+
+        if ([] !== $warnings) {
+            $warningsHeader = 1 === \count($warnings) ? 'Warning' : 'Warnings';
+
+            $doc .= "\n\n".$header($warningsHeader).implode("\n", $warnings);
         }
 
-        $rules = $definition->getRules();
+        $rules = $definition instanceof AutomaticRuleSetDefinitionInterface
+                ? $definition->getRulesCandidates()
+                : $definition->getRules();
 
         if ([] === $rules) {
             $doc .= "\n\nThis is an empty set.";
@@ -62,14 +93,16 @@ final class RuleSetDocumentationGenerator
                 foreach ($rules as $rule => $config) {
                     if (str_starts_with($rule, '@')) {
                         $ruleSetPath = $this->locator->getRuleSetsDocumentationFilePath($rule);
+                        \assert(false !== strrpos($ruleSetPath, '/'));
                         $ruleSetPath = substr($ruleSetPath, strrpos($ruleSetPath, '/'));
 
                         $doc .= "\n- `{$rule} <.{$ruleSetPath}>`_";
                     } else {
+                        \assert(isset($fixerNames[$rule]));
                         $path = Preg::replace(
                             '#^'.preg_quote($this->locator->getFixersDocumentationDirectoryPath(), '#').'/#',
                             './../rules/',
-                            $this->locator->getFixerDocumentationFilePath($fixerNames[$rule])
+                            $this->locator->getFixerDocumentationFilePath($fixerNames[$rule]),
                         );
 
                         $doc .= "\n- `{$rule} <{$path}>`_";
@@ -81,13 +114,18 @@ final class RuleSetDocumentationGenerator
                 }
             };
 
+            $rulesCandidatesDescriptionHeader = $definition instanceof AutomaticRuleSetDefinitionInterface
+                ? ' candidates'
+                : '';
+
             if ([] !== $enabledRules) {
-                $doc .= "\n\nRules\n-----\n";
+                $doc .= "\n\n".$header("Rules{$rulesCandidatesDescriptionHeader}");
                 $listRules($enabledRules);
             }
 
             if ([] !== $disabledRules) {
-                $doc .= "\n\nDisabled rules\n--------------\n";
+                $doc .= "\n\n".$header("Disabled rules{$rulesCandidatesDescriptionHeader}");
+
                 $listRules($disabledRules);
             }
         }
@@ -96,7 +134,7 @@ final class RuleSetDocumentationGenerator
     }
 
     /**
-     * @param array<string, string> $setDefinitions
+     * @param array<string, RuleSetDefinitionInterface> $setDefinitions
      */
     public function generateRuleSetsDocumentationIndex(array $setDefinitions): string
     {
@@ -105,9 +143,22 @@ final class RuleSetDocumentationGenerator
             List of Available Rule sets
             ===========================
             RST;
-        foreach ($setDefinitions as $name => $path) {
+
+        foreach ($setDefinitions as $path => $definition) {
+            \assert(false !== strrpos($path, '/'));
             $path = substr($path, strrpos($path, '/'));
-            $documentation .= "\n- `{$name} <.{$path}>`_";
+
+            $attributes = [];
+
+            if ($definition instanceof DeprecatedRuleSetDefinitionInterface) {
+                $attributes[] = 'deprecated';
+            }
+
+            $attributes = 0 === \count($attributes)
+                ? ''
+                : ' *('.implode(', ', $attributes).')*';
+
+            $documentation .= "\n- `{$definition->getName()} <.{$path}>`_{$attributes}";
         }
 
         return $documentation."\n";

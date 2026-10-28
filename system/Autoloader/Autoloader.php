@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CodeIgniter\Autoloader;
 
+use Closure;
 use CodeIgniter\Exceptions\ConfigException;
 use CodeIgniter\Exceptions\InvalidArgumentException;
 use CodeIgniter\Exceptions\RuntimeException;
@@ -21,7 +22,7 @@ use Composer\InstalledVersions;
 use Config\Autoload;
 use Config\Kint as KintConfig;
 use Config\Modules;
-use Kint;
+use Kint\Kint;
 use Kint\Renderer\CliRenderer;
 use Kint\Renderer\RichRenderer;
 
@@ -67,21 +68,21 @@ class Autoloader
     /**
      * Stores namespaces as key, and path as values.
      *
-     * @var array<string, list<string>>
+     * @var array<non-empty-string, list<non-empty-string>>
      */
     protected $prefixes = [];
 
     /**
      * Stores class name as key, and path as values.
      *
-     * @var array<class-string, string>
+     * @var array<class-string, non-empty-string>
      */
     protected $classmap = [];
 
     /**
      * Stores files as a list.
      *
-     * @var list<string>
+     * @var list<non-empty-string>
      */
     protected $files = [];
 
@@ -89,9 +90,21 @@ class Autoloader
      * Stores helper list.
      * Always load the URL helper, it should be used in most apps.
      *
-     * @var list<string>
+     * @var list<non-empty-string>
      */
     protected $helpers = ['url'];
+
+    /**
+     * Stores the closures registered with spl_autoload_register()
+     * so that unregister() can remove the exact same instances.
+     *
+     * @var list<Closure(string): void>
+     */
+    private array $registeredClosures = [];
+
+    public function __construct(private readonly string $composerPath = COMPOSER_PATH)
+    {
+    }
 
     /**
      * Reads in the configuration array (described above) and stores
@@ -123,11 +136,11 @@ class Autoloader
             $this->files = $config->files;
         }
 
-        if (isset($config->helpers)) {
+        if ($config->helpers !== []) {
             $this->helpers = [...$this->helpers, ...$config->helpers];
         }
 
-        if (is_file(COMPOSER_PATH)) {
+        if (is_file($this->composerPath)) {
             $this->loadComposerAutoloader($modules);
         }
 
@@ -139,55 +152,66 @@ class Autoloader
         // The path to the vendor directory.
         // We do not want to enforce this, so set the constant if Composer was used.
         if (! defined('VENDORPATH')) {
-            define('VENDORPATH', dirname(COMPOSER_PATH) . DIRECTORY_SEPARATOR);
+            define('VENDORPATH', dirname($this->composerPath) . DIRECTORY_SEPARATOR);
         }
 
         /** @var ClassLoader $composer */
-        $composer = include COMPOSER_PATH;
+        $composer = include $this->composerPath;
 
         // Should we load through Composer's namespaces, also?
         if ($modules->discoverInComposer) {
-            // @phpstan-ignore-next-line
-            $this->loadComposerNamespaces($composer, $modules->composerPackages ?? []);
+            $composerPackages = $modules->composerPackages;
+            $this->loadComposerNamespaces($composer, $composerPackages ?? []);
         }
 
         unset($composer);
     }
 
     /**
-     * Register the loader with the SPL autoloader stack.
+     * Register the loader with the SPL autoloader stack
+     * in the following order:
+     *
+     * 1. Classmap loader
+     * 2. PSR-4 autoloader
+     * 3. Non-class files
      *
      * @return void
      */
     public function register()
     {
-        // Register classmap loader for the files in our class map.
-        spl_autoload_register($this->loadClassmap(...), true);
+        // Store the exact Closure instances so unregister() can remove them.
+        // First-class callable syntax (e.g. $this->loadClass(...)) creates a
+        // new Closure object on every call, so we must reuse the same instances.
+        $loadClassmap = $this->loadClassmap(...);
+        $loadClass    = $this->loadClass(...);
 
-        // Register the PSR-4 autoloader.
-        spl_autoload_register($this->loadClass(...), true);
+        $this->registeredClosures[] = $loadClassmap;
+        $this->registeredClosures[] = $loadClass;
 
-        // Load our non-class files
+        spl_autoload_register($loadClassmap, true);
+        spl_autoload_register($loadClass, true);
+
         foreach ($this->files as $file) {
             $this->includeFile($file);
         }
     }
 
     /**
-     * Unregister autoloader.
-     *
-     * This method is for testing.
+     * Unregisters the autoloader from the SPL autoload stack.
      */
     public function unregister(): void
     {
-        spl_autoload_unregister($this->loadClass(...));
-        spl_autoload_unregister($this->loadClassmap(...));
+        foreach ($this->registeredClosures as $closure) {
+            spl_autoload_unregister($closure);
+        }
+
+        $this->registeredClosures = [];
     }
 
     /**
      * Registers namespaces with the autoloader.
      *
-     * @param array<string, list<string>|string>|string $namespace
+     * @param array<non-empty-string, list<non-empty-string>|non-empty-string>|non-empty-string $namespace
      *
      * @return $this
      */
@@ -219,8 +243,7 @@ class Autoloader
      *
      * If a prefix param is set, returns only paths to the given prefix.
      *
-     * @return         array<string, list<string>>|list<string>
-     * @phpstan-return ($prefix is null ? array<string, list<string>> : list<string>)
+     * @return ($prefix is null ? array<non-empty-string, list<non-empty-string>> : list<non-empty-string>)
      */
     public function getNamespace(?string $prefix = null)
     {
@@ -248,6 +271,8 @@ class Autoloader
     /**
      * Load a class using available class mapping.
      *
+     * @param class-string $class The fully qualified class name.
+     *
      * @internal For `spl_autoload_register` use.
      */
     public function loadClassmap(string $class): void
@@ -262,9 +287,9 @@ class Autoloader
     /**
      * Loads the class file for a given class name.
      *
-     * @internal For `spl_autoload_register` use.
+     * @param class-string $class The fully qualified class name.
      *
-     * @param string $class The fully qualified class name.
+     * @internal For `spl_autoload_register` use.
      */
     public function loadClass(string $class): void
     {
@@ -274,9 +299,9 @@ class Autoloader
     /**
      * Loads the class file for a given class name.
      *
-     * @param string $class The fully-qualified class name
+     * @param class-string $class The fully qualified class name.
      *
-     * @return false|string The mapped file name on success, or boolean false on fail
+     * @return false|non-empty-string The mapped file name on success, or boolean false on fail
      */
     protected function loadInNamespace(string $class)
     {
@@ -294,21 +319,20 @@ class Autoloader
                     $filePath = $directory . $relativeClassPath . '.php';
                     $filename = $this->includeFile($filePath);
 
-                    if ($filename) {
+                    if ($filename !== false) {
                         return $filename;
                     }
                 }
             }
         }
 
-        // never found a mapped file
         return false;
     }
 
     /**
      * A central way to include a file. Split out primarily for testing purposes.
      *
-     * @return false|string The filename on success, false if the file is not loaded
+     * @return false|non-empty-string The filename on success, false if the file is not loaded
      */
     protected function includeFile(string $file)
     {
@@ -452,14 +476,12 @@ class Autoloader
      */
     protected function discoverComposerNamespaces()
     {
-        if (! is_file(COMPOSER_PATH)) {
+        if (! is_file($this->composerPath)) {
             return;
         }
 
-        /**
-         * @var ClassLoader $composer
-         */
-        $composer = include COMPOSER_PATH;
+        /** @var ClassLoader $composer */
+        $composer = include $this->composerPath;
         $paths    = $composer->getPrefixesPsr4();
         $classes  = $composer->getClassMap();
 
@@ -509,7 +531,7 @@ class Autoloader
     {
         // If we have KINT_DIR it means it's already loaded via composer
         if (! defined('KINT_DIR')) {
-            spl_autoload_register(function ($class): void {
+            spl_autoload_register(static function ($class): void {
                 $class = explode('\\', $class);
 
                 if (array_shift($class) !== 'Kint') {

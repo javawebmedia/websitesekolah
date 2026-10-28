@@ -14,21 +14,15 @@ declare(strict_types=1);
 namespace CodeIgniter\Entity\Cast;
 
 /**
- * Class CSVCast
+ * @extends BaseCast<list<string>, string>
  */
 class CSVCast extends BaseCast
 {
-    /**
-     * {@inheritDoc}
-     */
     public static function get($value, array $params = []): array
     {
         return explode(',', $value);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public static function set($value, array $params = []): string
     {
         return implode(',', $value);

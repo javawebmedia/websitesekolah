@@ -84,14 +84,21 @@ class InvalidChars implements FilterInterface
     /**
      * Check the character encoding is valid UTF-8.
      *
-     * @param array|string $value
+     * @param array<array-key, mixed>|string $value
      *
-     * @return array|string
+     * @return array<array-key, mixed>|string
+     *
+     * @throws SecurityException
      */
     protected function checkEncoding($value)
     {
         if (is_array($value)) {
-            array_map($this->checkEncoding(...), $value);
+            foreach ($value as $key => $item) {
+                if (is_string($key)) {
+                    $this->checkEncoding($key);
+                }
+                $this->checkEncoding($item);
+            }
 
             return $value;
         }
@@ -106,14 +113,19 @@ class InvalidChars implements FilterInterface
     /**
      * Check for the presence of control characters except line breaks and tabs.
      *
-     * @param array|string $value
+     * @param array<array-key, mixed>|string $value
      *
-     * @return array|string
+     * @return array<array-key, mixed>|string
      */
     protected function checkControl($value)
     {
         if (is_array($value)) {
-            array_map($this->checkControl(...), $value);
+            foreach ($value as $key => $item) {
+                if (is_string($key)) {
+                    $this->checkControl($key);
+                }
+                $this->checkControl($item);
+            }
 
             return $value;
         }

@@ -44,6 +44,9 @@ class Glob
         $escaping = false;
         $inCurlies = 0;
         $regex = '';
+        if ($unanchored = str_starts_with($glob, '**/')) {
+            $glob = '/'.$glob;
+        }
         $sizeGlob = \strlen($glob);
         for ($i = 0; $i < $sizeGlob; ++$i) {
             $car = $glob[$i];
@@ -74,7 +77,10 @@ class Glob
             if ($delimiter === $car || '.' === $car || '(' === $car || ')' === $car || '|' === $car || '+' === $car || '^' === $car || '$' === $car) {
                 $regex .= "\\$car";
             } elseif ('*' === $car) {
-                $regex .= $escaping ? '\\*' : ($strictWildcardSlash ? '[^/]*' : '.*');
+                if ($escaping || $strictWildcardSlash || !str_ends_with($regex, '.*')) {
+                    // ".*.*" matches the same as ".*" but backtracks quadratically
+                    $regex .= $escaping ? '\\*' : ($strictWildcardSlash ? '[^/]*' : '.*');
+                }
             } elseif ('?' === $car) {
                 $regex .= $escaping ? '\\?' : ($strictWildcardSlash ? '[^/]' : '.');
             } elseif ('{' === $car) {
@@ -102,6 +108,10 @@ class Glob
                 $regex .= $car;
             }
             $escaping = false;
+        }
+
+        if ($unanchored) {
+            $regex = substr_replace($regex, '?', 1 + ('/' === $delimiter) + ($strictLeadingDot ? \strlen('(?=[^\.])') : 0), 0);
         }
 
         return $delimiter.'^'.$regex.'$'.$delimiter;

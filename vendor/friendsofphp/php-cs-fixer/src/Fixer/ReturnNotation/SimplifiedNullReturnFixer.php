@@ -23,6 +23,8 @@ use PhpCsFixer\Tokenizer\Tokens;
 
 /**
  * @author Graham Campbell <hello@gjcampbell.co.uk>
+ *
+ * @no-named-arguments Parameter names are not covered by the backward compatibility promise.
  */
 final class SimplifiedNullReturnFixer extends AbstractFixer
 {
@@ -40,9 +42,9 @@ final class SimplifiedNullReturnFixer extends AbstractFixer
                         function baz(): ?int { return null; }
                         function xyz(): void { return null; }
 
-                        EOT
+                        EOT,
                 ),
-            ]
+            ],
         );
     }
 
@@ -58,13 +60,26 @@ final class SimplifiedNullReturnFixer extends AbstractFixer
 
     public function isCandidate(Tokens $tokens): bool
     {
-        return $tokens->isTokenKindFound(T_RETURN);
+        return $tokens->isTokenKindFound(\T_RETURN);
     }
 
     protected function applyFix(\SplFileInfo $file, Tokens $tokens): void
     {
-        foreach ($tokens as $index => $token) {
-            if (!$token->isGivenKind(T_RETURN)) {
+        $this->fixRange($tokens, 1, $tokens->count() - 1);
+    }
+
+    private function fixRange(Tokens $tokens, int $startIndex, int $endIndex): void
+    {
+        for ($index = $startIndex; $index < $endIndex; ++$index) {
+            if ($tokens[$index]->isGivenKind(CT::T_PROPERTY_HOOK_BRACE_OPEN)) {
+                $propertyHookCloseIndex = $tokens->findBlockEnd(Tokens::BLOCK_TYPE_PROPERTY_HOOK, $index);
+                $this->scanRange($tokens, $index, $propertyHookCloseIndex);
+                $index = $propertyHookCloseIndex;
+
+                continue;
+            }
+
+            if (!$tokens[$index]->isGivenKind(\T_RETURN)) {
                 continue;
             }
 
@@ -74,12 +89,24 @@ final class SimplifiedNullReturnFixer extends AbstractFixer
         }
     }
 
+    private function scanRange(Tokens $tokens, int $startIndex, int $endIndex): void
+    {
+        for ($index = $startIndex; $index < $endIndex; ++$index) {
+            if ($tokens[$index]->isGivenKind(\T_FUNCTION)) {
+                $braceOpenIndex = $tokens->getNextTokenOfKind($index, ['{']);
+                $braceCloseIndex = $tokens->findBlockEnd(Tokens::BLOCK_TYPE_BRACE, $braceOpenIndex);
+                $this->fixRange($tokens, $braceOpenIndex, $braceCloseIndex);
+                $index = $braceCloseIndex;
+            }
+        }
+    }
+
     /**
      * Clear the return statement located at a given index.
      */
     private function clear(Tokens $tokens, int $index): void
     {
-        while (!$tokens[++$index]->equals(';')) {
+        while (!$tokens[++$index]->equalsAny([';', [\T_CLOSE_TAG]])) {
             if ($this->shouldClearToken($tokens, $index)) {
                 $tokens->clearAt($index);
             }
@@ -96,13 +123,16 @@ final class SimplifiedNullReturnFixer extends AbstractFixer
         }
 
         $content = '';
-        while (!$tokens[$index]->equals(';')) {
+        while (!$tokens[$index]->equalsAny([';', [\T_CLOSE_TAG]])) {
             $index = $tokens->getNextMeaningfulToken($index);
             $content .= $tokens[$index]->getContent();
         }
 
+        $lastTokenContent = $tokens[$index]->getContent();
+        $content = substr($content, 0, -\strlen($lastTokenContent));
+
         $content = ltrim($content, '(');
-        $content = rtrim($content, ');');
+        $content = rtrim($content, ')');
 
         return 'null' === strtolower($content);
     }
@@ -116,16 +146,17 @@ final class SimplifiedNullReturnFixer extends AbstractFixer
     {
         $functionIndex = $returnIndex;
         do {
-            $functionIndex = $tokens->getPrevTokenOfKind($functionIndex, [[T_FUNCTION]]);
+            $functionIndex = $tokens->getPrevTokenOfKind($functionIndex, [[\T_FUNCTION]]);
             if (null === $functionIndex) {
                 return false;
             }
             $openingCurlyBraceIndex = $tokens->getNextTokenOfKind($functionIndex, ['{']);
-            $closingCurlyBraceIndex = $tokens->findBlockEnd(Tokens::BLOCK_TYPE_CURLY_BRACE, $openingCurlyBraceIndex);
+            $closingCurlyBraceIndex = $tokens->findBlockEnd(Tokens::BLOCK_TYPE_BRACE, $openingCurlyBraceIndex);
         } while ($closingCurlyBraceIndex < $returnIndex);
 
         $possibleVoidIndex = $tokens->getPrevMeaningfulToken($openingCurlyBraceIndex);
-        $isStrictReturnType = $tokens[$possibleVoidIndex]->isGivenKind(T_STRING) && 'void' !== $tokens[$possibleVoidIndex]->getContent();
+        $isStrictReturnType = $tokens[$possibleVoidIndex]->isGivenKind([\T_STRING, CT::T_ARRAY_TYPEHINT])
+            && 'void' !== $tokens[$possibleVoidIndex]->getContent();
 
         $nullableTypeIndex = $tokens->getNextTokenOfKind($functionIndex, [[CT::T_NULLABLE_TYPE]]);
         $isNullableReturnType = null !== $nullableTypeIndex && $nullableTypeIndex < $openingCurlyBraceIndex;
@@ -136,13 +167,32 @@ final class SimplifiedNullReturnFixer extends AbstractFixer
     /**
      * Should we clear the specific token?
      *
-     * If the token is a comment, or is whitespace that is immediately before a
-     * comment, then we'll leave it alone.
+     * We'll leave it alone if
+     * - token is a comment
+     * - token is whitespace that is immediately before a comment
+     * - token is whitespace that is immediately before the PHP close tag
+     * - token is whitespace that is immediately after a comment and before a semicolon
      */
     private function shouldClearToken(Tokens $tokens, int $index): bool
     {
         $token = $tokens[$index];
 
-        return !$token->isComment() && !($token->isWhitespace() && $tokens[$index + 1]->isComment());
+        if ($token->isComment()) {
+            return false;
+        }
+
+        if (!$token->isWhitespace()) {
+            return true;
+        }
+
+        if (
+            $tokens[$index + 1]->isComment()
+            || $tokens[$index + 1]->isGivenKind(\T_CLOSE_TAG)
+            || ($tokens[$index - 1]->isComment() && $tokens[$index + 1]->equals(';'))
+        ) {
+            return false;
+        }
+
+        return true;
     }
 }

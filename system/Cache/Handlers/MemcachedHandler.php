@@ -38,7 +38,7 @@ class MemcachedHandler extends BaseHandler
     /**
      * Memcached Configuration
      *
-     * @var array
+     * @var array{host: string, port: int, weight: int, raw: bool}
      */
     protected $config = [
         'host'   => '127.0.0.1',
@@ -57,62 +57,36 @@ class MemcachedHandler extends BaseHandler
         $this->config = array_merge($this->config, $config->memcached);
     }
 
-    /**
-     * Closes the connection to Memcache(d) if present.
-     */
-    public function __destruct()
-    {
-        if ($this->memcached instanceof Memcached) {
-            $this->memcached->quit();
-        } elseif ($this->memcached instanceof Memcache) {
-            $this->memcached->close();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function initialize()
+    public function initialize(): void
     {
         try {
             if (class_exists(Memcached::class)) {
-                // Create new instance of Memcached
                 $this->memcached = new Memcached();
+
                 if ($this->config['raw']) {
                     $this->memcached->setOption(Memcached::OPT_BINARY_PROTOCOL, true);
                 }
 
-                // Add server
                 $this->memcached->addServer(
                     $this->config['host'],
                     $this->config['port'],
                     $this->config['weight'],
                 );
 
-                // attempt to get status of servers
                 $stats = $this->memcached->getStats();
 
                 // $stats should be an associate array with a key in the format of host:port.
                 // If it doesn't have the key, we know the server is not working as expected.
-                if (! isset($stats[$this->config['host'] . ':' . $this->config['port']])) {
+                if (! is_array($stats) || ! isset($stats[$this->config['host'] . ':' . $this->config['port']])) {
                     throw new CriticalError('Cache: Memcached connection failed.');
                 }
             } elseif (class_exists(Memcache::class)) {
-                // Create new instance of Memcache
                 $this->memcached = new Memcache();
 
-                // Check if we can connect to the server
-                $canConnect = $this->memcached->connect(
-                    $this->config['host'],
-                    $this->config['port'],
-                );
-
-                // If we can't connect, throw a CriticalError exception
-                if ($canConnect === false) {
+                if (! $this->memcached->connect($this->config['host'], $this->config['port'])) {
                     throw new CriticalError('Cache: Memcache connection failed.');
                 }
 
-                // Add server, third parameter is persistence and defaults to TRUE.
                 $this->memcached->addServer(
                     $this->config['host'],
                     $this->config['port'],
@@ -123,14 +97,11 @@ class MemcachedHandler extends BaseHandler
                 throw new CriticalError('Cache: Not support Memcache(d) extension.');
             }
         } catch (Exception $e) {
-            throw new CriticalError('Cache: Memcache(d) connection refused (' . $e->getMessage() . ').');
+            throw new CriticalError('Cache: Memcache(d) connection refused (' . $e->getMessage() . ').', $e->getCode(), $e);
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function get(string $key)
+    public function get(string $key): mixed
     {
         $data = [];
         $key  = static::validateKey($key, $this->prefix);
@@ -155,10 +126,7 @@ class MemcachedHandler extends BaseHandler
         return is_array($data) ? $data[0] : $data;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function save(string $key, $value, int $ttl = 60)
+    public function save(string $key, mixed $value, int $ttl = 60): bool
     {
         $key = static::validateKey($key, $this->prefix);
 
@@ -181,30 +149,19 @@ class MemcachedHandler extends BaseHandler
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function delete(string $key)
+    public function delete(string $key): bool
     {
         $key = static::validateKey($key, $this->prefix);
 
         return $this->memcached->delete($key);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return never
-     */
-    public function deleteMatching(string $pattern)
+    public function deleteMatching(string $pattern): never
     {
         throw new BadMethodCallException('The deleteMatching method is not implemented for Memcached. You must select File, Redis or Predis handlers to use it.');
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function increment(string $key, int $offset = 1)
+    public function increment(string $key, int $offset = 1): false|int
     {
         if (! $this->config['raw']) {
             return false;
@@ -215,10 +172,7 @@ class MemcachedHandler extends BaseHandler
         return $this->memcached->increment($key, $offset, $offset, 60);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function decrement(string $key, int $offset = 1)
+    public function decrement(string $key, int $offset = 1): false|int
     {
         if (! $this->config['raw']) {
             return false;
@@ -226,38 +180,31 @@ class MemcachedHandler extends BaseHandler
 
         $key = static::validateKey($key, $this->prefix);
 
-        // FIXME: third parameter isn't other handler actions.
-
-        return $this->memcached->decrement($key, $offset, $offset, 60);
+        // Memcached counters are unsigned and saturate at 0, so a missing
+        // key can only ever be initialized to 0, never a negative value.
+        // Use Memcached::decrement()'s own default of 0 as the initial
+        // value instead of $offset, so a new key no longer starts positive.
+        return $this->memcached->decrement($key, $offset, 0, 60);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function clean()
+    public function clean(): bool
     {
         return $this->memcached->flush();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getCacheInfo()
+    public function getCacheInfo(): array|false
     {
         return $this->memcached->getStats();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getMetaData(string $key)
+    public function getMetaData(string $key): ?array
     {
         $key    = static::validateKey($key, $this->prefix);
         $stored = $this->memcached->get($key);
 
         // if not an array, don't try to count for PHP7.2
         if (! is_array($stored) || count($stored) !== 3) {
-            return false; // @TODO This will return null in a future release
+            return null;
         }
 
         [$data, $time, $limit] = $stored;
@@ -269,11 +216,50 @@ class MemcachedHandler extends BaseHandler
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function isSupported(): bool
     {
         return extension_loaded('memcached') || extension_loaded('memcache');
+    }
+
+    public function ping(): bool
+    {
+        $version = $this->memcached->getVersion();
+
+        if ($this->memcached instanceof Memcached) {
+            // Memcached extension returns array with server:port => version
+            if (! is_array($version)) {
+                return false;
+            }
+
+            $serverKey = $this->config['host'] . ':' . $this->config['port'];
+
+            return isset($version[$serverKey]) && $version[$serverKey] !== false;
+        }
+
+        if ($this->memcached instanceof Memcache) {
+            // Memcache extension returns string version
+            return is_string($version) && $version !== '';
+        }
+
+        return false;
+    }
+
+    public function reconnect(): bool
+    {
+        if ($this->memcached instanceof Memcached) {
+            $this->memcached->quit();
+        } elseif ($this->memcached instanceof Memcache) {
+            $this->memcached->close();
+        }
+
+        try {
+            $this->initialize();
+
+            return true;
+        } catch (CriticalError $e) {
+            log_message('error', 'Cache: Memcached reconnection failed: ' . $e->getMessage());
+
+            return false;
+        }
     }
 }

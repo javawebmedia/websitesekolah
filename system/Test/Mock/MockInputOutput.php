@@ -31,16 +31,24 @@ final class MockInputOutput extends InputOutput
     /**
      * Output lines.
      *
-     * @var         array<int, string>
-     * @phpstan-var list<string>
+     * @var list<string>
      */
     private array $outputs = [];
 
     /**
+     * Snapshot of the shared CITestStreamFilter state captured before this
+     * object attaches its own filters, restored once it is done. Lets a test
+     * combine MockInputOutput with an enclosing StreamFilterTrait without the
+     * latter's filters being torn down.
+     *
+     * @var array{output: bool, error: bool, buffer: string}|null
+     */
+    private ?array $priorFilterState = null;
+
+    /**
      * Sets user inputs.
      *
-     * @param         array<int, string> $inputs
-     * @phpstan-param list<string>       $inputs
+     * @param list<string> $inputs
      */
     public function setInputs(array $inputs): void
     {
@@ -80,6 +88,8 @@ final class MockInputOutput extends InputOutput
 
     /**
      * Returns the outputs array.
+     *
+     * @return list<string>
      */
     public function getOutputs(): array
     {
@@ -88,6 +98,12 @@ final class MockInputOutput extends InputOutput
 
     private function addStreamFilters(): void
     {
+        $this->priorFilterState = [
+            'output' => CITestStreamFilter::hasOutputFilter(),
+            'error'  => CITestStreamFilter::hasErrorFilter(),
+            'buffer' => CITestStreamFilter::$buffer,
+        ];
+
         CITestStreamFilter::registration();
         CITestStreamFilter::addOutputFilter();
         CITestStreamFilter::addErrorFilter();
@@ -97,6 +113,22 @@ final class MockInputOutput extends InputOutput
     {
         CITestStreamFilter::removeOutputFilter();
         CITestStreamFilter::removeErrorFilter();
+
+        if ($this->priorFilterState === null) {
+            return;
+        }
+
+        CITestStreamFilter::$buffer = $this->priorFilterState['buffer'];
+
+        if ($this->priorFilterState['output']) {
+            CITestStreamFilter::addOutputFilter();
+        }
+
+        if ($this->priorFilterState['error']) {
+            CITestStreamFilter::addErrorFilter();
+        }
+
+        $this->priorFilterState = null;
     }
 
     public function input(?string $prefix = null): string

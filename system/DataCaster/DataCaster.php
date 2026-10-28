@@ -18,6 +18,7 @@ use CodeIgniter\DataCaster\Cast\BooleanCast;
 use CodeIgniter\DataCaster\Cast\CastInterface;
 use CodeIgniter\DataCaster\Cast\CSVCast;
 use CodeIgniter\DataCaster\Cast\DatetimeCast;
+use CodeIgniter\DataCaster\Cast\EnumCast;
 use CodeIgniter\DataCaster\Cast\FloatCast;
 use CodeIgniter\DataCaster\Cast\IntBoolCast;
 use CodeIgniter\DataCaster\Cast\IntegerCast;
@@ -28,6 +29,12 @@ use CodeIgniter\Entity\Cast\CastInterface as EntityCastInterface;
 use CodeIgniter\Entity\Exceptions\CastException;
 use CodeIgniter\Exceptions\InvalidArgumentException;
 
+/**
+ * @phpstan-type cast_handlers array<string, class-string<EntityCastInterface|CastInterface>>
+ *
+ * @see CodeIgniter\DataCaster\DataCasterTest
+ * @see CodeIgniter\Entity\EntityTest
+ */
 final class DataCaster
 {
     /**
@@ -38,9 +45,9 @@ final class DataCaster
     private array $types = [];
 
     /**
-     * Convert handlers
+     * Convert handlers.
      *
-     * @var array<string, class-string> [type => classname]
+     * @var cast_handlers [type => classname]
      */
     private array $castHandlers = [
         'array'     => ArrayCast::class,
@@ -48,6 +55,7 @@ final class DataCaster
         'boolean'   => BooleanCast::class,
         'csv'       => CSVCast::class,
         'datetime'  => DatetimeCast::class,
+        'enum'      => EnumCast::class,
         'double'    => FloatCast::class,
         'float'     => FloatCast::class,
         'int'       => IntegerCast::class,
@@ -59,10 +67,10 @@ final class DataCaster
     ];
 
     /**
-     * @param array<string, class-string>|null $castHandlers Custom convert handlers
-     * @param array<string, string>|null       $types        [field => type]
-     * @param object|null                      $helper       Helper object.
-     * @param bool                             $strict       Strict mode? Set to false for casts for Entity.
+     * @param cast_handlers|null         $castHandlers Custom convert handlers
+     * @param array<string, string>|null $types        [field => type]
+     * @param object|null                $helper       Helper object.
+     * @param bool                       $strict       Strict mode? Set to `false` for casts for Entity.
      */
     public function __construct(
         ?array $castHandlers = null,
@@ -70,7 +78,7 @@ final class DataCaster
         private readonly ?object $helper = null,
         private readonly bool $strict = true,
     ) {
-        $this->castHandlers = array_merge($this->castHandlers, $castHandlers);
+        $this->castHandlers = array_merge($this->castHandlers, $castHandlers ?? []);
 
         if ($types !== null) {
             $this->setTypes($types);
@@ -97,8 +105,6 @@ final class DataCaster
      *
      * @param array<string, string> $types [field => type]
      *
-     * @return $this
-     *
      * @internal
      */
     public function setTypes(array $types): static
@@ -113,13 +119,16 @@ final class DataCaster
      * Add ? at the beginning of the type (i.e. ?string) to get `null`
      * instead of casting $value when $value is null.
      *
-     * @param         mixed       $value  The value to convert
-     * @param         string      $field  The field name
-     * @param         string      $method Allowed to "get" and "set"
-     * @phpstan-param 'get'|'set' $method
+     * @param mixed  $value  The value to convert
+     * @param string $field  The field name
+     * @param string $method Allowed to "get" and "set"
      */
     public function castAs(mixed $value, string $field, string $method = 'get'): mixed
     {
+        if ($method !== 'get' && $method !== 'set') {
+            throw CastException::forInvalidMethod($method);
+        }
+
         // If the type is not defined, return as it is.
         if (! isset($this->types[$field])) {
             return $value;

@@ -72,15 +72,17 @@ class ExcludeDirectoryFilterIterator extends \FilterIterator implements \Recursi
      */
     public function accept(): bool
     {
-        if ($this->isRecursive && isset($this->excludedDirs[$this->getFilename()]) && $this->isDir()) {
+        if ($this->isRecursive && isset($this->excludedDirs[$this->current()->getFilename()]) && $this->current()->isDir()) {
             return false;
         }
 
         if ($this->excludedPattern) {
-            $path = $this->isDir() ? $this->current()->getRelativePathname() : $this->current()->getRelativePath();
+            $path = $this->current()->isDir() ? $this->current()->getRelativePathname() : $this->current()->getRelativePath();
             $path = str_replace('\\', '/', $path);
 
-            return !preg_match($this->excludedPattern, $path);
+            if (preg_match($this->excludedPattern, $path)) {
+                return false;
+            }
         }
 
         if ($this->pruneFilters && $this->hasChildren()) {
@@ -104,6 +106,7 @@ class ExcludeDirectoryFilterIterator extends \FilterIterator implements \Recursi
         $children = new self($this->iterator->getChildren(), []);
         $children->excludedDirs = $this->excludedDirs;
         $children->excludedPattern = $this->excludedPattern;
+        $children->pruneFilters = $this->pruneFilters;
 
         return $children;
     }

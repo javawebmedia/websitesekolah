@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace CodeIgniter\Debug;
 
+use CodeIgniter\HTTP\CLIRequest;
+use CodeIgniter\HTTP\IncomingRequest;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Config\Exceptions as ExceptionsConfig;
@@ -46,13 +48,13 @@ abstract class BaseExceptionHandler
 
         $this->obLevel = ob_get_level();
 
-        if ($this->viewPath === null) {
-            $this->viewPath = rtrim($this->config->errorViewPath, '\\/ ') . DIRECTORY_SEPARATOR;
-        }
+        $this->viewPath ??= rtrim($this->config->errorViewPath, '\\/ ') . DIRECTORY_SEPARATOR;
     }
 
     /**
      * The main entry point into the handler.
+     *
+     * @param CLIRequest|IncomingRequest $request
      *
      * @return void
      */
@@ -66,6 +68,16 @@ abstract class BaseExceptionHandler
 
     /**
      * Gathers the variables that will be made available to the view.
+     *
+     * @return array{
+     *   title: string,
+     *   type: string,
+     *   code: int,
+     *   message: string,
+     *   file: string,
+     *   line: int,
+     *   trace: list<array<string, mixed>>,
+     * }
      */
     protected function collectVars(Throwable $exception, int $statusCode): array
     {
@@ -95,6 +107,11 @@ abstract class BaseExceptionHandler
 
     /**
      * Mask sensitive data in the trace.
+     *
+     * @param list<array<string, mixed>> $trace
+     * @param list<string>               $keysToMask
+     *
+     * @return list<array<string, mixed>>
      */
     protected function maskSensitiveData(array $trace, array $keysToMask, string $path = ''): array
     {
@@ -106,9 +123,10 @@ abstract class BaseExceptionHandler
     }
 
     /**
-     * @param array|object $args
+     * @param array<array-key, mixed>|object $args
+     * @param list<string>                   $keysToMask
      *
-     * @return array|object
+     * @return array<array-key, mixed>|object
      */
     private function maskData($args, array $keysToMask, string $path = '')
     {

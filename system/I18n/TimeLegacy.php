@@ -15,7 +15,6 @@ namespace CodeIgniter\I18n;
 
 use DateTime;
 use Exception;
-use ReturnTypeWillChange;
 
 /**
  * Legacy Time class.
@@ -24,22 +23,23 @@ use ReturnTypeWillChange;
  * This is not immutable! Some methods are immutable,
  * but some methods can alter the state.
  *
- * @property int    $age         read-only
- * @property string $day         read-only
- * @property string $dayOfWeek   read-only
- * @property string $dayOfYear   read-only
- * @property bool   $dst         read-only
- * @property string $hour        read-only
- * @property bool   $local       read-only
- * @property string $minute      read-only
- * @property string $month       read-only
- * @property string $quarter     read-only
- * @property string $second      read-only
- * @property int    $timestamp   read-only
- * @property bool   $utc         read-only
- * @property string $weekOfMonth read-only
- * @property string $weekOfYear  read-only
- * @property string $year        read-only
+ * @property int    $age          read-only
+ * @property string $day          read-only
+ * @property string $dayOfWeek    read-only
+ * @property string $dayOfYear    read-only
+ * @property bool   $dst          read-only
+ * @property string $hour         read-only
+ * @property bool   $local        read-only
+ * @property string $minute       read-only
+ * @property string $month        read-only
+ * @property string $quarter      read-only
+ * @property string $second       read-only
+ * @property int    $timestamp    read-only
+ * @property string $timezoneName read-only
+ * @property bool   $utc          read-only
+ * @property string $weekOfMonth  read-only
+ * @property string $weekOfYear   read-only
+ * @property string $year         read-only
  *
  * @phpstan-consistent-constructor
  *
@@ -55,12 +55,9 @@ class TimeLegacy extends DateTime
      *
      * @param int $timestamp
      *
-     * @return static
-     *
      * @throws Exception
      */
-    #[ReturnTypeWillChange]
-    public function setTimestamp($timestamp)
+    public function setTimestamp($timestamp): static
     {
         $time = date('Y-m-d H:i:s', $timestamp);
 

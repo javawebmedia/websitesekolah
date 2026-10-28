@@ -39,7 +39,7 @@ class Connection extends BaseConnection
     /**
      * Identifier escape character
      *
-     * @var string
+     * @var list<string>|string
      */
     public $escapeChar = '`';
 
@@ -55,7 +55,7 @@ class Connection extends BaseConnection
      *
      * @see https://www.php.net/manual/en/sqlite3.busytimeout
      */
-    protected $busyTimeout;
+    protected ?int $busyTimeout = null;
 
     /**
      * The setting of the "synchronous" flag
@@ -107,7 +107,7 @@ class Connection extends BaseConnection
                 $this->database = WRITEPATH . $this->database;
             }
 
-            $sqlite = (! isset($this->password) || $this->password !== '')
+            $sqlite = ($this->password === null || $this->password === '')
                 ? new SQLite3($this->database)
                 : new SQLite3($this->database, SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE, $this->password);
 
@@ -115,27 +115,10 @@ class Connection extends BaseConnection
 
             return $sqlite;
         } catch (Exception $e) {
-            throw new DatabaseException('SQLite3 error: ' . $e->getMessage());
+            throw new DatabaseException('SQLite3 error: ' . $e->getMessage(), $e->getCode(), $e);
         }
     }
 
-    /**
-     * Keep or establish the connection if no queries have been sent for
-     * a length of time exceeding the server's idle timeout.
-     *
-     * @return void
-     */
-    public function reconnect()
-    {
-        $this->close();
-        $this->initialize();
-    }
-
-    /**
-     * Close the database connection.
-     *
-     * @return void
-     */
     protected function _close()
     {
         $this->connID->close();
@@ -175,7 +158,12 @@ class Connection extends BaseConnection
                 ? $this->connID->exec($sql)
                 : $this->connID->query($sql);
         } catch (Exception $e) {
-            log_message('error', (string) $e);
+            log_message('error', "{message}\nin {exFile} on line {exLine}.\n{trace}", [
+                'message' => $e->getMessage(),
+                'exFile'  => clean_path($e->getFile()),
+                'exLine'  => $e->getLine(),
+                'trace'   => render_backtrace($e->getTrace()),
+            ]);
 
             if ($this->DBDebug) {
                 throw new DatabaseException($e->getMessage(), $e->getCode(), $e);
@@ -205,11 +193,6 @@ class Connection extends BaseConnection
         return $this->connID->escapeString($str);
     }
 
-    /**
-     * Generates the SQL for listing tables in a platform-dependent manner.
-     *
-     * @param string|null $tableName If $tableName is provided will return only this table if exists.
-     */
     protected function _listTables(bool $prefixLimit = false, ?string $tableName = null): string
     {
         if ((string) $tableName !== '') {
@@ -225,11 +208,6 @@ class Connection extends BaseConnection
                     : '');
     }
 
-    /**
-     * Generates a platform-specific query string so that the column names can be fetched.
-     *
-     * @param string|TableName $table
-     */
     protected function _listColumns($table = ''): string
     {
         if ($table instanceof TableName) {
@@ -288,21 +266,22 @@ class Connection extends BaseConnection
     }
 
     /**
-     * Returns an array of objects with field data
-     *
-     * @return list<stdClass>
-     *
      * @throws DatabaseException
      */
     protected function _fieldData(string $table): array
     {
-        if (false === $query = $this->query('PRAGMA TABLE_INFO(' . $this->protectIdentifiers($table, true, null, false) . ')')) {
+        $parts  = explode('.', $table);
+        $table  = array_pop($parts);
+        $schema = array_pop($parts);
+        $pragma = ($schema === null ? '' : $this->escapeIdentifiers($schema) . '.') . 'TABLE_INFO(' . $this->protectIdentifiers($table, true, null, false) . ')';
+
+        if (false === $query = $this->query('PRAGMA ' . $pragma)) {
             throw new DatabaseException(lang('Database.failGetFieldData'));
         }
 
         $query = $query->getResultObject();
 
-        if (empty($query)) {
+        if ($query === []) {
             return [];
         }
 
@@ -326,10 +305,6 @@ class Connection extends BaseConnection
     }
 
     /**
-     * Returns an array of objects with index data
-     *
-     * @return array<string, stdClass>
-     *
      * @throws DatabaseException
      */
     protected function _indexData(string $table): array
@@ -382,11 +357,6 @@ class Connection extends BaseConnection
         return $retVal;
     }
 
-    /**
-     * Returns an array of objects with Foreign key data
-     *
-     * @return array<string, stdClass>
-     */
     protected function _foreignKeyData(string $table): array
     {
         if (! $this->supportsForeignKeys()) {
@@ -435,7 +405,7 @@ class Connection extends BaseConnection
      * Must return this format: ['code' => string|int, 'message' => string]
      * intval(code) === 0 means "no error".
      *
-     * @return array<string, int|string>
+     * @return array{code: int|string|null, message: string|null}
      */
     public function error(): array
     {
@@ -453,25 +423,16 @@ class Connection extends BaseConnection
         return $this->connID->lastInsertRowID();
     }
 
-    /**
-     * Begin Transaction
-     */
     protected function _transBegin(): bool
     {
         return $this->connID->exec('BEGIN TRANSACTION');
     }
 
-    /**
-     * Commit Transaction
-     */
     protected function _transCommit(): bool
     {
         return $this->connID->exec('END TRANSACTION');
     }
 
-    /**
-     * Rollback Transaction
-     */
     protected function _transRollback(): bool
     {
         return $this->connID->exec('ROLLBACK');

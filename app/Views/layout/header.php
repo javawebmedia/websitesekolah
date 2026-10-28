@@ -49,71 +49,76 @@ foreach($nav_menu as $nav_menu) {
             <address class="mb-0"><?php echo word_limiter(strip_tags($site_setting->namaweb),5) ?></address>
           </div>
               
-          <?php if($site_setting->fitur_pendaftaran=='On') { ?>
+
+          <?php if ($site_setting->fitur_pendaftaran == 'On') { ?>
 
               <div class="d-flex flex-row align-items-center me-6 ms-auto">
-                <p class="mb-0">
-                  <a href="<?php echo base_url('check') ?>" class="text-white hover">
-                   <i class="fa fa-user-check"></i> Cek Status Pendaftaran
-                  </a>
-                </p>
+                  <p class="mb-0">
+                      <a href="<?php echo base_url('check') ?>" class="text-white hover">
+                          <i class="fa fa-user-check"></i> Cek Status Pendaftaran
+                      </a>
+                  </p>
               </div>
 
-              <?php if(Session()->get('username_siswa') !='') { ?>
-                <div class="d-flex flex-row align-items-center me-6">
-                  <p class="mb-0">
-                    <a href="<?php echo base_url('pendaftaran') ?>" class="text-white hover">
-                     <i class="fa fa-edit"></i> Pendaftaran Online
-                    </a>
-                  </p>
-                </div>
+              <?php if (Session()->get('username_siswa') != '') { ?>
 
-                <div class="d-flex flex-row align-items-center me-6">
-                  <p class="mb-0">
-                    <a href="<?php echo base_url('siswa/dasbor') ?>" class="text-white hover">
-                     <i class="fa fa-tachometer-alt"></i> Dashboard
-                    </a>
-                  </p>
-                </div>
+                  <div class="d-flex flex-row align-items-center me-6">
+                      <p class="mb-0">
+                          <a href="<?php echo base_url('pendaftaran') ?>" class="text-white hover">
+                              <i class="fa fa-edit"></i> Pendaftaran Online
+                          </a>
+                      </p>
+                  </div>
 
-                <div class="d-flex flex-row align-items-center me-6">
-                  <p class="mb-0">
-                    <a href="<?php echo base_url('signin/logout') ?>" class="text-white hover">
-                     <i class="fa fa-sign-out-alt"></i>
-                    </a>
-                  </p>
-                </div>
+                  <div class="d-flex flex-row align-items-center me-6">
+                      <p class="mb-0">
+                          <a href="<?php echo base_url('siswa/dasbor') ?>" class="text-white hover">
+                              <i class="fa fa-tachometer-alt"></i> Dashboard
+                          </a>
+                      </p>
+                  </div>
 
-              <?php }else{ ?>
+                  <div class="d-flex flex-row align-items-center me-6">
+                      <p class="mb-0">
+                          <a href="<?php echo base_url('signin/logout') ?>" class="text-white hover">
+                              <i class="fa fa-sign-out-alt"></i>
+                          </a>
+                      </p>
+                  </div>
 
-                <div class="d-flex flex-row align-items-center me-6">
-                  <p class="mb-0">
-                    <a href="<?php echo base_url('pendaftaran') ?>" class="text-white hover">
-                     <i class="fa fa-edit"></i> Pendaftaran Online
-                    </a>
-                  </p>
-                </div>
+              <?php } else { ?>
 
-                <div class="d-flex flex-row align-items-center">
-                  <p class="mb-0">
-                    <a href="<?php echo base_url('signin') ?>" class="text-white hover">
-                     <i class="fa fa-lock"></i>  Login
-                    </a>
-                  </p>
-                </div>
+                  <div class="d-flex flex-row align-items-center me-6">
+                      <p class="mb-0">
+                          <a href="<?php echo base_url('pendaftaran') ?>" class="text-white hover">
+                              <i class="fa fa-edit"></i> Pendaftaran Online
+                          </a>
+                      </p>
+                  </div>
 
-                
+                  <div class="d-flex flex-row align-items-center">
+                      <p class="mb-0">
+                          <a href="<?php echo base_url('signin') ?>" class="text-white hover">
+                              <i class="fa fa-lock"></i> Login
+                          </a>
+                      </p>
+                  </div>
 
               <?php } ?>
-              <?php }else{ ?>
-                <div class="d-flex flex-row align-items-center me-6">
+
+          <?php } else { ?>
+
+              <div class="d-flex flex-row align-items-center ms-auto">
                   <p class="mb-0">
-                    <a href="mailto:<?php echo $site_setting->email ?>" class="text-white hover">
-                      <i class="fa fa-envelope"></i> <?php echo $site_setting->email ?>
-                    </a>
+                      <a href="mailto:<?php echo $site_setting->email ?>" class="text-white hover">
+                          <i class="fa fa-envelope"></i>
+                          <?php echo $site_setting->email ?>
+                      </a>
                   </p>
-                </div>
-              <?php } ?>
+              </div>
+
+          <?php } ?>
+
         </div>
         <!-- /.container -->
       </div>

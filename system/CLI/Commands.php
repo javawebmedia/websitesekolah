@@ -21,13 +21,15 @@ use ReflectionException;
 
 /**
  * Core functionality for running, listing, etc commands.
+ *
+ * @phpstan-type commands_list array<string, array{'class': class-string<BaseCommand>, 'file': string, 'group': string,'description': string}>
  */
 class Commands
 {
     /**
      * The found commands.
      *
-     * @var array
+     * @var commands_list
      */
     protected $commands = [];
 
@@ -52,6 +54,8 @@ class Commands
     /**
      * Runs a command given
      *
+     * @param array<array-key, string|null> $params
+     *
      * @return int Exit code
      */
     public function run(string $command, array $params)
@@ -60,8 +64,6 @@ class Commands
             return EXIT_ERROR;
         }
 
-        // The file would have already been loaded during the
-        // createCommandList function...
         $className = $this->commands[$command]['class'];
         $class     = new $className($this->logger, $this);
 
@@ -77,7 +79,7 @@ class Commands
     /**
      * Provide access to the list of commands.
      *
-     * @return array
+     * @return commands_list
      */
     public function getCommands()
     {
@@ -96,19 +98,16 @@ class Commands
             return;
         }
 
-        /** @var FileLocatorInterface $locator */
+        /** @var FileLocatorInterface */
         $locator = service('locator');
         $files   = $locator->listFiles('Commands/');
 
-        // If no matching command files were found, bail
-        // This should never happen in unit testing.
         if ($files === []) {
-            return; // @codeCoverageIgnore
+            return;
         }
 
-        // Loop over each file checking to see if a command with that
-        // alias exists in the class.
         foreach ($files as $file) {
+            /** @var class-string<BaseCommand>|false */
             $className = $locator->findQualifiedNameFromPath($file);
 
             if ($className === false || ! class_exists($className)) {
@@ -122,10 +121,9 @@ class Commands
                     continue;
                 }
 
-                /** @var BaseCommand $class */
                 $class = new $className($this->logger, $this);
 
-                if (isset($class->group) && ! isset($this->commands[$class->name])) {
+                if ($class->group !== null && ! isset($this->commands[$class->name])) {
                     $this->commands[$class->name] = [
                         'class'       => $className,
                         'file'        => $file,
@@ -146,6 +144,8 @@ class Commands
     /**
      * Verifies if the command being sought is found
      * in the commands list.
+     *
+     * @param commands_list $commands
      */
     public function verifyCommand(string $command, array $commands): bool
     {
@@ -156,18 +156,17 @@ class Commands
         $message = lang('CLI.commandNotFound', [$command]);
 
         $alternatives = $this->getCommandAlternatives($command, $commands);
-        if ($alternatives !== []) {
-            if (count($alternatives) === 1) {
-                $message .= "\n\n" . lang('CLI.altCommandSingular') . "\n    ";
-            } else {
-                $message .= "\n\n" . lang('CLI.altCommandPlural') . "\n    ";
-            }
 
-            $message .= implode("\n    ", $alternatives);
+        if ($alternatives !== []) {
+            $message = sprintf(
+                "%s\n\n%s\n    %s",
+                $message,
+                count($alternatives) === 1 ? lang('CLI.altCommandSingular') : lang('CLI.altCommandPlural'),
+                implode("\n    ", $alternatives),
+            );
         }
 
         CLI::error($message);
-        CLI::newLine();
 
         return false;
     }
@@ -175,11 +174,17 @@ class Commands
     /**
      * Finds alternative of `$name` among collection
      * of commands.
+     *
+     * @param commands_list $collection
+     *
+     * @return list<string>
      */
     protected function getCommandAlternatives(string $name, array $collection): array
     {
+        /** @var array<string, int> */
         $alternatives = [];
 
+        /** @var string $commandName */
         foreach (array_keys($collection) as $commandName) {
             $lev = levenshtein($name, $commandName);
 

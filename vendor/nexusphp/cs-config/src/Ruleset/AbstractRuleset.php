@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Nexus\CsConfig\Ruleset;
 
-abstract class AbstractRuleset implements RulesetInterface
+abstract class AbstractRuleset implements ConfigurableAllowedUnsupportedPhpVersionRulesetInterface
 {
     /**
      * Name of the ruleset.
@@ -23,16 +23,16 @@ abstract class AbstractRuleset implements RulesetInterface
     /**
      * Rules for the ruleset.
      *
-     * @var array<string, array<string, array<string>|bool|string>|bool>
+     * @var array<string, array<string, bool|list<string>|string>|bool>
      */
     protected array $rules = [];
 
     /**
      * Minimum PHP version.
      *
-     * @phpstan-var int<0, max>
+     * @var int<80100, 90000>
      */
-    protected int $requiredPHPVersion = 0;
+    protected int $requiredPHPVersion = 8_01_00;
 
     /**
      * Have this ruleset turn on `$isRiskyAllowed` flag?
@@ -40,8 +40,10 @@ abstract class AbstractRuleset implements RulesetInterface
     protected bool $autoActivateIsRiskyAllowed = false;
 
     /**
-     * {@inheritDoc}
+     * Allow unsupported PHP versions.
      */
+    protected bool $isUnsupportedPhpVersionAllowed = \PHP_VERSION_ID > self::PHP_CS_FIXER_MAX_SUPPORTED_PHP_VERSION_ID;
+
     final public function getName(): string
     {
         if ('' !== $this->name) {
@@ -57,27 +59,23 @@ abstract class AbstractRuleset implements RulesetInterface
         return static::class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     final public function getRules(): array
     {
         return $this->rules;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     final public function getRequiredPHPVersion(): int
     {
         return $this->requiredPHPVersion;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     final public function willAutoActivateIsRiskyAllowed(): bool
     {
         return $this->autoActivateIsRiskyAllowed;
+    }
+
+    final public function isUnsupportedPhpVersionAllowed(): bool
+    {
+        return $this->isUnsupportedPhpVersionAllowed;
     }
 }

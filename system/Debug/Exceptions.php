@@ -84,17 +84,6 @@ class Exceptions
         $this->viewPath = rtrim($config->errorViewPath, '\\/ ') . DIRECTORY_SEPARATOR;
 
         $this->config = $config;
-
-        // workaround for upgraded users
-        // This causes "Deprecated: Creation of dynamic property" in PHP 8.2.
-        // @TODO remove this after dropping PHP 8.1 support.
-        if (! isset($this->config->sensitiveDataInTrace)) {
-            $this->config->sensitiveDataInTrace = [];
-        }
-        if (! isset($this->config->logDeprecations, $this->config->deprecationLogLevel)) {
-            $this->config->logDeprecations     = false;
-            $this->config->deprecationLogLevel = LogLevel::WARNING;
-        }
     }
 
     /**
@@ -136,7 +125,7 @@ class Exceptions
                 'routeInfo' => $routeInfo,
                 'exFile'    => clean_path($exception->getFile()), // {file} refers to THIS file
                 'exLine'    => $exception->getLine(), // {line} refers to THIS line
-                'trace'     => self::renderBacktrace($exception->getTrace()),
+                'trace'     => render_backtrace($exception->getTrace()),
             ]);
 
             // Get the first exception.
@@ -149,7 +138,7 @@ class Exceptions
                     'message' => $prevException->getMessage(),
                     'exFile'  => clean_path($prevException->getFile()), // {file} refers to THIS file
                     'exLine'  => $prevException->getLine(), // {line} refers to THIS line
-                    'trace'   => self::renderBacktrace($prevException->getTrace()),
+                    'trace'   => render_backtrace($prevException->getTrace()),
                 ]);
             }
         }
@@ -212,10 +201,6 @@ class Exceptions
                 return true;
             }
 
-            if ($this->isImplicitNullableDeprecationError($message, $file, $line)) {
-                return true;
-            }
-
             if (! $this->config->logDeprecations || (bool) env('CODEIGNITER_SCREAM_DEPRECATIONS')) {
                 throw new ErrorException($message, 0, $severity, $file, $line);
             }
@@ -239,38 +224,6 @@ class Exceptions
         if (
             PHP_VERSION_ID >= 80400
             && str_contains($message, 'session.sid_')
-        ) {
-            log_message(
-                LogLevel::WARNING,
-                '[DEPRECATED] {message} in {errFile} on line {errLine}.',
-                [
-                    'message' => $message,
-                    'errFile' => clean_path($file ?? ''),
-                    'errLine' => $line ?? 0,
-                ],
-            );
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Workaround to implicit nullable deprecation errors in PHP 8.4.
-     *
-     * "Implicitly marking parameter $xxx as nullable is deprecated,
-     *  the explicit nullable type must be used instead"
-     *
-     * @TODO remove this before v4.6.0 release
-     */
-    private function isImplicitNullableDeprecationError(string $message, ?string $file = null, ?int $line = null): bool
-    {
-        if (
-            PHP_VERSION_ID >= 80400
-            && str_contains($message, 'the explicit nullable type must be used instead')
-            // Only Kint and Faker, which cause this error, are logged.
-            && (str_starts_with($message, 'Kint\\') || str_starts_with($message, 'Faker\\'))
         ) {
             log_message(
                 LogLevel::WARNING,
@@ -402,6 +355,8 @@ class Exceptions
     /**
      * Gathers the variables that will be made available to the view.
      *
+     * @return array{title: string, type: string, code: int, message: string, file: string, line: int, trace: list<array<string, mixed>>}
+     *
      * @deprecated 4.4.0 No longer used. Moved to BaseExceptionHandler.
      */
     protected function collectVars(Throwable $exception, int $statusCode): array
@@ -433,9 +388,10 @@ class Exceptions
     /**
      * Mask sensitive data in the trace.
      *
-     * @param array $trace
+     * @param list<array<string, mixed>> $trace
+     * @param list<string>               $keysToMask
      *
-     * @return array
+     * @return list<array<string, mixed>>
      *
      * @deprecated 4.4.0 No longer used. Moved to BaseExceptionHandler.
      */
@@ -449,9 +405,10 @@ class Exceptions
     }
 
     /**
-     * @param array|object $args
+     * @param array<array-key, mixed>|object $args
+     * @param list<string>                   $keysToMask
      *
-     * @return array|object
+     * @return array<array-key, mixed>|object
      *
      * @deprecated 4.4.0 No longer used. Moved to BaseExceptionHandler.
      */
@@ -488,6 +445,8 @@ class Exceptions
 
     /**
      * Determines the HTTP status code and the exit status code for this request.
+     *
+     * @return array{int, int}
      */
     protected function determineCodes(Throwable $exception): array
     {
@@ -527,7 +486,7 @@ class Exceptions
                 'message' => $message,
                 'errFile' => clean_path($file ?? ''),
                 'errLine' => $line ?? 0,
-                'trace'   => self::renderBacktrace($trace),
+                'trace'   => render_backtrace($trace),
             ],
         );
 
@@ -645,42 +604,5 @@ class Exceptions
         }
 
         return '<pre><code>' . $out . '</code></pre>';
-    }
-
-    private static function renderBacktrace(array $backtrace): string
-    {
-        $backtraces = [];
-
-        foreach ($backtrace as $index => $trace) {
-            $frame = $trace + ['file' => '[internal function]', 'line' => '', 'class' => '', 'type' => '', 'args' => []];
-
-            if ($frame['file'] !== '[internal function]') {
-                $frame['file'] = sprintf('%s(%s)', $frame['file'], $frame['line']);
-            }
-
-            unset($frame['line']);
-            $idx = $index;
-            $idx = str_pad((string) ++$idx, 2, ' ', STR_PAD_LEFT);
-
-            $args = implode(', ', array_map(static fn ($value): string => match (true) {
-                is_object($value)   => sprintf('Object(%s)', $value::class),
-                is_array($value)    => $value !== [] ? '[...]' : '[]',
-                $value === null     => 'null',
-                is_resource($value) => sprintf('resource (%s)', get_resource_type($value)),
-                default             => var_export($value, true),
-            }, $frame['args']));
-
-            $backtraces[] = sprintf(
-                '%s %s: %s%s%s(%s)',
-                $idx,
-                clean_path($frame['file']),
-                $frame['class'],
-                $frame['type'],
-                $frame['function'],
-                $args,
-            );
-        }
-
-        return implode("\n", $backtraces);
     }
 }

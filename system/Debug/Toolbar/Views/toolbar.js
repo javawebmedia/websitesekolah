@@ -27,22 +27,25 @@ var ciDebugBar = {
             .getElementById("debug-icon-link")
             .addEventListener("click", ciDebugBar.toggleToolbar, true);
 
-        // Allows to highlight the row of the current history request
-        var btn = this.toolbar.querySelector(
-            'button[data-time="' + localStorage.getItem("debugbar-time") + '"]'
-        );
-        ciDebugBar.addClass(btn.parentNode.parentNode, "current");
-
         historyLoad = this.toolbar.getElementsByClassName("ci-history-load");
 
-        for (var i = 0; i < historyLoad.length; i++) {
-            historyLoad[i].addEventListener(
-                "click",
-                function () {
-                    loadDoc(this.getAttribute("data-time"));
-                },
-                true
+        if (historyLoad.length) {
+            // Allows highlighting the row of the current history request
+            var btn = this.toolbar.querySelector(
+                'button[data-time="' + localStorage.getItem("debugbar-time-new") + '"]'
             );
+            ciDebugBar.addClass(btn.parentNode.parentNode, "current");
+
+
+            for (var i = 0; i < historyLoad.length; i++) {
+                historyLoad[i].addEventListener(
+                    "click",
+                    function () {
+                        loadDoc(this.getAttribute("data-time"));
+                    },
+                    true
+                );
+            }
         }
 
         // Display the active Tab on page load
@@ -77,14 +80,14 @@ var ciDebugBar = {
                 links[i].addEventListener("click", function() {
                     ciDebugBar.toggleDataTable(datatable)
                 }, true);
-               
+
             } else if (toggleData === "childrows") {
 
                 let child = links[i].getAttribute("data-child");
                 links[i].addEventListener("click", function() {
                     ciDebugBar.toggleChildRows(child)
                 }, true);
-                
+
             } else {
                 links[i].addEventListener("click", ciDebugBar.toggleRows, true);
             }
@@ -174,10 +177,10 @@ var ciDebugBar = {
             );
 
             if (target.classList.contains("debug-bar-ndisplay")) {
-                ciDebugBar.switchClass(target, "debug-bar-ndisplay", "debug-bar-dtableRow");   
+                ciDebugBar.switchClass(target, "debug-bar-ndisplay", "debug-bar-dtableRow");
             } else {
                 ciDebugBar.switchClass(target, "debug-bar-dtableRow", "debug-bar-ndisplay");
-            } 
+            }
         }
     },
 
@@ -261,7 +264,7 @@ var ciDebugBar = {
         } else {
             ciDebugBar.switchClass(ciDebugBar.icon, "debug-bar-dinlineBlock", "debug-bar-ndisplay");
             ciDebugBar.switchClass(ciDebugBar.toolbar, "debug-bar-ndisplay", "debug-bar-dinlineBlock");
-        } 
+        }
     },
 
     toggleViewsHints: function () {
@@ -334,6 +337,11 @@ var ciDebugBar = {
         const OUTER_ELEMENTS = ["HTML", "BODY", "HEAD"];
 
         var getValidElementInner = function (node, reverse) {
+            // handle null node
+            if (node === null) {
+                return null;
+            }
+
             // handle invalid tags
             if (OUTER_ELEMENTS.indexOf(node.nodeName) !== -1) {
                 for (var i = 0; i < document.body.children.length; ++i) {
@@ -437,7 +445,7 @@ var ciDebugBar = {
                 var debugPath = document.createElement("div"); // path
                 var childArray = startElement[0].parentNode.childNodes; // target child array
                 var parent = startElement[0].parentNode;
-                var start, end;
+                let start, end;
 
                 // setup container
                 debugDiv.classList.add("debug-view");
@@ -754,7 +762,7 @@ var ciDebugBar = {
         var rowGet = this.toolbar.querySelectorAll(
             'td[data-debugbar-route="GET"]'
         );
-        var patt = /\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\)/;
+        var patt = /\(.+?\)/g;
 
         for (var i = 0; i < rowGet.length; i++) {
             row = rowGet[i];
@@ -780,10 +788,9 @@ var ciDebugBar = {
                     '<form data-debugbar-route-tpl="' +
                     ciDebugBar.trimSlash(row.innerText.replace(patt, "?")) +
                     '">' +
-                    row.innerText.replace(
-                        patt,
-                        '<input type="text" placeholder="$1">'
-                    ) +
+                    row.innerText.replace(patt, function (match) {
+                        return '<input type="text" placeholder="' + match + '">';
+                    }) +
                     '<input type="submit" value="Go" class="debug-bar-mleft4">' +
                     "</form>";
             }

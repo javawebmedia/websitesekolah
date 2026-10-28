@@ -171,9 +171,9 @@ class DownloadResponse extends Response
          *
          * Reference: http://digiblog.de/2011/04/19/android-and-the-download-file-headers/
          */
-        // @todo: depend super global
-        if (count($x) !== 1 && isset($_SERVER['HTTP_USER_AGENT'])
-                && preg_match('/Android\s(1|2\.[01])/', $_SERVER['HTTP_USER_AGENT'])) {
+        $userAgent = service('superglobals')->server('HTTP_USER_AGENT');
+        if (count($x) !== 1 && $userAgent !== null
+                && preg_match('/Android\s(1|2\.[01])/', $userAgent)) {
             $x[count($x) - 1] = strtoupper($extension);
             $filename         = implode('.', $x);
         }
@@ -182,22 +182,21 @@ class DownloadResponse extends Response
     }
 
     /**
-     * get Content-Disposition Header string.
+     * Get Content-Disposition Header string.
      */
-    private function getContentDisposition(): string
+    private function getContentDisposition(bool $inline = false): string
     {
-        $downloadFilename = $this->getDownloadFileName();
-
-        $utf8Filename = $downloadFilename;
+        $downloadFilename = $utf8Filename = $this->getDownloadFileName();
+        $disposition      = $inline ? 'inline' : 'attachment';
 
         if (strtoupper($this->charset) !== 'UTF-8') {
             $utf8Filename = mb_convert_encoding($downloadFilename, 'UTF-8', $this->charset);
         }
 
-        $result = sprintf('attachment; filename="%s"', $downloadFilename);
+        $result = sprintf('%s; filename="%s"', $disposition, addslashes($downloadFilename));
 
         if ($utf8Filename !== '') {
-            $result .= '; filename*=UTF-8\'\'' . rawurlencode($utf8Filename);
+            $result .= sprintf('; filename*=UTF-8\'\'%s', rawurlencode($utf8Filename));
         }
 
         return $result;
@@ -217,7 +216,7 @@ class DownloadResponse extends Response
      * Sets the Content Type header for this response with the mime type
      * and, optionally, the charset.
      *
-     * @return ResponseInterface
+     * @return $this
      */
     public function setContentType(string $mime, string $charset = 'UTF-8')
     {
@@ -287,7 +286,7 @@ class DownloadResponse extends Response
     /**
      * output download file text.
      *
-     * @return DownloadResponse
+     * @return $this
      *
      * @throws DownloadException
      */
@@ -307,7 +306,7 @@ class DownloadResponse extends Response
     /**
      * output download text by file.
      *
-     * @return DownloadResponse
+     * @return $this
      */
     private function sendBodyByFilePath()
     {
@@ -325,7 +324,7 @@ class DownloadResponse extends Response
     /**
      * output download text by binary
      *
-     * @return DownloadResponse
+     * @return $this
      */
     private function sendBodyByBinary()
     {
@@ -341,7 +340,7 @@ class DownloadResponse extends Response
      */
     public function inline()
     {
-        $this->setHeader('Content-Disposition', 'inline');
+        $this->setHeader('Content-Disposition', $this->getContentDisposition(true));
 
         return $this;
     }

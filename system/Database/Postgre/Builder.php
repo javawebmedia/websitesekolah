@@ -14,19 +14,23 @@ declare(strict_types=1);
 namespace CodeIgniter\Database\Postgre;
 
 use CodeIgniter\Database\BaseBuilder;
+use CodeIgniter\Database\BaseResult;
 use CodeIgniter\Database\Exceptions\DatabaseException;
+use CodeIgniter\Database\Query;
 use CodeIgniter\Database\RawSql;
 use CodeIgniter\Exceptions\InvalidArgumentException;
 
 /**
  * Builder for Postgre
+ *
+ * @extends BaseBuilder<Connection>
  */
 class Builder extends BaseBuilder
 {
     /**
      * ORDER BY random keyword
      *
-     * @var array
+     * @var list<string>
      */
     protected $randomKeyword = [
         'RANDOM()',
@@ -36,7 +40,7 @@ class Builder extends BaseBuilder
      * Specifies which sql statements
      * support the ignore option.
      *
-     * @var array
+     * @var array<string, string>
      */
     protected $supportedIgnoreStatements = [
         'insert' => 'ON CONFLICT DO NOTHING',
@@ -52,8 +56,8 @@ class Builder extends BaseBuilder
     {
         $sql = parent::compileIgnore($statement);
 
-        if (! empty($sql)) {
-            $sql = ' ' . trim($sql);
+        if ($sql !== '') {
+            return ' ' . trim($sql);
         }
 
         return $sql;
@@ -64,7 +68,7 @@ class Builder extends BaseBuilder
      *
      * @param string $direction ASC, DESC or RANDOM
      *
-     * @return BaseBuilder
+     * @return $this
      */
     public function orderBy(string $orderBy, string $direction = '', ?bool $escape = null)
     {
@@ -89,7 +93,7 @@ class Builder extends BaseBuilder
     /**
      * Increments a numeric column by the specified value.
      *
-     * @return mixed
+     * @return bool
      *
      * @throws DatabaseException
      */
@@ -97,7 +101,7 @@ class Builder extends BaseBuilder
     {
         $column = $this->db->protectIdentifiers($column);
 
-        $sql = $this->_update($this->QBFrom[0], [$column => "to_number({$column}, '9999999') + {$value}"]);
+        $sql = $this->_update($this->QBFrom[0], [$column => "CAST({$column} AS numeric) + {$value}"]);
 
         if (! $this->testMode) {
             $this->resetWrite();
@@ -111,7 +115,7 @@ class Builder extends BaseBuilder
     /**
      * Decrements a numeric column by the specified value.
      *
-     * @return mixed
+     * @return bool
      *
      * @throws DatabaseException
      */
@@ -119,7 +123,7 @@ class Builder extends BaseBuilder
     {
         $column = $this->db->protectIdentifiers($column);
 
-        $sql = $this->_update($this->QBFrom[0], [$column => "to_number({$column}, '9999999') - {$value}"]);
+        $sql = $this->_update($this->QBFrom[0], [$column => "CAST({$column} AS numeric) - {$value}"]);
 
         if (! $this->testMode) {
             $this->resetWrite();
@@ -136,9 +140,9 @@ class Builder extends BaseBuilder
      * we simply do a DELETE and an INSERT on the first key/value
      * combo, assuming that it's either the primary key or a unique key.
      *
-     * @param array|null $set An associative array of insert values
+     * @param array<string, mixed>|null $set An associative array of insert values
      *
-     * @return mixed
+     * @return BaseResult|false|Query|string
      *
      * @throws DatabaseException
      */
@@ -169,9 +173,9 @@ class Builder extends BaseBuilder
         $builder = $this->db->table($table);
         $exists  = $builder->where($key, $value, true)->get()->getFirstRow();
 
-        if (empty($exists) && $this->testMode) {
+        if ($exists === null && $this->testMode) {
             $result = $this->getCompiledInsert();
-        } elseif (empty($exists)) {
+        } elseif ($exists === null) {
             $result = $builder->insert($set);
         } elseif ($this->testMode) {
             $result = $this->where($key, $value, true)->getCompiledUpdate();
@@ -223,15 +227,15 @@ class Builder extends BaseBuilder
     /**
      * Compiles a delete string and runs the query
      *
-     * @param mixed $where
+     * @param array<array-key, mixed>|RawSql|string $where
      *
-     * @return mixed
+     * @return bool|string
      *
      * @throws DatabaseException
      */
     public function delete($where = '', ?int $limit = null, bool $resetData = true)
     {
-        if ($limit !== null && $limit !== 0 || ! empty($this->QBLimit)) {
+        if ($limit !== null && $limit !== 0 || ($this->QBLimit !== false && $this->QBLimit !== 0)) {
             throw new DatabaseException('PostgreSQL does not allow LIMITs on DELETE queries.');
         }
 
@@ -253,7 +257,7 @@ class Builder extends BaseBuilder
      */
     protected function _update(string $table, array $values): string
     {
-        if (! empty($this->QBLimit)) {
+        if ($this->QBLimit !== false && $this->QBLimit !== 0) {
             throw new DatabaseException('Postgres does not support LIMITs with UPDATE queries.');
         }
 
@@ -303,7 +307,7 @@ class Builder extends BaseBuilder
      *
      * @param RawSql|string $cond
      *
-     * @return BaseBuilder
+     * @return $this
      */
     public function join(string $table, $cond, string $type = '', ?bool $escape = null)
     {
@@ -368,7 +372,7 @@ class Builder extends BaseBuilder
             $sql .= 'WHERE ' . implode(
                 ' AND ',
                 array_map(
-                    static function ($key, $value) use ($table, $alias, $that): string|RawSql {
+                    static function ($key, $value) use ($table, $alias, $that): RawSql|string {
                         if ($value instanceof RawSql && is_string($key)) {
                             return $table . '.' . $key . ' = ' . $value;
                         }
@@ -391,20 +395,58 @@ class Builder extends BaseBuilder
         if (isset($this->QBOptions['setQueryAsData'])) {
             $data = $this->QBOptions['setQueryAsData'];
         } else {
+            $updateFields = $this->QBOptions['updateFields'] ?? [];
+
             $data = implode(
                 " UNION ALL\n",
                 array_map(
-                    static fn ($value): string => 'SELECT ' . implode(', ', array_map(
-                        static fn ($key, $index): string => $index . ' ' . $key,
+                    fn (array $value): string => sprintf('SELECT %s', implode(', ', array_map(
+                        fn (string $key, float|int|string $index): string => sprintf(
+                            '%s %s',
+                            $this->castValue((string) $index, $this->getSourceType($table, $key, $updateFields)),
+                            $key,
+                        ),
                         $keys,
                         $value,
-                    )),
+                    ))),
                     $values,
                 ),
             ) . "\n";
         }
 
         return str_replace('{:_table_:}', $data, $sql);
+    }
+
+    /**
+     * Returns the type shared by every destination column fed from the source key, or null when they differ.
+     *
+     * @param array<array-key, RawSql|string> $map Destination column to source key.
+     */
+    private function getSourceType(string $table, string $key, array $map): ?string
+    {
+        $columns = array_filter(array_keys($map, $key, true), is_string(...));
+
+        if ($columns === []) {
+            return $this->getFieldType($table, $key);
+        }
+
+        $types = array_unique(array_map(fn (string $column): ?string => $this->getFieldType($table, $column), $columns));
+
+        return count($types) === 1 ? reset($types) : null;
+    }
+
+    /**
+     * Returns the literal cast to the column type, except a numeric literal for a numeric column, which stays as is so a non-integral value never rounds into a match.
+     */
+    private function castValue(string $value, ?string $type): string
+    {
+        $isNumericType = in_array(strtolower((string) $type), ['smallint', 'integer', 'bigint', 'numeric', 'real', 'double precision'], true);
+
+        if ($isNumericType && is_numeric($value)) {
+            return $value;
+        }
+
+        return $this->cast($value, $type);
     }
 
     /**
@@ -433,11 +475,15 @@ class Builder extends BaseBuilder
             foreach ($this->db->getFieldData($table) as $field) {
                 $type = $field->type;
 
-                // If `character` (or `char`) lacks a specifier, it is equivalent
-                // to `character(1)`.
-                // See https://www.postgresql.org/docs/current/datatype-character.html
-                if ($field->type === 'character') {
-                    $type = $field->type . '(' . $field->max_length . ')';
+                // information_schema reports enum, domain and array columns as `USER-DEFINED` or `ARRAY`, which are not castable names.
+                if ($type === 'USER-DEFINED' || $type === 'ARRAY') {
+                    continue;
+                }
+
+                // `character` without a length is `character(1)` and `character(n)` truncates on cast,
+                // while `bpchar` keeps the full value.
+                if ($type === 'character') {
+                    $type = 'bpchar';
                 }
 
                 $this->QBOptions['fieldTypes'][$table][$field->name] = $type;
@@ -462,23 +508,22 @@ class Builder extends BaseBuilder
 
             $constraints = $this->QBOptions['constraints'] ?? [];
 
-            if (empty($constraints)) {
+            if ($constraints === []) {
                 $allIndexes = array_filter($this->db->getIndexData($table), static function ($index) use ($fieldNames): bool {
                     $hasAllFields = count(array_intersect($index->fields, $fieldNames)) === count($index->fields);
 
                     return ($index->type === 'UNIQUE' || $index->type === 'PRIMARY') && $hasAllFields;
                 });
 
-                foreach (array_map(static fn ($index) => $index->fields, $allIndexes) as $index) {
-                    $constraints[] = current($index);
-                    // only one index can be used?
+                foreach ($allIndexes as $index) {
+                    $constraints = $index->fields;
                     break;
                 }
 
                 $constraints = $this->onConstraint($constraints)->QBOptions['constraints'] ?? [];
             }
 
-            if (empty($constraints)) {
+            if ($constraints === []) {
                 if ($this->db->DBDebug) {
                     throw new DatabaseException('No constraint found for upsert.');
                 }
@@ -596,11 +641,7 @@ class Builder extends BaseBuilder
             );
 
             // convert binds in where
-            foreach ($this->QBWhere as $key => $where) {
-                foreach ($this->binds as $field => $bind) {
-                    $this->QBWhere[$key]['condition'] = str_replace(':' . $field . ':', $bind[0], $where['condition']);
-                }
-            }
+            $this->convertWhereBindsForBatch();
 
             $sql .= ' ' . str_replace(
                 'WHERE ',
@@ -614,14 +655,20 @@ class Builder extends BaseBuilder
         if (isset($this->QBOptions['setQueryAsData'])) {
             $data = $this->QBOptions['setQueryAsData'];
         } else {
+            $constraints = $this->QBOptions['constraints'] ?? [];
+
             $data = implode(
                 " UNION ALL\n",
                 array_map(
-                    static fn ($value): string => 'SELECT ' . implode(', ', array_map(
-                        static fn ($key, $index): string => $index . ' ' . $key,
+                    fn (array $value): string => sprintf('SELECT %s', implode(', ', array_map(
+                        fn (string $key, float|int|string $index): string => sprintf(
+                            '%s %s',
+                            $this->castValue((string) $index, $this->getSourceType($table, $key, $constraints)),
+                            $key,
+                        ),
                         $keys,
                         $value,
-                    )),
+                    ))),
                     $values,
                 ),
             ) . "\n";

@@ -1,7 +1,7 @@
 # Nexus CS Config
 
 [![PHP version](https://img.shields.io/packagist/php-v/nexusphp/cs-config)](https://php.net)
-![build](https://github.com/NexusPHP/cs-config/workflows/build/badge.svg?branch=develop)
+[![Tests](https://github.com/NexusPHP/cs-config/actions/workflows/tests.yml/badge.svg)](https://github.com/NexusPHP/cs-config/actions/workflows/tests.yml)
 [![Coverage Status](https://coveralls.io/repos/github/NexusPHP/cs-config/badge.svg?branch=develop)](https://coveralls.io/github/NexusPHP/cs-config?branch=develop)
 [![Latest Stable Version](https://poser.pugx.org/nexusphp/cs-config/v)](//packagist.org/packages/nexusphp/cs-config)
 [![license MIT](https://img.shields.io/github/license/nexusphp/cs-config)](LICENSE)
@@ -31,9 +31,9 @@ then you should add it as a development-time dependency:
 <?php
 
 use Nexus\CsConfig\Factory;
-use Nexus\CsConfig\Ruleset\Nexus73;
+use Nexus\CsConfig\Ruleset\Nexus82;
 
-return Factory::create(new Nexus73())->forProjects();
+return Factory::create(new Nexus82())->forProjects();
 
 ```
 
@@ -61,10 +61,10 @@ two optional arguments (the email address and starting year of license).
  <?php
 
  use Nexus\CsConfig\Factory;
- use Nexus\CsConfig\Ruleset\Nexus73;
+ use Nexus\CsConfig\Ruleset\Nexus82;
 
--return Factory::create(new Nexus73())->forProjects();
-+return Factory::create(new Nexus73())->forLibrary('My Library', 'John Doe', 'john@doe.com', 2020);
+-return Factory::create(new Nexus82())->forProjects();
++return Factory::create(new Nexus82())->forLibrary('My Library', 'John Doe', 'john@doe.com', 2020);
 ```
 
 This setting will configure a license header similar to below:
@@ -93,10 +93,10 @@ these will not be shown on the license header allowing flexibility on the copyri
 <?php
 
  use Nexus\CsConfig\Factory;
- use Nexus\CsConfig\Ruleset\Nexus73;
+ use Nexus\CsConfig\Ruleset\Nexus82;
 
--return Factory::create(new Nexus73())->forProjects();
-+return Factory::create(new Nexus73())->forLibrary('My Library', 'John Doe');
+-return Factory::create(new Nexus82())->forProjects();
++return Factory::create(new Nexus82())->forLibrary('My Library', 'John Doe');
 ```
 
 This will give the following license header:
@@ -124,10 +124,10 @@ If you feel that a specific rule in the ruleset is not appropriate for you, you 
  <?php
 
  use Nexus\CsConfig\Factory;
- use Nexus\CsConfig\Ruleset\Nexus73;
+ use Nexus\CsConfig\Ruleset\Nexus82;
 
--return Factory::create(new Nexus73())->forProjects();
-+return Factory::create(new Nexus73(), [
+-return Factory::create(new Nexus82())->forProjects();
++return Factory::create(new Nexus82(), [
 +    'binary_operator_spaces' => false,
 +])->forProjects();
 
@@ -150,19 +150,19 @@ containing your desired options.
 | hideProgress   | `bool`                                   | `false`                              |
 | indent         | `string`                                 | `'    '` // 4 spaces                 |
 | lineEnding     | `string`                                 | `"\n"`                               |
-| phpExecutable  | `null, string`                           | `null`                               |
 | isRiskyAllowed | `bool`                                   | `false`                              |
 | usingCache     | `bool`                                   | `true`                               |
 | customRules    | `array`                                  | `[]`                                 |
+| ruleCustomisers | `RuleCustomisationPolicyInterface` or `null` | `null`                            |
 
 ```diff
  <?php
 
  use Nexus\CsConfig\Factory;
- use Nexus\CsConfig\Ruleset\Nexus73;
+ use Nexus\CsConfig\Ruleset\Nexus82;
 
--return Factory::create(new Nexus73())->forProjects();
-+return Factory::create(new Nexus73(), [], [
+-return Factory::create(new Nexus82())->forProjects();
++return Factory::create(new Nexus82(), [], [
 +    'usingCache'  => false,
 +    'hideProgress => true,
 +])->forProjects();
@@ -194,7 +194,7 @@ final class MyCompany extends AbstractRuleset
       '@PSR2' => true,
       ...
     ];
-    $this->requiredPHPVersion = 70400;
+    $this->requiredPHPVersion = 80200;
     $this->autoActivateIsRiskyAllowed = true;
   }
 }

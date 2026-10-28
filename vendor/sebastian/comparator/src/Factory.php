@@ -9,32 +9,26 @@
  */
 namespace SebastianBergmann\Comparator;
 
+use const PHP_VERSION;
 use function array_unshift;
+use function extension_loaded;
+use function version_compare;
 
-/**
- * Factory for comparators which compare values for equality.
- */
-class Factory
+final class Factory
 {
-    /**
-     * @var Factory
-     */
-    private static $instance;
+    private static ?Factory $instance = null;
 
     /**
-     * @var Comparator[]
+     * @var array<non-negative-int, Comparator>
      */
-    private $customComparators = [];
+    private array $customComparators = [];
 
     /**
-     * @var Comparator[]
+     * @var list<Comparator>
      */
-    private $defaultComparators = [];
+    private array $defaultComparators = [];
 
-    /**
-     * @return Factory
-     */
-    public static function getInstance()
+    public static function getInstance(): self
     {
         if (self::$instance === null) {
             self::$instance = new self; // @codeCoverageIgnore
@@ -43,23 +37,12 @@ class Factory
         return self::$instance;
     }
 
-    /**
-     * Constructs a new factory.
-     */
     public function __construct()
     {
         $this->registerDefaultComparators();
     }
 
-    /**
-     * Returns the correct comparator for comparing two values.
-     *
-     * @param mixed $expected The first value to compare
-     * @param mixed $actual   The second value to compare
-     *
-     * @return Comparator
-     */
-    public function getComparatorFor($expected, $actual)
+    public function getComparatorFor(mixed $expected, mixed $actual): Comparator
     {
         foreach ($this->customComparators as $comparator) {
             if ($comparator->accepts($expected, $actual)) {
@@ -83,10 +66,8 @@ class Factory
      * returns TRUE for the compared values. It has higher priority than the
      * existing comparators, meaning that its accept() method will be invoked
      * before those of the other comparators.
-     *
-     * @param Comparator $comparator The comparator to be registered
      */
-    public function register(Comparator $comparator)/*: void*/
+    public function register(Comparator $comparator): void
     {
         array_unshift($this->customComparators, $comparator);
 
@@ -97,10 +78,8 @@ class Factory
      * Unregisters a comparator.
      *
      * This comparator will no longer be considered by getComparatorFor().
-     *
-     * @param Comparator $comparator The comparator to be unregistered
      */
-    public function unregister(Comparator $comparator)/*: void*/
+    public function unregister(Comparator $comparator): void
     {
         foreach ($this->customComparators as $key => $_comparator) {
             if ($comparator === $_comparator) {
@@ -109,10 +88,7 @@ class Factory
         }
     }
 
-    /**
-     * Unregisters all non-default comparators.
-     */
-    public function reset()/*: void*/
+    public function reset(): void
     {
         $this->customComparators = [];
     }
@@ -124,6 +100,12 @@ class Factory
         $this->registerDefaultComparator(new DOMNodeComparator);
         $this->registerDefaultComparator(new SplObjectStorageComparator);
         $this->registerDefaultComparator(new ExceptionComparator);
+        $this->registerDefaultComparator(new EnumerationComparator);
+
+        if (extension_loaded('bcmath') && version_compare(PHP_VERSION, '8.4.0', '>=')) {
+            $this->registerDefaultComparator(new NumberComparator);
+        }
+
         $this->registerDefaultComparator(new ObjectComparator);
         $this->registerDefaultComparator(new ResourceComparator);
         $this->registerDefaultComparator(new ArrayComparator);

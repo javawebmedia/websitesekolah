@@ -20,16 +20,16 @@ use CodeIgniter\Entity\Entity;
 /**
  * PHP data <==> DataSource data converter
  *
- * @see \CodeIgniter\DataConverter\DataConverterTest
- *
  * @template TEntity of object
+ *
+ * @see \CodeIgniter\DataConverter\DataConverterTest
  */
-final class DataConverter
+final readonly class DataConverter
 {
     /**
      * The data caster.
      */
-    private readonly DataCaster $dataCaster;
+    private DataCaster $dataCaster;
 
     /**
      * @param array<string, class-string> $castHandlers Custom convert handlers
@@ -42,26 +42,26 @@ final class DataConverter
          *
          * @var array<string, string> [column => type]
          */
-        private readonly array $types,
+        private array $types,
         array $castHandlers = [],
         /**
          * Helper object.
          */
-        private readonly ?object $helper = null,
+        private ?object $helper = null,
         /**
          * Static reconstruct method name or closure to reconstruct an object.
          * Used by reconstruct().
          *
-         * @phpstan-var (Closure(array<string, mixed>): TEntity)|string|null
+         * @var (Closure(array<string, mixed>): TEntity)|string|null
          */
-        private readonly Closure|string|null $reconstructor = 'reconstruct',
+        private Closure|string|null $reconstructor = 'reconstruct',
         /**
          * Extract method name or closure to extract data from an object.
          * Used by extract().
          *
-         * @phpstan-var (Closure(TEntity, bool, bool): array<string, mixed>)|string|null
+         * @var (Closure(TEntity, bool, bool): array<string, mixed>)|string|null
          */
-        private readonly Closure|string|null $extractor = null,
+        private Closure|string|null $extractor = null,
     ) {
         $this->dataCaster = new DataCaster($castHandlers, $types, $this->helper);
     }
@@ -70,6 +70,8 @@ final class DataConverter
      * Converts data from DataSource to PHP array with specified type values.
      *
      * @param array<string, mixed> $data DataSource data
+     *
+     * @return array<string, mixed>
      *
      * @internal
      */
@@ -89,6 +91,8 @@ final class DataConverter
      *
      * @param array<string, mixed> $phpData PHP data
      *
+     * @return array<string, mixed>
+     *
      * @internal
      */
     public function toDataSource(array $phpData): array
@@ -105,11 +109,10 @@ final class DataConverter
     /**
      * Takes database data array and creates a specified type object.
      *
-     * @param         class-string          $classname
-     * @phpstan-param class-string<TEntity> $classname
-     * @param         array<string, mixed>  $row       Raw data from database
+     * @param class-string<TEntity> $classname
+     * @param array<string, mixed>  $row       Raw data from database
      *
-     * @phpstan-return TEntity
+     * @return TEntity
      *
      * @internal
      */

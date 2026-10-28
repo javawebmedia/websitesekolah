@@ -17,6 +17,8 @@ use CodeIgniter\Exceptions\InvalidArgumentException;
 use CodeIgniter\HTTP\Exceptions\HTTPException;
 use Config\App;
 use Config\CURLRequest as ConfigCURLRequest;
+use CurlShareHandle;
+use SensitiveParameter;
 
 /**
  * A lightweight HTTP client for sending synchronous HTTP requests via cURL.
@@ -47,16 +49,21 @@ class CURLRequest extends OutgoingRequest
     protected $baseURI;
 
     /**
+     * The constructor's base URI, preserved independently of per-request changes.
+     */
+    private readonly URI $defaultBaseURI;
+
+    /**
      * The setting values
      *
-     * @var array
+     * @var array<string, mixed>
      */
     protected $config;
 
     /**
      * The default setting values
      *
-     * @var array
+     * @var array<string, mixed>
      */
     protected $defaultConfig = [
         'timeout'         => 0.0,
@@ -69,7 +76,7 @@ class CURLRequest extends OutgoingRequest
      * Default values for when 'allow_redirects'
      * option is true.
      *
-     * @var array
+     * @var array<string, mixed>
      */
     protected $redirectDefaults = [
         'max'       => 5,
@@ -90,6 +97,8 @@ class CURLRequest extends OutgoingRequest
 
     /**
      * The default options from the constructor. Applied to all requests.
+     *
+     * @var array<string, mixed>
      */
     private readonly array $defaultOptions;
 
@@ -100,6 +109,11 @@ class CURLRequest extends OutgoingRequest
      * It may cause an error request with unnecessary headers.
      */
     private readonly bool $shareOptions;
+
+    /**
+     * The share connection instance.
+     */
+    protected ?CurlShareHandle $shareConnection = null;
 
     /**
      * Takes an array of options to set the following possible class properties:
@@ -125,34 +139,50 @@ class CURLRequest extends OutgoingRequest
         $this->baseURI        = $uri->useRawQueryString();
         $this->defaultOptions = $options;
 
-        /** @var ConfigCURLRequest|null $configCURLRequest */
-        $configCURLRequest  = config(ConfigCURLRequest::class);
-        $this->shareOptions = $configCURLRequest->shareOptions ?? true;
+        $this->shareOptions = config(ConfigCURLRequest::class)->shareOptions;
 
         $this->config = $this->defaultConfig;
         $this->parseOptions($options);
+        $this->defaultBaseURI = clone $this->baseURI;
+
+        // Share Connection
+        $optShareConnection = config(ConfigCURLRequest::class)->shareConnectionOptions ?? [ // @phpstan-ignore nullCoalesce.property
+            CURL_LOCK_DATA_CONNECT,
+            CURL_LOCK_DATA_DNS,
+        ];
+
+        if ($optShareConnection !== []) {
+            $this->shareConnection = curl_share_init();
+
+            foreach (array_unique($optShareConnection) as $opt) {
+                curl_share_setopt($this->shareConnection, CURLSHOPT_SHARE, $opt);
+            }
+        }
     }
 
     /**
      * Sends an HTTP request to the specified $url. If this is a relative
      * URL, it will be merged with $this->baseURI to form a complete URL.
      *
-     * @param string $method HTTP method
+     * @param string               $method  HTTP method
+     * @param array<string, mixed> $options
      */
     public function request($method, string $url, array $options = []): ResponseInterface
     {
         $this->response = clone $this->responseOrig;
 
-        $this->parseOptions($options);
+        try {
+            $this->parseOptions($options);
 
-        $url = $this->prepareURL($url);
+            $url = $this->prepareURL($url);
 
-        $method = esc(strip_tags($method));
+            $method = esc(strip_tags($method));
 
-        $this->send($method, $url);
-
-        if ($this->shareOptions === false) {
-            $this->resetOptions();
+            $this->send($method, $url);
+        } finally {
+            if ($this->shareOptions === false) {
+                $this->resetOptions();
+            }
         }
 
         return $this->response;
@@ -175,12 +205,17 @@ class CURLRequest extends OutgoingRequest
         // Reset configs
         $this->config = $this->defaultConfig;
 
+        $this->baseURI = clone $this->defaultBaseURI;
+        $this->delay   = 0.0;
+
         // Set the default options for next request
         $this->parseOptions($this->defaultOptions);
     }
 
     /**
      * Convenience method for sending a GET request.
+     *
+     * @param array<string, mixed> $options
      */
     public function get(string $url, array $options = []): ResponseInterface
     {
@@ -189,6 +224,8 @@ class CURLRequest extends OutgoingRequest
 
     /**
      * Convenience method for sending a DELETE request.
+     *
+     * @param array<string, mixed> $options
      */
     public function delete(string $url, array $options = []): ResponseInterface
     {
@@ -197,6 +234,8 @@ class CURLRequest extends OutgoingRequest
 
     /**
      * Convenience method for sending a HEAD request.
+     *
+     * @param array<string, mixed> $options
      */
     public function head(string $url, array $options = []): ResponseInterface
     {
@@ -205,6 +244,8 @@ class CURLRequest extends OutgoingRequest
 
     /**
      * Convenience method for sending an OPTIONS request.
+     *
+     * @param array<string, mixed> $options
      */
     public function options(string $url, array $options = []): ResponseInterface
     {
@@ -213,6 +254,8 @@ class CURLRequest extends OutgoingRequest
 
     /**
      * Convenience method for sending a PATCH request.
+     *
+     * @param array<string, mixed> $options
      */
     public function patch(string $url, array $options = []): ResponseInterface
     {
@@ -221,6 +264,8 @@ class CURLRequest extends OutgoingRequest
 
     /**
      * Convenience method for sending a POST request.
+     *
+     * @param array<string, mixed> $options
      */
     public function post(string $url, array $options = []): ResponseInterface
     {
@@ -229,6 +274,8 @@ class CURLRequest extends OutgoingRequest
 
     /**
      * Convenience method for sending a PUT request.
+     *
+     * @param array<string, mixed> $options
      */
     public function put(string $url, array $options = []): ResponseInterface
     {
@@ -242,13 +289,9 @@ class CURLRequest extends OutgoingRequest
      *
      * @return $this
      */
-    public function setAuth(string $username, string $password, string $type = 'basic')
+    public function setAuth(string $username, #[SensitiveParameter] string $password, string $type = 'basic')
     {
-        $this->config['auth'] = [
-            $username,
-            $password,
-            $type,
-        ];
+        $this->config['auth'] = [$username, $password, $type];
 
         return $this;
     }
@@ -256,7 +299,8 @@ class CURLRequest extends OutgoingRequest
     /**
      * Set form data to be sent.
      *
-     * @param bool $multipart Set TRUE if you are sending CURLFiles
+     * @param bool                 $multipart Set TRUE if you are sending CURLFiles
+     * @param array<string, mixed> $params
      *
      * @return $this
      */
@@ -274,7 +318,7 @@ class CURLRequest extends OutgoingRequest
     /**
      * Set JSON data to be sent.
      *
-     * @param array|bool|float|int|object|string|null $data
+     * @param mixed $data
      *
      * @return $this
      */
@@ -288,6 +332,8 @@ class CURLRequest extends OutgoingRequest
     /**
      * Sets the correct settings based on the options array
      * passed in.
+     *
+     * @param array<string, mixed> $options
      *
      * @return void
      */
@@ -356,18 +402,24 @@ class CURLRequest extends OutgoingRequest
         // Reset our curl options so we're on a fresh slate.
         $curlOptions = [];
 
-        if (! empty($this->config['query']) && is_array($this->config['query'])) {
+        $query = $this->config['query'] ?? [];
+
+        if (is_array($query) && $query !== []) {
             // This is likely too naive a solution.
             // Should look into handling when $url already
             // has query vars on it.
-            $url .= '?' . http_build_query($this->config['query']);
+            $url .= '?' . http_build_query($query);
             unset($this->config['query']);
         }
 
         $curlOptions[CURLOPT_URL]            = $url;
         $curlOptions[CURLOPT_RETURNTRANSFER] = true;
-        $curlOptions[CURLOPT_HEADER]         = true;
-        $curlOptions[CURLOPT_FRESH_CONNECT]  = true;
+
+        if ($this->shareConnection instanceof CurlShareHandle) {
+            $curlOptions[CURLOPT_SHARE] = $this->shareConnection;
+        }
+
+        $curlOptions[CURLOPT_HEADER] = true;
         // Disable @file uploads in post data.
         $curlOptions[CURLOPT_SAFE_UPLOAD] = true;
 
@@ -385,18 +437,8 @@ class CURLRequest extends OutgoingRequest
         // Set the string we want to break our response from
         $breakString = "\r\n\r\n";
 
-        while (str_starts_with($output, 'HTTP/1.1 100 Continue')) {
-            $output = substr($output, strpos($output, $breakString) + 4);
-        }
-
-        if (preg_match('/HTTP\/\d\.\d 200 Connection established/i', $output)) {
-            $output = substr($output, strpos($output, $breakString) + 4);
-        }
-
-        // If request and response have Digest
-        if (isset($this->config['auth'][2]) && $this->config['auth'][2] === 'digest' && str_contains($output, 'WWW-Authenticate: Digest')) {
-            $output = substr($output, strpos($output, $breakString) + 4);
-        }
+        // Remove all intermediate responses
+        $output = $this->removeIntermediateResponses($output, $breakString);
 
         // Split out our headers and body
         $break = strpos($output, $breakString);
@@ -419,10 +461,14 @@ class CURLRequest extends OutgoingRequest
 
     /**
      * Adds $this->headers to the cURL request.
+     *
+     * @param array<int, mixed> $curlOptions
+     *
+     * @return array<int, mixed>
      */
     protected function applyRequestHeaders(array $curlOptions = []): array
     {
-        if (empty($this->headers)) {
+        if ($this->headers === []) {
             return $curlOptions;
         }
 
@@ -439,6 +485,10 @@ class CURLRequest extends OutgoingRequest
 
     /**
      * Apply method
+     *
+     * @param array<int, mixed> $curlOptions
+     *
+     * @return array<int, mixed>
      */
     protected function applyMethod(string $method, array $curlOptions): array
     {
@@ -466,10 +516,14 @@ class CURLRequest extends OutgoingRequest
 
     /**
      * Apply body
+     *
+     * @param array<int, mixed> $curlOptions
+     *
+     * @return array<int, mixed>
      */
     protected function applyBody(array $curlOptions = []): array
     {
-        if (! empty($this->body)) {
+        if (! in_array($this->body, [null, '', '0'], true)) {
             $curlOptions[CURLOPT_POSTFIELDS] = (string) $this->getBody();
         }
 
@@ -479,6 +533,8 @@ class CURLRequest extends OutgoingRequest
     /**
      * Parses the header retrieved from the cURL response into
      * our Response object.
+     *
+     * @param list<string> $headers
      *
      * @return void
      */
@@ -495,14 +551,14 @@ class CURLRequest extends OutgoingRequest
                     $this->response->setHeader($title, $value);
                 }
             } elseif (str_starts_with($header, 'HTTP')) {
-                preg_match('#^HTTP\/([12](?:\.[01])?) (\d+) (.+)#', $header, $matches);
+                preg_match('#^HTTP\/([12](?:\.[01])?) (\d+)(?: (.+))?#', $header, $matches);
 
                 if (isset($matches[1])) {
                     $this->response->setProtocolVersion($matches[1]);
                 }
 
                 if (isset($matches[2])) {
-                    $this->response->setStatusCode((int) $matches[2], $matches[3] ?? null);
+                    $this->response->setStatusCode((int) $matches[2], $matches[3] ?? '');
                 }
             }
         }
@@ -511,27 +567,59 @@ class CURLRequest extends OutgoingRequest
     /**
      * Set CURL options
      *
-     * @return array
+     * @param array<int, mixed>    $curlOptions
+     * @param array<string, mixed> $config
+     *
+     * @return array<int, mixed>
      *
      * @throws InvalidArgumentException
      */
     protected function setCURLOptions(array $curlOptions = [], array $config = [])
     {
-        // Auth Headers
-        if (! empty($config['auth'])) {
-            $curlOptions[CURLOPT_USERPWD] = $config['auth'][0] . ':' . $config['auth'][1];
+        $curlOptions = $this->applyAuthOptions($curlOptions, $config);
+        $curlOptions = $this->applySslOptions($curlOptions, $config);
+        $curlOptions = $this->applyProxyOptions($curlOptions, $config);
+        $curlOptions = $this->applyDebugOptions($curlOptions, $config);
+        $curlOptions = $this->applyRedirectOptions($curlOptions, $config);
+        $curlOptions = $this->applyConnectionOptions($curlOptions, $config);
+        $curlOptions = $this->applyBodyOptions($curlOptions, $config);
+        $curlOptions = $this->applyResponseOptions($curlOptions, $config);
+        $curlOptions = $this->applyProtocolOptions($curlOptions, $config);
 
-            if (! empty($config['auth'][2]) && strtolower($config['auth'][2]) === 'digest') {
-                $curlOptions[CURLOPT_HTTPAUTH] = CURLAUTH_DIGEST;
-            } else {
-                $curlOptions[CURLOPT_HTTPAUTH] = CURLAUTH_BASIC;
-            }
+        return $this->applyClientOptions($curlOptions, $config);
+    }
+
+    /**
+     * @param array<int, mixed>    $curlOptions
+     * @param array<string, mixed> $config
+     *
+     * @return array<int, mixed>
+     */
+    private function applyAuthOptions(array $curlOptions, array $config): array
+    {
+        // Auth Headers
+        if (isset($config['auth']) && is_array($config['auth']) && count($config['auth']) >= 2) {
+            $curlOptions[CURLOPT_USERPWD]  = $config['auth'][0] . ':' . $config['auth'][1];
+            $curlOptions[CURLOPT_HTTPAUTH] = (isset($config['auth'][2]) && $config['auth'][2] !== '' && strtolower($config['auth'][2]) === 'digest')
+                ? CURLAUTH_DIGEST
+                : CURLAUTH_BASIC;
         }
 
-        // Certificate
-        if (! empty($config['cert'])) {
-            $cert = $config['cert'];
+        return $curlOptions;
+    }
 
+    /**
+     * @param array<int, mixed>    $curlOptions
+     * @param array<string, mixed> $config
+     *
+     * @return array<int, mixed>
+     */
+    private function applySslOptions(array $curlOptions, array $config): array
+    {
+        // Certificate
+        $cert = $config['cert'] ?? null;
+
+        if ((bool) $cert) {
             if (is_array($cert)) {
                 $curlOptions[CURLOPT_SSLCERTPASSWD] = $cert[1];
                 $cert                               = $cert[0];
@@ -547,7 +635,8 @@ class CURLRequest extends OutgoingRequest
         // SSL Verification
         if (isset($config['verify'])) {
             if (is_string($config['verify'])) {
-                $file = realpath($config['verify']) ?: $config['verify'];
+                $realPath = realpath($config['verify']);
+                $file     = $realPath === false ? $config['verify'] : $realPath;
 
                 if (! is_file($file)) {
                     throw HTTPException::forInvalidSSLKey($config['verify']);
@@ -562,30 +651,51 @@ class CURLRequest extends OutgoingRequest
             }
         }
 
+        return $curlOptions;
+    }
+
+    /**
+     * @param array<int, mixed>    $curlOptions
+     * @param array<string, mixed> $config
+     *
+     * @return array<int, mixed>
+     */
+    private function applyProxyOptions(array $curlOptions, array $config): array
+    {
         // Proxy
         if (isset($config['proxy'])) {
             $curlOptions[CURLOPT_HTTPPROXYTUNNEL] = true;
             $curlOptions[CURLOPT_PROXY]           = $config['proxy'];
         }
 
+        return $curlOptions;
+    }
+
+    /**
+     * @param array<int, mixed>    $curlOptions
+     * @param array<string, mixed> $config
+     *
+     * @return array<int, mixed>
+     */
+    private function applyDebugOptions(array $curlOptions, array $config): array
+    {
         // Debug
-        if ($config['debug']) {
+        if ((bool) ($config['debug'] ?? false)) {
             $curlOptions[CURLOPT_VERBOSE] = 1;
             $curlOptions[CURLOPT_STDERR]  = is_string($config['debug']) ? fopen($config['debug'], 'a+b') : fopen('php://stderr', 'wb');
         }
 
-        // Decode Content
-        if (! empty($config['decode_content'])) {
-            $accept = $this->getHeaderLine('Accept-Encoding');
+        return $curlOptions;
+    }
 
-            if ($accept !== '') {
-                $curlOptions[CURLOPT_ENCODING] = $accept;
-            } else {
-                $curlOptions[CURLOPT_ENCODING]   = '';
-                $curlOptions[CURLOPT_HTTPHEADER] = 'Accept-Encoding';
-            }
-        }
-
+    /**
+     * @param array<int, mixed>    $curlOptions
+     * @param array<string, mixed> $config
+     *
+     * @return array<int, mixed>
+     */
+    private function applyRedirectOptions(array $curlOptions, array $config): array
+    {
         // Allow Redirects
         if (array_key_exists('allow_redirects', $config)) {
             $settings = $this->redirectDefaults;
@@ -614,40 +724,32 @@ class CURLRequest extends OutgoingRequest
             }
         }
 
+        return $curlOptions;
+    }
+
+    /**
+     * @param array<int, mixed>    $curlOptions
+     * @param array<string, mixed> $config
+     *
+     * @return array<int, mixed>
+     */
+    private function applyConnectionOptions(array $curlOptions, array $config): array
+    {
+        // DNS Cache Timeout
+        if (isset($config['dns_cache_timeout']) && is_numeric($config['dns_cache_timeout']) && $config['dns_cache_timeout'] >= -1) {
+            $curlOptions[CURLOPT_DNS_CACHE_TIMEOUT] = (int) $config['dns_cache_timeout'];
+        }
+
+        // Fresh Connect (default true)
+        $curlOptions[CURLOPT_FRESH_CONNECT] = isset($config['fresh_connect']) && is_bool($config['fresh_connect'])
+            ? $config['fresh_connect']
+            : true;
+
         // Timeout
-        $curlOptions[CURLOPT_TIMEOUT_MS] = (float) $config['timeout'] * 1000;
+        $curlOptions[CURLOPT_TIMEOUT_MS] = (float) ($config['timeout'] ?? 0) * 1000;
 
         // Connection Timeout
-        $curlOptions[CURLOPT_CONNECTTIMEOUT_MS] = (float) $config['connect_timeout'] * 1000;
-
-        // Post Data - application/x-www-form-urlencoded
-        if (! empty($config['form_params']) && is_array($config['form_params'])) {
-            $postFields                      = http_build_query($config['form_params']);
-            $curlOptions[CURLOPT_POSTFIELDS] = $postFields;
-
-            // Ensure content-length is set, since CURL doesn't seem to
-            // calculate it when HTTPHEADER is set.
-            $this->setHeader('Content-Length', (string) strlen($postFields));
-            $this->setHeader('Content-Type', 'application/x-www-form-urlencoded');
-        }
-
-        // Post Data - multipart/form-data
-        if (! empty($config['multipart']) && is_array($config['multipart'])) {
-            // setting the POSTFIELDS option automatically sets multipart
-            $curlOptions[CURLOPT_POSTFIELDS] = $config['multipart'];
-        }
-
-        // HTTP Errors
-        $curlOptions[CURLOPT_FAILONERROR] = array_key_exists('http_errors', $config) ? (bool) $config['http_errors'] : true;
-
-        // JSON
-        if (isset($config['json'])) {
-            // Will be set as the body in `applyBody()`
-            $json = json_encode($config['json']);
-            $this->setBody($json);
-            $this->setHeader('Content-Type', 'application/json');
-            $this->setHeader('Content-Length', (string) strlen($json));
-        }
+        $curlOptions[CURLOPT_CONNECTTIMEOUT_MS] = (float) ($config['connect_timeout'] ?? 150) * 1000;
 
         // Resolve IP
         if (array_key_exists('force_ip_resolve', $config)) {
@@ -658,24 +760,113 @@ class CURLRequest extends OutgoingRequest
             };
         }
 
-        // version
-        if (! empty($config['version'])) {
-            $version = sprintf('%.1F', $config['version']);
-            if ($version === '1.0') {
-                $curlOptions[CURLOPT_HTTP_VERSION] = CURL_HTTP_VERSION_1_0;
-            } elseif ($version === '1.1') {
-                $curlOptions[CURLOPT_HTTP_VERSION] = CURL_HTTP_VERSION_1_1;
-            } elseif ($version === '2.0') {
-                $curlOptions[CURLOPT_HTTP_VERSION] = CURL_HTTP_VERSION_2_0;
-            } elseif ($version === '3.0') {
-                if (! defined('CURL_HTTP_VERSION_3')) {
-                    define('CURL_HTTP_VERSION_3', 30);
-                }
+        return $curlOptions;
+    }
 
-                $curlOptions[CURLOPT_HTTP_VERSION] = CURL_HTTP_VERSION_3;
+    /**
+     * @param array<int, mixed>    $curlOptions
+     * @param array<string, mixed> $config
+     *
+     * @return array<int, mixed>
+     */
+    private function applyBodyOptions(array $curlOptions, array $config): array
+    {
+        // Post Data - application/x-www-form-urlencoded
+        if (isset($config['form_params']) && is_array($config['form_params']) && $config['form_params'] !== []) {
+            $postFields                      = http_build_query($config['form_params']);
+            $curlOptions[CURLOPT_POSTFIELDS] = $postFields;
+
+            // Ensure content-length is set, since CURL doesn't seem to
+            // calculate it when HTTPHEADER is set.
+            $this->setHeader('Content-Length', (string) strlen($postFields));
+            $this->setHeader('Content-Type', 'application/x-www-form-urlencoded');
+        }
+
+        // Post Data - multipart/form-data
+        if (isset($config['multipart']) && is_array($config['multipart']) && $config['multipart'] !== []) {
+            // setting the POSTFIELDS option automatically sets multipart
+            $curlOptions[CURLOPT_POSTFIELDS] = $config['multipart'];
+        }
+
+        // JSON
+        if (isset($config['json'])) {
+            // Will be set as the body in `applyBody()`
+            $json = json_encode($config['json']);
+            $this->setBody($json);
+            $this->setHeader('Content-Type', 'application/json');
+            $this->setHeader('Content-Length', (string) strlen($json));
+        }
+
+        return $curlOptions;
+    }
+
+    /**
+     * @param array<int, mixed>    $curlOptions
+     * @param array<string, mixed> $config
+     *
+     * @return array<int, mixed>
+     */
+    private function applyResponseOptions(array $curlOptions, array $config): array
+    {
+        // Decode Content
+        if ((bool) ($config['decode_content'] ?? false)) {
+            $accept = $this->getHeaderLine('Accept-Encoding');
+
+            if ($accept !== '') {
+                $curlOptions[CURLOPT_ENCODING] = $accept;
+            } else {
+                $curlOptions[CURLOPT_ENCODING]   = '';
+                $curlOptions[CURLOPT_HTTPHEADER] = 'Accept-Encoding';
             }
         }
 
+        // HTTP Errors
+        $curlOptions[CURLOPT_FAILONERROR] = array_key_exists('http_errors', $config) ? (bool) $config['http_errors'] : true;
+
+        return $curlOptions;
+    }
+
+    /**
+     * @param array<int, mixed>    $curlOptions
+     * @param array<string, mixed> $config
+     *
+     * @return array<int, mixed>
+     */
+    private function applyProtocolOptions(array $curlOptions, array $config): array
+    {
+        if (! isset($config['version']) || (bool) $config['version'] === false) {
+            return $curlOptions;
+        }
+
+        $version = sprintf('%.1F', (float) $config['version']);
+
+        if ($version === '3.0' && ! defined('CURL_HTTP_VERSION_3')) {
+            define('CURL_HTTP_VERSION_3', 30);
+        }
+
+        $curlVersion = match ($version) {
+            '1.0'   => CURL_HTTP_VERSION_1_0,
+            '1.1'   => CURL_HTTP_VERSION_1_1,
+            '2.0'   => CURL_HTTP_VERSION_2_0,
+            '3.0'   => CURL_HTTP_VERSION_3,
+            default => null,
+        };
+
+        if ($curlVersion !== null) {
+            $curlOptions[CURLOPT_HTTP_VERSION] = $curlVersion;
+        }
+
+        return $curlOptions;
+    }
+
+    /**
+     * @param array<int, mixed>    $curlOptions
+     * @param array<string, mixed> $config
+     *
+     * @return array<int, mixed>
+     */
+    private function applyClientOptions(array $curlOptions, array $config): array
+    {
         // Cookie
         if (isset($config['cookie'])) {
             $curlOptions[CURLOPT_COOKIEJAR]  = $config['cookie'];
@@ -694,6 +885,8 @@ class CURLRequest extends OutgoingRequest
      * Does the actual work of initializing cURL, setting the options,
      * and grabbing the output.
      *
+     * @param array<int, mixed> $curlOptions
+     *
      * @codeCoverageIgnore
      */
     protected function sendRequest(array $curlOptions = []): string
@@ -709,8 +902,74 @@ class CURLRequest extends OutgoingRequest
             throw HTTPException::forCurlError((string) curl_errno($ch), curl_error($ch));
         }
 
-        curl_close($ch);
+        return $output;
+    }
+
+    private function removeIntermediateResponses(string $output, string $breakString): string
+    {
+        while (true) {
+            // Check if we should remove the current response
+            if ($this->shouldRemoveCurrentResponse($output, $breakString)) {
+                $breakStringPos = strpos($output, $breakString);
+                if ($breakStringPos !== false) {
+                    $output = substr($output, $breakStringPos + 4);
+
+                    continue;
+                }
+            }
+
+            // No more intermediate responses to remove
+            break;
+        }
 
         return $output;
+    }
+
+    /**
+     * Check if the current response (at the beginning of output) should be removed.
+     */
+    private function shouldRemoveCurrentResponse(string $output, string $breakString): bool
+    {
+        // HTTP/x.x 1xx responses (Continue, Processing, etc.)
+        if (preg_match('/^HTTP\/\d+(?:\.\d+)?\s+1\d\d\s/', $output)) {
+            return true;
+        }
+
+        // HTTP/x.x 200 Connection established (proxy responses)
+        if (preg_match('/^HTTP\/\d+(?:\.\d+)?\s+200\s+Connection\s+established/i', $output)) {
+            return true;
+        }
+
+        // HTTP/x.x 3xx responses (redirects) - only if redirects are allowed
+        $allowRedirects = isset($this->config['allow_redirects']) && $this->config['allow_redirects'] !== false;
+        if ($allowRedirects && preg_match('/^HTTP\/\d+(?:\.\d+)?\s+3\d\d\s/', $output)) {
+            // Check if there's a Location header
+            $breakStringPos = strpos($output, $breakString);
+            if ($breakStringPos !== false) {
+                $headerSection = substr($output, 0, $breakStringPos);
+                $headers       = explode("\n", $headerSection);
+
+                foreach ($headers as $header) {
+                    if (str_starts_with(strtolower($header), 'location:')) {
+                        return true; // Found location header, this is a redirect to remove
+                    }
+                }
+            }
+        }
+
+        // Digest auth challenges - only remove if there's another response after
+        if (isset($this->config['auth'][2]) && $this->config['auth'][2] === 'digest') {
+            $breakStringPos = strpos($output, $breakString);
+            if ($breakStringPos !== false) {
+                $headerSection = substr($output, 0, $breakStringPos);
+                if (str_contains($headerSection, 'WWW-Authenticate: Digest')) {
+                    $nextBreakPos = strpos($output, $breakString, $breakStringPos + 4);
+
+                    return $nextBreakPos !== false; // Only remove if there's another response
+                }
+            }
+        }
+
+        return false;
     }
 }

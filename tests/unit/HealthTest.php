@@ -11,7 +11,7 @@ final class HealthTest extends CIUnitTestCase
 {
     public function testIsDefinedAppPath(): void
     {
-        $this->assertTrue(defined('APPPATH'));
+        $this->assertDirectoryExists(APPPATH);
     }
 
     public function testBaseUrlHasBeenSet(): void
@@ -27,7 +27,7 @@ final class HealthTest extends CIUnitTestCase
 
         if ($env) {
             // BaseURL in .env is a valid URL?
-            // phpunit.xml.dist sets app.baseURL in $_SERVER
+            // phpunit.dist.xml sets app.baseURL in $_SERVER
             // So if you set app.baseURL in .env, it takes precedence
             $config = new App();
             $this->assertTrue(
@@ -37,7 +37,7 @@ final class HealthTest extends CIUnitTestCase
         }
 
         // Get the baseURL in app/Config/App.php
-        // You can't use Config\App, because phpunit.xml.dist sets app.baseURL
+        // You can't use Config\App, because phpunit.dist.xml sets app.baseURL
         $reader = new ConfigReader();
 
         // BaseURL in app/Config/App.php is a valid URL?

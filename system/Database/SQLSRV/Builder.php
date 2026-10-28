@@ -14,8 +14,10 @@ declare(strict_types=1);
 namespace CodeIgniter\Database\SQLSRV;
 
 use CodeIgniter\Database\BaseBuilder;
+use CodeIgniter\Database\BaseResult;
 use CodeIgniter\Database\Exceptions\DatabaseException;
 use CodeIgniter\Database\Exceptions\DataException;
+use CodeIgniter\Database\Query;
 use CodeIgniter\Database\RawSql;
 use CodeIgniter\Database\ResultInterface;
 use Config\Feature;
@@ -26,13 +28,15 @@ use Config\Feature;
  * @todo auto check for TextCastToInt
  * @todo auto check for InsertIndexValue
  * @todo replace: delete index entries before insert
+ *
+ * @extends BaseBuilder<Connection>
  */
 class Builder extends BaseBuilder
 {
     /**
      * ORDER BY random keyword
      *
-     * @var array
+     * @var list<string>
      */
     protected $randomKeyword = [
         'NEWID()',
@@ -222,7 +226,7 @@ class Builder extends BaseBuilder
 
         $fullTableName = $this->getFullName($table);
 
-        $statement = sprintf('UPDATE %s%s SET ', empty($this->QBLimit) ? '' : 'TOP(' . $this->QBLimit . ') ', $fullTableName);
+        $statement = sprintf('UPDATE %s%s SET ', $this->QBLimit === false || $this->QBLimit === 0 ? '' : 'TOP(' . $this->QBLimit . ') ', $fullTableName);
 
         $statement .= implode(', ', $valstr)
             . $this->compileWhereHaving('QBWhere')
@@ -269,7 +273,7 @@ class Builder extends BaseBuilder
         if ($this->castTextToInt) {
             $values = [$column => "CONVERT(VARCHAR(MAX),CONVERT(INT,CONVERT(VARCHAR(MAX), {$column})) - {$value})"];
         } else {
-            $values = [$column => "{$column} + {$value}"];
+            $values = [$column => "{$column} - {$value}"];
         }
 
         $sql = $this->_update($this->QBFrom[0], $values);
@@ -321,7 +325,7 @@ class Builder extends BaseBuilder
     }
 
     /**
-     * Add permision statements for index value inserts
+     * Add permission statements for index value inserts
      */
     private function addIdentity(string $fullTable, string $insert): string
     {
@@ -337,12 +341,12 @@ class Builder extends BaseBuilder
         // DatabaseException:
         //   [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]The number of
         //   rows provided for a FETCH clause must be greater then zero.
-        $limitZeroAsAll = config(Feature::class)->limitZeroAsAll ?? true;
+        $limitZeroAsAll = config(Feature::class)->limitZeroAsAll ?? true; // @phpstan-ignore nullCoalesce.property
         if (! $limitZeroAsAll && $this->QBLimit === 0) {
             return "SELECT * \nFROM " . $this->_fromTables() . ' WHERE 1=0 ';
         }
 
-        if (empty($this->QBOrderBy)) {
+        if (! is_array($this->QBOrderBy) || $this->QBOrderBy === []) {
             $sql .= ' ORDER BY (SELECT NULL) ';
         }
 
@@ -358,7 +362,7 @@ class Builder extends BaseBuilder
     /**
      * Compiles a replace into string and runs the query
      *
-     * @return mixed
+     * @return BaseResult|false|Query|string
      *
      * @throws DatabaseException
      */
@@ -462,7 +466,7 @@ class Builder extends BaseBuilder
      *
      * Handle float return value
      *
-     * @return BaseBuilder
+     * @return $this
      */
     protected function maxMinAvgSum(string $select = '', string $alias = '', string $type = 'MAX')
     {
@@ -512,7 +516,7 @@ class Builder extends BaseBuilder
         }
 
         $query = $this->db->query($sql, null, false);
-        if (empty($query->getResult())) {
+        if ($query->getResult() === []) {
             return 0;
         }
 
@@ -530,15 +534,15 @@ class Builder extends BaseBuilder
      */
     protected function _delete(string $table): string
     {
-        return 'DELETE' . (empty($this->QBLimit) ? '' : ' TOP (' . $this->QBLimit . ') ') . ' FROM ' . $this->getFullName($table) . $this->compileWhereHaving('QBWhere');
+        return 'DELETE' . ($this->QBLimit === false || $this->QBLimit === 0 ? '' : ' TOP (' . $this->QBLimit . ') ') . ' FROM ' . $this->getFullName($table) . $this->compileWhereHaving('QBWhere');
     }
 
     /**
      * Compiles a delete string and runs the query
      *
-     * @param mixed $where
+     * @param array<array-key, mixed>|RawSql|string $where
      *
-     * @return mixed
+     * @return bool|string
      *
      * @throws DatabaseException
      */
@@ -576,7 +580,7 @@ class Builder extends BaseBuilder
      *
      * Generates a query string based on which functions were used.
      *
-     * @param bool $selectOverride
+     * @param false|string $selectOverride
      */
     protected function compileSelect($selectOverride = false): string
     {
@@ -584,16 +588,16 @@ class Builder extends BaseBuilder
         if ($selectOverride !== false) {
             $sql = $selectOverride;
         } else {
-            $sql = (! $this->QBDistinct) ? 'SELECT ' : 'SELECT DISTINCT ';
+            $sql = $this->QBDistinct ? 'SELECT DISTINCT ' : 'SELECT ';
 
             // SQL Server can't work with select * if group by is specified
-            if (empty($this->QBSelect) && $this->QBGroupBy !== [] && is_array($this->QBGroupBy)) {
+            if ($this->QBSelect === [] && $this->QBGroupBy !== [] && is_array($this->QBGroupBy)) {
                 foreach ($this->QBGroupBy as $field) {
                     $this->QBSelect[] = is_array($field) ? $field['field'] : $field;
                 }
             }
 
-            if (empty($this->QBSelect)) {
+            if ($this->QBSelect === []) {
                 $sql .= '*';
             } else {
                 // Cycle through the "select" portion of the query and prep each column name.
@@ -614,7 +618,7 @@ class Builder extends BaseBuilder
         }
 
         // Write the "JOIN" portion of the query
-        if (! empty($this->QBJoin)) {
+        if ($this->QBJoin !== []) {
             $sql .= "\n" . implode("\n", $this->QBJoin);
         }
 
@@ -624,7 +628,7 @@ class Builder extends BaseBuilder
             . $this->compileOrderBy(); // ORDER BY
 
         // LIMIT
-        $limitZeroAsAll = config(Feature::class)->limitZeroAsAll ?? true;
+        $limitZeroAsAll = config(Feature::class)->limitZeroAsAll ?? true; // @phpstan-ignore nullCoalesce.property
         if ($limitZeroAsAll) {
             if ($this->QBLimit) {
                 $sql = $this->_limit($sql . "\n");
@@ -640,11 +644,11 @@ class Builder extends BaseBuilder
      * Compiles the select statement based on the other functions called
      * and runs the query
      *
-     * @return ResultInterface
+     * @return false|ResultInterface|string
      */
     public function get(?int $limit = null, int $offset = 0, bool $reset = true)
     {
-        $limitZeroAsAll = config(Feature::class)->limitZeroAsAll ?? true;
+        $limitZeroAsAll = config(Feature::class)->limitZeroAsAll ?? true; // @phpstan-ignore nullCoalesce.property
         if ($limitZeroAsAll && $limit === 0) {
             $limit = null;
         }
@@ -696,7 +700,7 @@ class Builder extends BaseBuilder
 
             $fieldNames = array_map(static fn ($columnName): string => trim($columnName, '"'), $keys);
 
-            if (empty($constraints)) {
+            if ($constraints === []) {
                 $tableIndexes = $this->db->getIndexData($table);
 
                 $uniqueIndexes = array_filter($tableIndexes, static function ($index) use ($fieldNames): bool {
@@ -723,7 +727,7 @@ class Builder extends BaseBuilder
                 $constraints = $this->onConstraint($constraints)->QBOptions['constraints'] ?? [];
             }
 
-            if (empty($constraints)) {
+            if ($constraints === []) {
                 if ($this->db->DBDebug) {
                     throw new DatabaseException('No constraint found for upsert.');
                 }
@@ -750,7 +754,7 @@ class Builder extends BaseBuilder
             $sql .= implode(
                 ' AND ',
                 array_map(
-                    static fn ($key, $value) => (
+                    static fn ($key, $value): RawSql|string => (
                         ($value instanceof RawSql && is_string($key))
                         ?
                         $fullTableName . '.' . $key . ' = ' . $value

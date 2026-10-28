@@ -23,7 +23,7 @@ interface RulesetInterface
     /**
      * Defined rules for this ruleset.
      *
-     * @return array<string, array<string, array<string>|bool|string>|bool>
+     * @return array<string, array<string, bool|list<string>|string>|bool>
      */
     public function getRules(): array;
 

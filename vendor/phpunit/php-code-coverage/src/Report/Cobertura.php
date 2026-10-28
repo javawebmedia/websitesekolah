@@ -9,24 +9,25 @@
  */
 namespace SebastianBergmann\CodeCoverage\Report;
 
+use const DIRECTORY_SEPARATOR;
 use function basename;
 use function count;
-use function dirname;
-use function file_put_contents;
 use function preg_match;
 use function range;
 use function str_replace;
-use function strpos;
 use function time;
 use DOMImplementation;
 use SebastianBergmann\CodeCoverage\CodeCoverage;
 use SebastianBergmann\CodeCoverage\Driver\WriteOperationFailedException;
 use SebastianBergmann\CodeCoverage\Node\File;
 use SebastianBergmann\CodeCoverage\Util\Filesystem;
+use SebastianBergmann\CodeCoverage\Util\Xml;
 
 final class Cobertura
 {
     /**
+     * @param null|non-empty-string $target
+     *
      * @throws WriteOperationFailedException
      */
     public function process(CodeCoverage $coverage, ?string $target = null): string
@@ -40,13 +41,12 @@ final class Cobertura
         $documentType = $implementation->createDocumentType(
             'coverage',
             '',
-            'http://cobertura.sourceforge.net/xml/coverage-04.dtd'
+            'http://cobertura.sourceforge.net/xml/coverage-04.dtd',
         );
 
-        $document               = $implementation->createDocument('', '', $documentType);
-        $document->xmlVersion   = '1.0';
-        $document->encoding     = 'UTF-8';
-        $document->formatOutput = true;
+        $document             = $implementation->createDocument('', '', $documentType);
+        $document->xmlVersion = '1.0';
+        $document->encoding   = 'UTF-8';
 
         $coverageElement = $document->createElement('coverage');
 
@@ -114,12 +114,8 @@ final class Cobertura
             $coverageData = $item->lineCoverageData();
 
             foreach ($classes as $className => $class) {
-                $complexity += $class['ccn'];
+                $complexity        += $class['ccn'];
                 $packageComplexity += $class['ccn'];
-
-                if (!empty($class['package']['namespace'])) {
-                    $className = $class['package']['namespace'] . '\\' . $className;
-                }
 
                 $linesValid   = $class['executableLines'];
                 $linesCovered = $class['executedLines'];
@@ -175,7 +171,7 @@ final class Cobertura
                     $methodElement->appendChild($methodLinesElement);
 
                     foreach (range($method['startLine'], $method['endLine']) as $line) {
-                        if (!isset($coverageData[$line]) || $coverageData[$line] === null) {
+                        if (!isset($coverageData[$line])) {
                             continue;
                         }
                         $methodLineElement = $document->createElement('line');
@@ -225,22 +221,22 @@ final class Cobertura
                     continue;
                 }
 
-                $complexity += $function['ccn'];
-                $packageComplexity += $function['ccn'];
+                $complexity          += $function['ccn'];
+                $packageComplexity   += $function['ccn'];
                 $functionsComplexity += $function['ccn'];
 
                 $linesValid   = $function['executableLines'];
                 $linesCovered = $function['executedLines'];
                 $lineRate     = $linesValid === 0 ? 0 : ($linesCovered / $linesValid);
 
-                $functionsLinesValid += $linesValid;
+                $functionsLinesValid   += $linesValid;
                 $functionsLinesCovered += $linesCovered;
 
                 $branchesValid   = $function['executableBranches'];
                 $branchesCovered = $function['executedBranches'];
                 $branchRate      = $branchesValid === 0 ? 0 : ($branchesCovered / $branchesValid);
 
-                $functionsBranchesValid += $branchesValid;
+                $functionsBranchesValid   += $branchesValid;
                 $functionsBranchesCovered += $branchesValid;
 
                 $methodElement = $document->createElement('method');
@@ -256,7 +252,7 @@ final class Cobertura
                 $methodElement->appendChild($methodLinesElement);
 
                 foreach (range($function['startLine'], $function['endLine']) as $line) {
-                    if (!isset($coverageData[$line]) || $coverageData[$line] === null) {
+                    if (!isset($coverageData[$line])) {
                         continue;
                     }
                     $methodLineElement = $document->createElement('line');
@@ -292,16 +288,10 @@ final class Cobertura
 
         $coverageElement->setAttribute('complexity', (string) $complexity);
 
-        $buffer = $document->saveXML();
+        $buffer = Xml::asString($document);
 
         if ($target !== null) {
-            if (!strpos($target, '://') !== false) {
-                Filesystem::createDirectory(dirname($target));
-            }
-
-            if (@file_put_contents($target, $buffer) === false) {
-                throw new WriteOperationFailedException($target);
-            }
+            Filesystem::write($target, $buffer);
         }
 
         return $buffer;

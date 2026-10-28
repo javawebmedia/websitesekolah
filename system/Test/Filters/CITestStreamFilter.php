@@ -48,13 +48,14 @@ class CITestStreamFilter extends php_user_filter
      * @param resource $out
      * @param int      $consumed
      * @param bool     $closing
+     *
+     * @param-out int $consumed
      */
     public function filter($in, $out, &$consumed, $closing): int
     {
         while ($bucket = stream_bucket_make_writeable($in)) {
             static::$buffer .= $bucket->data;
-
-            $consumed += $bucket->datalen;
+            $consumed += (int) $bucket->datalen;
         }
 
         return PSFS_PASS_ON;
@@ -92,11 +93,29 @@ class CITestStreamFilter extends php_user_filter
     }
 
     /**
-     * @param resource $stream
+     * Whether an output filter is currently attached to STDOUT.
+     */
+    public static function hasOutputFilter(): bool
+    {
+        return self::$out !== null;
+    }
+
+    /**
+     * Whether an error filter is currently attached to STDERR.
+     */
+    public static function hasErrorFilter(): bool
+    {
+        return self::$err !== null;
+    }
+
+    /**
+     * @param resource|null $stream
+     *
+     * @param-out null $stream
      */
     protected static function removeFilter(&$stream): void
     {
-        if (is_resource($stream)) {
+        if ($stream !== null) {
             stream_filter_remove($stream);
             $stream = null;
         }

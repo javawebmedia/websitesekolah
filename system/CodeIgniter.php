@@ -15,7 +15,6 @@ use Closure;
 use CodeIgniter\Cache\ResponseCache;
 use CodeIgniter\Debug\Timer;
 use CodeIgniter\Events\Events;
-use CodeIgniter\Exceptions\FrameworkException;
 use CodeIgniter\Exceptions\LogicException;
 use CodeIgniter\Exceptions\PageNotFoundException;
 use CodeIgniter\Filters\Filters;
@@ -26,6 +25,7 @@ use CodeIgniter\HTTP\IncomingRequest;
 use CodeIgniter\HTTP\Method;
 use CodeIgniter\HTTP\RedirectResponse;
 use CodeIgniter\HTTP\Request;
+use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponsableInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\HTTP\URI;
@@ -55,7 +55,7 @@ class CodeIgniter
     /**
      * The current version of CodeIgniter Framework
      */
-    public const CI_VERSION = '4.6.0';
+    public const CI_VERSION = '4.7.5';
 
     /**
      * App startup time.
@@ -95,14 +95,14 @@ class CodeIgniter
     /**
      * Current response.
      *
-     * @var ResponseInterface
+     * @var ResponseInterface|null
      */
     protected $response;
 
     /**
      * Router to use.
      *
-     * @var Router
+     * @var Router|null
      */
     protected $router;
 
@@ -116,14 +116,14 @@ class CodeIgniter
     /**
      * Controller method to invoke.
      *
-     * @var string
+     * @var string|null
      */
     protected $method;
 
     /**
      * Output handler to use.
      *
-     * @var string
+     * @var string|null
      */
     protected $output;
 
@@ -141,7 +141,7 @@ class CodeIgniter
      *  web:     Invoked by HTTP request
      *  php-cli: Invoked by CLI via `php public/index.php`
      *
-     * @phpstan-var 'php-cli'|'web'
+     * @var 'php-cli'|'web'|null
      */
     protected ?string $context = null;
 
@@ -186,42 +186,51 @@ class CodeIgniter
     public function initialize()
     {
         // Set default locale on the server
-        Locale::setDefault($this->config->defaultLocale ?? 'en');
+        Locale::setDefault($this->config->defaultLocale);
 
         // Set default timezone on the server
-        date_default_timezone_set($this->config->appTimezone ?? 'UTC');
+        date_default_timezone_set($this->config->appTimezone);
     }
 
     /**
-     * Checks system for missing required PHP extensions.
-     *
-     * @return void
-     *
-     * @throws FrameworkException
-     *
-     * @codeCoverageIgnore
-     *
-     * @deprecated 4.5.0 Moved to system/bootstrap.php.
+     * Reset request-specific state for worker mode.
+     * Clears all request/response data to prepare for the next request.
      */
-    protected function resolvePlatformExtensions()
+    public function resetForWorkerMode(): void
     {
-        $requiredExtensions = [
-            'intl',
-            'json',
-            'mbstring',
-        ];
+        $this->request    = null;
+        $this->response   = null;
+        $this->router     = null;
+        $this->controller = null;
+        $this->method     = null;
+        $this->output     = null;
 
-        $missingExtensions = [];
+        // Reset timing
+        $this->startTime = null;
+        $this->totalTime = 0;
 
-        foreach ($requiredExtensions as $extension) {
-            if (! extension_loaded($extension)) {
-                $missingExtensions[] = $extension;
-            }
+        $this->resetKintForWorkerMode();
+    }
+
+    /**
+     * Resets Kint request-specific state for worker mode.
+     */
+    private function resetKintForWorkerMode(): void
+    {
+        if (! CI_DEBUG || ! class_exists(Kint::class, false)) {
+            return;
         }
 
-        if ($missingExtensions !== []) {
-            throw FrameworkException::forMissingExtension(implode(', ', $missingExtensions));
+        $csp = service('csp');
+        if ($csp->enabled()) {
+            RichRenderer::$js_nonce  = $csp->getScriptNonce();
+            RichRenderer::$css_nonce = $csp->getStyleNonce();
+        } else {
+            RichRenderer::$js_nonce  = null;
+            RichRenderer::$css_nonce = null;
         }
+
+        RichRenderer::$needs_pre_render = true;
     }
 
     /**
@@ -252,7 +261,7 @@ class CodeIgniter
     {
         // If we have KINT_DIR it means it's already loaded via composer
         if (! defined('KINT_DIR')) {
-            spl_autoload_register(function ($class): void {
+            spl_autoload_register(static function ($class): void {
                 $class = explode('\\', $class);
 
                 if (array_shift($class) !== 'Kint') {
@@ -466,7 +475,7 @@ class CodeIgniter
             if ($routeFilters !== null) {
                 $filters->enableFilters($routeFilters, 'before');
 
-                $oldFilterOrder = config(Feature::class)->oldFilterOrder ?? false;
+                $oldFilterOrder = config(Feature::class)->oldFilterOrder ?? false; // @phpstan-ignore nullCoalesce.property
                 if (! $oldFilterOrder) {
                     $routeFilters = array_reverse($routeFilters);
                 }
@@ -493,28 +502,32 @@ class CodeIgniter
 
         $returned = $this->startController();
 
-        // Closure controller has run in startController().
-        if (! is_callable($this->controller)) {
-            $controller = $this->createController();
+        // If startController returned a Response (from an attribute or Closure), use it
+        if ($returned instanceof ResponseInterface) {
+            $this->gatherOutput($cacheConfig, $returned);
+        } else {
+            // Closure controller has run in startController().
+            if (! is_callable($this->controller)) {
+                $controller = $this->createController();
 
-            if (! method_exists($controller, '_remap') && ! is_callable([$controller, $this->method], false)) {
-                throw PageNotFoundException::forMethodNotFound($this->method);
+                if (! method_exists($controller, '_remap') && ! is_callable([$controller, $this->method], false)) {
+                    throw PageNotFoundException::forMethodNotFound($this->method);
+                }
+
+                // Is there a "post_controller_constructor" event?
+                Events::trigger('post_controller_constructor');
+
+                $returned = $this->runController($controller);
+            } else {
+                $this->benchmark->stop('controller_constructor');
+                $this->benchmark->stop('controller');
             }
 
-            // Is there a "post_controller_constructor" event?
-            Events::trigger('post_controller_constructor');
-
-            $returned = $this->runController($controller);
-        } else {
-            $this->benchmark->stop('controller_constructor');
-            $this->benchmark->stop('controller');
+            // If $returned is a string, then the controller output something,
+            // probably a view, instead of echoing it directly. Send it along
+            // so it can be used with the output.
+            $this->gatherOutput($cacheConfig, $returned);
         }
-
-        // If $returned is a string, then the controller output something,
-        // probably a view, instead of echoing it directly. Send it along
-        // so it can be used with the output.
-        $this->gatherOutput($cacheConfig, $returned);
-
         if ($this->enableFilters) {
             /** @var Filters $filters */
             $filters = service('filters');
@@ -528,6 +541,13 @@ class CodeIgniter
             if ($response instanceof ResponseInterface) {
                 $this->response = $response;
             }
+        }
+
+        // Execute controller attributes' after() methods AFTER framework filters
+        if ((config('Routing')->useControllerAttributes ?? true) === true) { // @phpstan-ignore nullCoalesce.property
+            $this->benchmark->start('route_attributes_after');
+            $this->response = $this->router->executeAfterAttributes($this->request, $this->response);
+            $this->benchmark->stop('route_attributes_after');
         }
 
         // Skip unnecessary processing for special Responses.
@@ -604,9 +624,7 @@ class CodeIgniter
      */
     protected function startBenchmark()
     {
-        if ($this->startTime === null) {
-            $this->startTime = microtime(true);
-        }
+        $this->startTime ??= microtime(true);
 
         $this->benchmark = Services::timer();
         $this->benchmark->start('total_execution', $this->startTime);
@@ -755,6 +773,8 @@ class CodeIgniter
 
     /**
      * Returns an array with our basic performance stats collected.
+     *
+     * @return array{startTime: float|null, totalTime: float}
      */
     public function getPerformanceStats(): array
     {
@@ -888,6 +908,27 @@ class CodeIgniter
             throw PageNotFoundException::forControllerNotFound($this->controller, $this->method);
         }
 
+        // Execute route attributes' before() methods
+        // This runs after routing/validation but BEFORE expensive controller instantiation
+        if ((config('Routing')->useControllerAttributes ?? true) === true) { // @phpstan-ignore nullCoalesce.property
+            $this->benchmark->start('route_attributes_before');
+            $attributeResponse = $this->router->executeBeforeAttributes($this->request);
+            $this->benchmark->stop('route_attributes_before');
+
+            // If attribute returns a Response, short-circuit
+            if ($attributeResponse instanceof ResponseInterface) {
+                $this->benchmark->stop('controller_constructor');
+                $this->benchmark->stop('controller');
+
+                return $attributeResponse;
+            }
+
+            // If attribute returns a modified Request, use it
+            if ($attributeResponse instanceof RequestInterface) {
+                $this->request = $attributeResponse;
+            }
+        }
+
         return null;
     }
 
@@ -948,7 +989,9 @@ class CodeIgniter
         $this->response->setStatusCode($e->getCode());
 
         // Is there a 404 Override available?
-        if ($override = $this->router->get404Override()) {
+        $override = $this->router->get404Override();
+
+        if ($override !== null) {
             $returned = null;
 
             if ($override instanceof Closure) {
@@ -1126,7 +1169,7 @@ class CodeIgniter
     /**
      * Sets the app context.
      *
-     * @phpstan-param 'php-cli'|'web' $context
+     * @param 'php-cli'|'web' $context
      *
      * @return $this
      */

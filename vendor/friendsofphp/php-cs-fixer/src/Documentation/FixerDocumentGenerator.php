@@ -17,23 +17,31 @@ namespace PhpCsFixer\Documentation;
 use PhpCsFixer\Console\Command\HelpCommand;
 use PhpCsFixer\Differ\FullDiffer;
 use PhpCsFixer\Fixer\ConfigurableFixerInterface;
-use PhpCsFixer\Fixer\DeprecatedFixerInterface;
 use PhpCsFixer\Fixer\FixerInterface;
 use PhpCsFixer\FixerConfiguration\AliasedFixerOption;
 use PhpCsFixer\FixerConfiguration\AllowedValueSubset;
 use PhpCsFixer\FixerConfiguration\DeprecatedFixerOptionInterface;
+use PhpCsFixer\FixerConfiguration\FixerOptionInterface;
 use PhpCsFixer\FixerDefinition\CodeSampleInterface;
 use PhpCsFixer\FixerDefinition\FileSpecificCodeSampleInterface;
 use PhpCsFixer\FixerDefinition\VersionSpecificCodeSampleInterface;
+use PhpCsFixer\Future;
 use PhpCsFixer\Preg;
+use PhpCsFixer\RuleSet\AutomaticRuleSetDefinitionInterface;
+use PhpCsFixer\RuleSet\DeprecatedRuleSetDefinitionInterface;
 use PhpCsFixer\RuleSet\RuleSet;
+use PhpCsFixer\RuleSet\RuleSetDefinitionInterface;
 use PhpCsFixer\RuleSet\RuleSets;
 use PhpCsFixer\StdinFileInfo;
 use PhpCsFixer\Tokenizer\Tokens;
 use PhpCsFixer\Utils;
 
 /**
+ * @readonly
+ *
  * @internal
+ *
+ * @no-named-arguments Parameter names are not covered by the backward compatibility promise.
  */
 final class FixerDocumentGenerator
 {
@@ -41,10 +49,14 @@ final class FixerDocumentGenerator
 
     private FullDiffer $differ;
 
+    /** @var array<string, RuleSetDefinitionInterface> */
+    private array $ruleSetDefinitions;
+
     public function __construct(DocumentationLocator $locator)
     {
         $this->locator = $locator;
         $this->differ = new FullDiffer();
+        $this->ruleSetDefinitions = RuleSets::getSetDefinitions();
     }
 
     public function generateFixerDocumentation(FixerInterface $fixer): string
@@ -71,55 +83,36 @@ final class FixerDocumentGenerator
                 RST;
         }
 
-        $deprecationDescription = '';
+        $header = static function (string $message, string $underline = '-'): string {
+            $line = str_repeat($underline, \strlen($message));
 
-        if ($fixer instanceof DeprecatedFixerInterface) {
-            $deprecationDescription = <<<'RST'
+            return "{$message}\n{$line}\n";
+        };
 
-                This rule is deprecated and will be removed in the next major version
-                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                RST;
-            $alternatives = $fixer->getSuccessorsNames();
+        $tags = DocumentationTagGenerator::analyseRule($fixer);
+        $warnings = array_map(
+            static function (DocumentationTag $tag): string {
+                $titleLine = str_repeat('~', \strlen($tag->title));
 
-            if (0 !== \count($alternatives)) {
-                $deprecationDescription .= RstUtils::toRst(sprintf(
-                    "\n\nYou should use %s instead.",
-                    Utils::naturalLanguageJoinWithBackticks($alternatives)
-                ), 0);
-            }
-        }
+                return \sprintf(
+                    "\n%s\n%s\n\n%s",
+                    $tag->title,
+                    $titleLine,
+                    null === $tag->description ? '' : RstUtils::toRst($tag->description, 0),
+                );
+            },
+            $tags,
+        );
 
-        $riskyDescription = '';
-        $riskyDescriptionRaw = $definition->getRiskyDescription();
+        if ([] !== $warnings) {
+            $warningsHeader = 1 === \count($warnings) ? 'Warning' : 'Warnings';
 
-        if (null !== $riskyDescriptionRaw) {
-            $riskyDescriptionRaw = RstUtils::toRst($riskyDescriptionRaw, 0);
-            $riskyDescription = <<<RST
-
-                Using this rule is risky
-                ~~~~~~~~~~~~~~~~~~~~~~~~
-
-                {$riskyDescriptionRaw}
-                RST;
-        }
-
-        if ('' !== $deprecationDescription || '' !== $riskyDescription) {
-            $warningsHeader = 'Warning';
-
-            if ('' !== $deprecationDescription && '' !== $riskyDescription) {
-                $warningsHeader = 'Warnings';
-            }
-
-            $warningsHeaderLine = str_repeat('-', \strlen($warningsHeader));
-            $doc .= "\n\n".implode("\n", array_filter([
-                $warningsHeader,
-                $warningsHeaderLine,
-                $deprecationDescription,
-                $riskyDescription,
-            ]));
+            $doc .= "\n\n".$header($warningsHeader).implode("\n", $warnings);
         }
 
         if ($fixer instanceof ConfigurableFixerInterface) {
+            $fixerInFutureMode = self::createFixerInFutureMode($fixer);
+
             $doc .= <<<'RST'
 
 
@@ -148,10 +141,13 @@ final class FixerDocumentGenerator
 
                 if (null === $allowed) {
                     $allowedKind = 'Allowed types';
-                    $allowed = array_map(
-                        static fn ($value): string => '``'.$value.'``',
-                        $option->getAllowedTypes(),
-                    );
+                    $allowedTypes = $option->getAllowedTypes();
+                    if (null !== $allowedTypes) {
+                        $allowed = array_map(
+                            static fn (string $value): string => '``'.Utils::convertArrayTypeToList($value).'``',
+                            $allowedTypes,
+                        );
+                    }
                 } else {
                     $allowedKind = 'Allowed values';
                     $allowed = array_map(static fn ($value): string => $value instanceof AllowedValueSubset
@@ -159,12 +155,22 @@ final class FixerDocumentGenerator
                         : '``'.Utils::toString($value).'``', $allowed);
                 }
 
-                $allowed = Utils::naturalLanguageJoin($allowed, '');
-                $optionInfo .= "\n\n{$allowedKind}: {$allowed}";
+                if (null !== $allowed) {
+                    $allowed = Utils::naturalLanguageJoin($allowed, '');
+                    $optionInfo .= "\n\n{$allowedKind}: {$allowed}";
+                }
 
                 if ($option->hasDefault()) {
-                    $default = Utils::toString($option->getDefault());
-                    $optionInfo .= "\n\nDefault value: ``{$default}``";
+                    $optionInfo .= \sprintf("\n\nDefault value: ``%s``", Utils::toString($option->getDefault()));
+
+                    $optionInFutureMode = array_find(
+                        $fixerInFutureMode->getConfigurationDefinition()->getOptions(),
+                        static fn (FixerOptionInterface $opt): bool => $option->getName() === $opt->getName(),
+                    );
+                    \assert(null !== $optionInFutureMode); // if rule exist in v3, shall exist in future mode too, as it does not remove options
+                    if ($optionInFutureMode->getDefault() !== $option->getDefault()) {
+                        $optionInfo .= \sprintf("\n\nDefault value (future-mode): ``%s``", Utils::toString($optionInFutureMode->getDefault()));
+                    }
                 } else {
                     $optionInfo .= "\n\nThis option is required.";
                 }
@@ -184,7 +190,7 @@ final class FixerDocumentGenerator
                 RST;
 
             foreach ($samples as $index => $sample) {
-                $title = sprintf('Example #%d', $index + 1);
+                $title = \sprintf('Example #%d', $index + 1);
                 $titleLine = str_repeat('~', \strlen($title));
                 $doc .= "\n\n{$title}\n{$titleLine}";
 
@@ -192,9 +198,9 @@ final class FixerDocumentGenerator
                     if (null === $sample->getConfiguration()) {
                         $doc .= "\n\n*Default* configuration.";
                     } else {
-                        $doc .= sprintf(
+                        $doc .= \sprintf(
                             "\n\nWith configuration: ``%s``.",
-                            Utils::toString($sample->getConfiguration())
+                            Utils::toString($sample->getConfiguration()),
                         );
                     }
                 }
@@ -218,31 +224,52 @@ final class FixerDocumentGenerator
 
             foreach ($ruleSetConfigs as $set => $config) {
                 $ruleSetPath = $this->locator->getRuleSetsDocumentationFilePath($set);
+                \assert(false !== strrpos($ruleSetPath, '/'));
                 $ruleSetPath = substr($ruleSetPath, strrpos($ruleSetPath, '/'));
+
+                \assert(isset($this->ruleSetDefinitions[$set]));
+                $ruleSetDefinition = $this->ruleSetDefinitions[$set];
+
+                if ($ruleSetDefinition instanceof AutomaticRuleSetDefinitionInterface) {
+                    continue;
+                }
+
+                $deprecatedDesc = ($ruleSetDefinition instanceof DeprecatedRuleSetDefinitionInterface) ? ' *(deprecated)*' : '';
 
                 $configInfo = (null !== $config)
                     ? " with config:\n\n  ``".Utils::toString($config)."``\n"
                     : '';
 
                 $doc .= <<<RST
-                    - `{$set} <./../../ruleSets{$ruleSetPath}>`_{$configInfo}\n
+                    - `{$set} <./../../ruleSets{$ruleSetPath}>`_{$deprecatedDesc}{$configInfo}\n
                     RST;
             }
+
+            $doc = trim($doc);
         }
 
         $reflectionObject = new \ReflectionObject($fixer);
         $className = str_replace('\\', '\\\\', $reflectionObject->getName());
         $fileName = $reflectionObject->getFileName();
+        \assert(false !== $fileName);
         $fileName = str_replace('\\', '/', $fileName);
-        $fileName = substr($fileName, strrpos($fileName, '/src/Fixer/') + 1);
+        $fileName = substr($fileName, (int) strrpos($fileName, '/src/Fixer/') + 1);
         $fileName = "`{$className} <./../../../{$fileName}>`_";
+
+        $testFileName = Preg::replace('~.*\K/src/(?=Fixer/)~', '/tests/', $fileName);
+        $testFileName = Preg::replace('~PhpCsFixer\\\\\\\\\K(?=Fixer\\\\\\\)~', 'Tests\\\\\\\\', $testFileName);
+        $testFileName = Preg::replace('~(?= <|\.php>)~', 'Test', $testFileName);
 
         $doc .= <<<RST
 
-            Source class
-            ------------
 
-            {$fileName}
+            References
+            ----------
+
+            - Fixer class: {$fileName}
+            - Test class: {$testFileName}
+
+            The test class defines officially supported behaviour. Each test case is a part of our backward compatibility promise.
             RST;
 
         $doc = str_replace("\t", '<TAB>', $doc);
@@ -257,11 +284,27 @@ final class FixerDocumentGenerator
      */
     public static function getSetsOfRule(string $ruleName): array
     {
+        static $ruleSetCache = null;
+
+        if (null === $ruleSetCache) {
+            $definitionNames = array_keys(
+                array_filter(
+                    RuleSets::getSetDefinitions(),
+                    static fn (RuleSetDefinitionInterface $definition): bool => !$definition instanceof AutomaticRuleSetDefinitionInterface,
+                ),
+            );
+            $ruleSetCache = array_combine(
+                $definitionNames,
+                array_map(
+                    static fn (string $name): RuleSet => new RuleSet([$name => true]),
+                    $definitionNames,
+                ),
+            );
+        }
+
         $ruleSetConfigs = [];
 
-        foreach (RuleSets::getSetDefinitionNames() as $set) {
-            $ruleSet = new RuleSet([$set => true]);
-
+        foreach ($ruleSetCache as $set => $ruleSet) {
             if ($ruleSet->hasRule($ruleName)) {
                 $ruleSetConfigs[$set] = $ruleSet->getRuleConfiguration($ruleName);
             }
@@ -271,7 +314,7 @@ final class FixerDocumentGenerator
     }
 
     /**
-     * @param FixerInterface[] $fixers
+     * @param list<FixerInterface> $fixers
      */
     public function generateFixersDocumentationIndex(array $fixers): string
     {
@@ -292,7 +335,7 @@ final class FixerDocumentGenerator
         $currentGroup = null;
 
         foreach ($fixers as $fixer) {
-            $namespace = Preg::replace('/^.*\\\\(.+)\\\\.+Fixer$/', '$1', \get_class($fixer));
+            $namespace = Preg::replace('/^.*\\\(.+)\\\.+Fixer$/', '$1', \get_class($fixer));
             $group = $overrideGroups[$namespace] ?? Preg::replace('/(?<=[[:lower:]])(?=[[:upper:]])/', ' ', $namespace);
 
             if ($group !== $currentGroup) {
@@ -304,19 +347,14 @@ final class FixerDocumentGenerator
 
             $path = './'.$this->locator->getFixerDocumentationFileRelativePath($fixer);
 
-            $attributes = [];
+            $tags = array_map(
+                static fn (DocumentationTag $tag): string => $tag->type,
+                DocumentationTagGenerator::analyseRule($fixer),
+            );
 
-            if ($fixer instanceof DeprecatedFixerInterface) {
-                $attributes[] = 'deprecated';
-            }
-
-            if ($fixer->isRisky()) {
-                $attributes[] = 'risky';
-            }
-
-            $attributes = 0 === \count($attributes)
+            $attributes = 0 === \count($tags)
                 ? ''
-                : ' *('.implode(', ', $attributes).')*';
+                : ' *('.implode(', ', $tags).')*';
 
             $summary = str_replace('`', '``', $fixer->getDefinition()->getSummary());
 
@@ -329,6 +367,24 @@ final class FixerDocumentGenerator
         }
 
         return "{$documentation}\n";
+    }
+
+    /**
+     * @template T of FixerInterface
+     *
+     * @param T $fixer
+     *
+     * @return T
+     */
+    private static function createFixerInFutureMode(FixerInterface $fixer): FixerInterface
+    {
+        $object = Future::runWithEnforcedFutureMode(
+            static fn () => (new \ReflectionObject($fixer))->newInstance(),
+        );
+
+        \assert($object instanceof $fixer);
+
+        return $object;
     }
 
     private function generateSampleDiff(FixerInterface $fixer, CodeSampleInterface $sample, int $sampleNumber, string $ruleName): string
@@ -351,7 +407,7 @@ final class FixerDocumentGenerator
                    the sample is not suitable for current version of PHP (%s).
                 RST;
 
-            return sprintf($error, PHP_VERSION);
+            return \sprintf($error, \PHP_VERSION);
         }
 
         $old = $sample->getCode();

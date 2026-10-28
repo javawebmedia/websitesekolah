@@ -1,21 +1,24 @@
 <?php declare(strict_types=1);
+use CodeIgniter\Debug\Toolbar;
+use CodeIgniter\View\Parser;
+
 /**
- * @var CodeIgniter\Debug\Toolbar $this
- * @var int                       $totalTime
- * @var int                       $totalMemory
- * @var string                    $url
- * @var string                    $method
- * @var bool                      $isAJAX
- * @var int                       $startTime
- * @var int                       $totalTime
- * @var int                       $totalMemory
- * @var float                     $segmentDuration
- * @var int                       $segmentCount
- * @var string                    $CI_VERSION
- * @var array                     $collectors
- * @var array                     $vars
- * @var array                     $styles
- * @var CodeIgniter\View\Parser   $parser
+ * @var Toolbar $this
+ * @var int     $totalTime
+ * @var int     $totalMemory
+ * @var string  $url
+ * @var string  $method
+ * @var bool    $isAJAX
+ * @var int     $startTime
+ * @var int     $totalTime
+ * @var int     $totalMemory
+ * @var float   $segmentDuration
+ * @var int     $segmentCount
+ * @var string  $CI_VERSION
+ * @var array   $collectors
+ * @var array   $vars
+ * @var array   $styles
+ * @var Parser  $parser
  */
 ?>
 <style>
@@ -25,6 +28,7 @@
 <script id="toolbar_js">
     var ciSiteURL = "<?= rtrim(site_url(), '/') ?>"
     <?= file_get_contents(__DIR__ . '/toolbar.js') ?>
+    <?= file_get_contents(__DIR__ . '/toolbarstandalone.js') ?>
 </script>
 <div id="debug-icon" class="debug-bar-ndisplay">
     <a id="debug-icon-link">

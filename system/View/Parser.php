@@ -15,13 +15,11 @@ use CodeIgniter\Autoloader\FileLocatorInterface;
 use CodeIgniter\View\Exceptions\ViewException;
 use Config\View as ViewConfig;
 use ParseError;
+use PhpToken;
 use Psr\Log\LoggerInterface;
 
 /**
  * Class for parsing pseudo-vars
- *
- * @phpstan-type parser_callable (callable(mixed): mixed)
- * @phpstan-type parser_callable_string (callable(mixed): mixed)&string
  *
  * @see \CodeIgniter\View\ParserTest
  */
@@ -63,8 +61,7 @@ class Parser extends View
     /**
      * Stores any plugins registered at run-time.
      *
-     * @var         array<string, callable|list<string>|string>
-     * @phpstan-var array<string, array<parser_callable_string>|parser_callable_string|parser_callable>
+     * @var array<string, (callable(mixed...): mixed)|((callable(mixed...): mixed)&string)|list<(callable(mixed...): mixed)&string>>
      */
     protected $plugins = [];
 
@@ -75,6 +72,27 @@ class Parser extends View
      * @var array<string, mixed>
      */
     protected $dataContexts = [];
+
+    /**
+     * Substitution values are temporarily replaced with opaque tokens so they
+     * cannot be interpreted as Parser syntax by a later substitution pass.
+     *
+     * @var array<string, string>
+     */
+    private array $replacementTokens = [];
+
+    private ?string $replacementTokenPrefix = null;
+
+    /**
+     * @var list<string>
+     */
+    private array $conditionalSources = [];
+
+    /**
+     * Whether conditionals in the template being parsed are restricted
+     * to variables, literals, arithmetic, comparison and logical operators.
+     */
+    private bool $restrictConditionals = false;
 
     /**
      * Constructor
@@ -107,9 +125,7 @@ class Parser extends View
     public function render(string $view, ?array $options = null, ?bool $saveData = null): string
     {
         $start = microtime(true);
-        if ($saveData === null) {
-            $saveData = $this->config->saveData;
-        }
+        $saveData ??= $this->config->saveData;
 
         $fileExt = pathinfo($view, PATHINFO_EXTENSION);
         $view    = ($fileExt === '') ? $view . '.php' : $view; // allow Views as .html, .tpl, etc (from CI3)
@@ -117,10 +133,14 @@ class Parser extends View
         $cacheName = $options['cache_name'] ?? str_replace('.php', '', $view);
 
         // Was it cached?
-        if (isset($options['cache']) && ($output = cache($cacheName))) {
-            $this->logPerformance($start, microtime(true), $view);
+        if (isset($options['cache'])) {
+            $output = cache($cacheName);
 
-            return $output;
+            if (is_string($output) && $output !== '') {
+                $this->logPerformance($start, microtime(true), $view);
+
+                return $output;
+            }
         }
 
         $file = $this->viewPath . $view;
@@ -135,9 +155,7 @@ class Parser extends View
             }
         }
 
-        if ($this->tempData === null) {
-            $this->tempData = $this->data;
-        }
+        $this->tempData ??= $this->data;
 
         $template = file_get_contents($file);
         $output   = $this->parse($template, $this->tempData, $options);
@@ -171,13 +189,9 @@ class Parser extends View
     public function renderString(string $template, ?array $options = null, ?bool $saveData = null): string
     {
         $start = microtime(true);
-        if ($saveData === null) {
-            $saveData = $this->config->saveData;
-        }
+        $saveData ??= $this->config->saveData;
 
-        if ($this->tempData === null) {
-            $this->tempData = $this->data;
-        }
+        $this->tempData ??= $this->data;
 
         $output = $this->parse($template, $this->tempData, $options);
 
@@ -198,10 +212,9 @@ class Parser extends View
      * so that the variable is correctly handled within the
      * parsing itself, and contexts (including raw) are respected.
      *
-     * @param         array<string, mixed>                      $data
-     * @param         non-empty-string|null                     $context The context to escape it for.
-     *                                                                   If 'raw', no escaping will happen.
-     * @phpstan-param null|'html'|'js'|'css'|'url'|'attr'|'raw' $context
+     * @param array<string, mixed>                      $data
+     * @param 'attr'|'css'|'html'|'js'|'raw'|'url'|null $context The context to escape it for.
+     *                                                           If 'raw', no escaping will happen.
      */
     public function setData(array $data = [], ?string $context = null): RendererInterface
     {
@@ -240,57 +253,94 @@ class Parser extends View
             return '';
         }
 
-        // Remove any possible PHP tags since we don't support it
-        // and parseConditionals needs it clean anyway...
+        $replacementState = [
+            $this->replacementTokens,
+            $this->replacementTokenPrefix,
+        ];
+
+        $this->replacementTokens      = [];
+        $this->replacementTokenPrefix = bin2hex(random_bytes(16));
+
+        try {
+            return $this->parseTemplate($template, $data, $options);
+        } finally {
+            [
+                $this->replacementTokens,
+                $this->replacementTokenPrefix,
+            ] = $replacementState;
+        }
+    }
+
+    /**
+     * @param array<string, mixed>      $data
+     * @param array<string, mixed>|null $options
+     */
+    private function parseTemplate(string $template, array $data, ?array $options): string
+    {
+        $template = $this->parseComments($template);
+
+        // Neutralize PHP tags after stripping comments, which can assemble them.
+        // parseConditionals() evaluates the template as PHP.
         $template = str_replace(['<?', '?>'], ['&lt;?', '?&gt;'], $template);
 
-        $template = $this->parseComments($template);
         $template = $this->extractNoparse($template);
 
-        // Replace any conditional code here so we don't have to parse as much
-        $template = $this->parseConditionals($template);
+        $restrictConditionals = $this->restrictConditionals;
 
-        // Handle any plugins before normal data, so that
-        // it can potentially modify any template between its tags.
-        $template = $this->parsePlugins($template);
+        // Nested renders must not weaken the restriction of the outer render.
+        $this->restrictConditionals = $restrictConditionals
+            || (bool) ($options['restrictConditionals'] ?? $this->config->restrictParserConditionals);
 
-        // Parse stack for each parse type (Single and Pairs)
-        $replaceSingleStack = [];
-        $replacePairsStack  = [];
+        try {
+            // Replace any conditional code here so we don't have to parse as much
+            $template = $this->parseConditionals($template);
 
-        // loop over the data variables, saving regex and data
-        // for later replacement.
-        foreach ($data as $key => $val) {
-            $escape = true;
+            // Handle any plugins before normal data, so that
+            // it can potentially modify any template between its tags.
+            $template = $this->parsePlugins($template);
 
-            if (is_array($val)) {
-                $escape              = false;
-                $replacePairsStack[] = [
-                    'replace' => $this->parsePair($key, $val, $template),
-                    'escape'  => $escape,
-                ];
-            } else {
-                $replaceSingleStack[] = [
-                    'replace' => $this->parseSingle($key, (string) $val),
-                    'escape'  => $escape,
-                ];
+            // Parse stack for each parse type (Single and Pairs)
+            $replaceSingleStack = [];
+            $replacePairsStack  = [];
+
+            // loop over the data variables, saving regex and data
+            // for later replacement.
+            foreach ($data as $key => $val) {
+                $escape = true;
+
+                if (is_array($val)) {
+                    $escape              = false;
+                    $replacePairsStack[] = [
+                        'replace' => $this->parsePair($key, $val, $template),
+                        'escape'  => $escape,
+                    ];
+                } else {
+                    $replaceSingleStack[] = [
+                        'replace' => $this->parseSingle($key, (string) $val),
+                        'escape'  => $escape,
+                    ];
+                }
             }
-        }
 
-        // Merge both stacks, pairs first + single stacks
-        // This allows for nested data with the same key to be replaced properly
-        $replace = array_merge($replacePairsStack, $replaceSingleStack);
+            // Merge both stacks, pairs first + single stacks
+            // This allows for nested data with the same key to be replaced properly
+            $replace = array_merge($replacePairsStack, $replaceSingleStack);
 
-        // Loop over each replace array item which
-        // holds all the data to be replaced
-        foreach ($replace as $replaceItem) {
-            // Loop over the actual data to be replaced
-            foreach ($replaceItem['replace'] as $pattern => $content) {
-                $template = $this->replaceSingle($pattern, $content, $template, $replaceItem['escape']);
+            // Loop over each replace array item which
+            // holds all the data to be replaced
+            foreach ($replace as $replaceItem) {
+                // Loop over the actual data to be replaced
+                foreach ($replaceItem['replace'] as $pattern => $content) {
+                    $template = $this->replaceSingle($pattern, $content, $template, $replaceItem['escape']);
+                }
             }
-        }
 
-        return $this->insertNoparse($template);
+            $template = $this->insertNoparse($template);
+
+            return strtr($template, $this->replacementTokens);
+        } finally {
+            $this->restrictConditionals = $restrictConditionals;
+        }
     }
 
     /**
@@ -364,7 +414,9 @@ class Parser extends View
                         $pair = $this->parsePair($key, $val, $match[1]);
 
                         if ($pair !== []) {
-                            $pairs[array_keys($pair)[0]] = true;
+                            foreach (array_keys($pair) as $pattern) {
+                                $pairs[$pattern] = true;
+                            }
 
                             $temp = array_merge($temp, $pair);
                         }
@@ -477,6 +529,10 @@ class Parser extends View
             // Build the string to replace the `if` statement with.
             $condition = $match[2];
 
+            if ($this->restrictConditionals && ! $this->isRestrictedCondition($condition)) {
+                throw ViewException::forRestrictedConditional($match[0]);
+            }
+
             $statement = $match[1] === 'elseif' ? '<?php elseif (' . $condition . '): ?>' : '<?php if (' . $condition . '): ?>';
             $template  = str_replace($match[0], $statement, $template);
         }
@@ -495,21 +551,88 @@ class Parser extends View
         // Parse the PHP itself, or insert an error so they can debug
         ob_start();
 
-        if ($this->tempData === null) {
-            $this->tempData = $this->data;
-        }
+        $this->tempData ??= $this->data;
 
-        extract($this->tempData);
+        $this->conditionalSources[] = $template;
 
         try {
-            eval('?>' . $template . '<?php ');
+            extract($this->tempData);
+            // The source must survive a parser-data variable named $template.
+            eval('?>' . $this->conditionalSources[count($this->conditionalSources) - 1] . '<?php ');
         } catch (ParseError) {
             ob_end_clean();
 
-            throw ViewException::forTagSyntaxError(str_replace(['?>', '<?php '], '', $template));
+            throw ViewException::forTagSyntaxError(str_replace(
+                ['?>', '<?php '],
+                '',
+                $this->conditionalSources[count($this->conditionalSources) - 1],
+            ));
+        } finally {
+            array_pop($this->conditionalSources);
         }
 
         return ob_get_clean();
+    }
+
+    /**
+     * Checks that a conditional expression only contains variables,
+     * literals, arithmetic, comparison and logical operators, and grouping parentheses.
+     */
+    private function isRestrictedCondition(string $condition): bool
+    {
+        $allowedTokens = [
+            T_VARIABLE,
+            T_CONSTANT_ENCAPSED_STRING,
+            T_LNUMBER,
+            T_DNUMBER,
+            T_POW,
+            T_IS_EQUAL,
+            T_IS_NOT_EQUAL,
+            T_IS_IDENTICAL,
+            T_IS_NOT_IDENTICAL,
+            T_IS_SMALLER_OR_EQUAL,
+            T_IS_GREATER_OR_EQUAL,
+            T_BOOLEAN_AND,
+            T_BOOLEAN_OR,
+            T_LOGICAL_AND,
+            T_LOGICAL_OR,
+        ];
+        $valueTokens = [
+            T_VARIABLE,
+            T_CONSTANT_ENCAPSED_STRING,
+            T_LNUMBER,
+            T_DNUMBER,
+            T_STRING,
+        ];
+
+        $afterValue = false;
+
+        foreach (PhpToken::tokenize('<?php ' . $condition) as $index => $token) {
+            if ($index === 0 || $token->is(T_WHITESPACE)) {
+                continue;
+            }
+
+            if ($token->text === '(') {
+                // A parenthesis after a value would be a call.
+                if ($afterValue) {
+                    return false;
+                }
+            } elseif ($token->is(T_STRING)) {
+                if (! in_array(strtolower($token->text), ['true', 'false', 'null'], true)) {
+                    return false;
+                }
+            } elseif ($token->is(T_VARIABLE)) {
+                if ($token->text === '$this') {
+                    return false;
+                }
+            } elseif (! $token->is($allowedTokens) && ! in_array($token->text, [')', '<', '>', '!', '+', '-', '*', '/', '%'], true)) {
+                return false;
+            }
+
+            $afterValue = $token->is($valueTokens) || $token->text === ')';
+        }
+
+        return true;
     }
 
     /**
@@ -544,16 +667,20 @@ class Parser extends View
      * Handles replacing a pseudo-variable with the actual content. Will double-check
      * for escaping brackets.
      *
-     * @param array|string $pattern
-     * @param string       $content
-     * @param string       $template
+     * @param array<array-key, string>|string $pattern
+     * @param string                          $content
+     * @param string                          $template
      */
     protected function replaceSingle($pattern, $content, $template, bool $escape = false): string
     {
         $content = (string) $content;
 
+        // Callers enable escaping for scalar data, but not assembled pairs.
+        // Protect scalar data even when {! !} disables escaping below.
+        $protectReplacement = $escape;
+
         // Replace the content in the template
-        return preg_replace_callback($pattern, function ($matches) use ($content, $escape): string {
+        return preg_replace_callback($pattern, function ($matches) use ($content, $escape, $protectReplacement): string {
             // Check for {! !} syntax to not escape this one.
             if (
                 str_starts_with($matches[0], $this->leftDelimiter . '!')
@@ -562,8 +689,29 @@ class Parser extends View
                 $escape = false;
             }
 
-            return $this->prepareReplacement($matches, $content, $escape);
+            $replacement = $this->prepareReplacement($matches, $content, $escape);
+
+            if (! $protectReplacement || $this->replacementTokenPrefix === null) {
+                return $replacement;
+            }
+
+            return $this->protectReplacement($replacement);
         }, (string) $template);
+    }
+
+    /**
+     * Keeps rendered data opaque until all template processing is complete.
+     */
+    private function protectReplacement(string $replacement): string
+    {
+        if ($this->replacementTokenPrefix === null) {
+            return $replacement;
+        }
+
+        $token                           = "\x1A{$this->replacementTokenPrefix}:" . count($this->replacementTokens) . "\x1A";
+        $this->replacementTokens[$token] = $replacement;
+
+        return $token;
     }
 
     /**
@@ -710,9 +858,19 @@ class Parser extends View
                     }
                 }
 
-                $template = $isPair
-                    ? str_replace($match[0], $callable($match[2], $params), $template)
-                    : str_replace($match[0], $callable($params), $template);
+                $replacement = $isPair ? $callable($match[2], $params) : $callable($params);
+
+                // Built-in plugins return rendered data. Custom plugins may
+                // intentionally return template code for subsequent processing.
+                // Identify the implementation, not the alias applications can override.
+                if (
+                    is_string($callable)
+                    && str_starts_with(strtolower(ltrim($callable, '\\')), strtolower(Plugins::class) . '::')
+                ) {
+                    $replacement = $this->protectReplacement((string) $replacement);
+                }
+
+                $template = str_replace($match[0], $replacement, $template);
             }
         }
 
@@ -721,6 +879,8 @@ class Parser extends View
 
     /**
      * Makes a new plugin available during the parsing of the template.
+     *
+     * @param (callable(array<array-key, string>): string)|(callable(string, array<array-key, string>): string) $callback
      *
      * @return $this
      */
@@ -747,7 +907,7 @@ class Parser extends View
      * Converts an object to an array, respecting any
      * toArray() methods on an object.
      *
-     * @param array<string, mixed>|bool|float|int|object|string|null $value
+     * @param mixed $value
      *
      * @return array<string, mixed>|bool|float|int|string|null
      */

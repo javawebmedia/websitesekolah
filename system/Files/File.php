@@ -17,7 +17,7 @@ use CodeIgniter\Files\Exceptions\FileException;
 use CodeIgniter\Files\Exceptions\FileNotFoundException;
 use CodeIgniter\I18n\Time;
 use Config\Mimes;
-use ReturnTypeWillChange;
+use RuntimeException;
 use SplFileInfo;
 
 /**
@@ -30,7 +30,7 @@ class File extends SplFileInfo
     /**
      * The files size in bytes
      *
-     * @var int
+     * @var false|int|null
      */
     protected $size;
 
@@ -59,21 +59,19 @@ class File extends SplFileInfo
      *
      * Implementations SHOULD return the value stored in the "size" key of
      * the file in the $_FILES array if available, as PHP calculates this based
-     * on the actual size transmitted. A RuntimeException will be thrown if the file
-     * does not exist or an error occurs.
+     * on the actual size transmitted.
      *
-     * @return false|int The file size in bytes, or false on failure
+     * @throws RuntimeException if the file does not exist or an error occurs
      */
-    #[ReturnTypeWillChange]
-    public function getSize()
+    public function getSize(): false|int
     {
-        return $this->size ?? ($this->size = parent::getSize());
+        return $this->size ??= parent::getSize();
     }
 
     /**
      * Retrieve the file size by unit, calculated in IEC standards with 1024 as base value.
      *
-     * @phpstan-param positive-int $precision
+     * @param positive-int $precision
      */
     public function getSizeByBinaryUnit(FileSizeUnit $unit = FileSizeUnit::B, int $precision = 3): int|string
     {
@@ -83,7 +81,7 @@ class File extends SplFileInfo
     /**
      * Retrieve the file size by unit, calculated in metric standards with 1000 as base value.
      *
-     * @phpstan-param positive-int $precision
+     * @param positive-int $precision
      */
     public function getSizeByMetricUnit(FileSizeUnit $unit = FileSizeUnit::B, int $precision = 3): int|string
     {
@@ -113,7 +111,8 @@ class File extends SplFileInfo
     public function guessExtension(): ?string
     {
         // naively get the path extension using pathinfo
-        $pathinfo = pathinfo($this->getRealPath() ?: $this->__toString()) + ['extension' => ''];
+        $realPath = $this->getRealPath();
+        $pathinfo = pathinfo($realPath === false ? $this->__toString() : $realPath) + ['extension' => ''];
 
         $proposedExtension = $pathinfo['extension'];
 
@@ -134,10 +133,9 @@ class File extends SplFileInfo
         }
 
         $finfo    = finfo_open(FILEINFO_MIME_TYPE);
-        $mimeType = finfo_file($finfo, $this->getRealPath() ?: $this->__toString());
-        finfo_close($finfo);
+        $realPath = $this->getRealPath();
 
-        return $mimeType;
+        return finfo_file($finfo, $realPath === false ? $this->__toString() : $realPath);
     }
 
     /**
@@ -147,7 +145,7 @@ class File extends SplFileInfo
     public function getRandomName(): string
     {
         $extension = $this->getExtension();
-        $extension = empty($extension) ? '' : '.' . $extension;
+        $extension = $extension === '' ? '' : '.' . $extension;
 
         return Time::now()->getTimestamp() . '_' . bin2hex(random_bytes(10)) . $extension;
     }
@@ -163,7 +161,8 @@ class File extends SplFileInfo
         $name ??= $this->getBasename();
         $destination = $overwrite ? $targetPath . $name : $this->getDestination($targetPath . $name);
 
-        $oldName = $this->getRealPath() ?: $this->__toString();
+        $realPath = $this->getRealPath();
+        $oldName  = $realPath === false ? $this->__toString() : $realPath;
 
         if (! @rename($oldName, $destination)) {
             $error = error_get_last();
@@ -171,7 +170,7 @@ class File extends SplFileInfo
             throw FileException::forUnableToMove($this->getBasename(), $targetPath, strip_tags($error['message']));
         }
 
-        @chmod($destination, 0777 & ~umask());
+        @chmod($destination, 0666 & ~umask());
 
         return new self($destination);
     }
@@ -219,7 +218,7 @@ class File extends SplFileInfo
         $size     = $this->getSize() / $divider;
 
         if ($unit !== FileSizeUnit::B) {
-            $size = number_format($size, $precision);
+            return number_format($size, $precision);
         }
 
         return $size;

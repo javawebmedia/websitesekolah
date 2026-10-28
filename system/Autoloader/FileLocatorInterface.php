@@ -23,7 +23,7 @@ interface FileLocatorInterface
      * Attempts to locate a file by examining the name for a namespace
      * and looking through the PSR-4 namespaced files that we know about.
      *
-     * @param string                $file   The relative file path or namespaced file to
+     * @param non-empty-string      $file   The relative file path or namespaced file to
      *                                      locate. If not namespaced, search in the app
      *                                      folder.
      * @param non-empty-string|null $folder The folder within the namespace that we should
@@ -32,12 +32,14 @@ interface FileLocatorInterface
      *                                      folder.
      * @param string                $ext    The file extension the file should have.
      *
-     * @return false|string The path to the file, or false if not found.
+     * @return false|non-empty-string The path to the file, or false if not found.
      */
     public function locateFile(string $file, ?string $folder = null, string $ext = 'php');
 
     /**
      * Examines a file and returns the fully qualified class name.
+     *
+     * @param non-empty-string $file
      */
     public function getClassname(string $file): string;
 
@@ -54,7 +56,7 @@ interface FileLocatorInterface
      *      'app/Modules/bar/Config/Routes.php',
      *  ]
      *
-     * @return list<string>
+     * @return list<non-empty-string>
      */
     public function search(string $path, string $ext = 'php', bool $prioritizeApp = true): array;
 
@@ -62,7 +64,7 @@ interface FileLocatorInterface
      * Find the qualified name of a file according to
      * the namespace of the first matched namespace path.
      *
-     * @return false|string The qualified name or false if the path is not found
+     * @return class-string|false The qualified name or false if the path is not found
      */
     public function findQualifiedNameFromPath(string $path);
 

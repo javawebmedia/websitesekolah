@@ -16,6 +16,9 @@ namespace Nexus\CsConfig\Fixer;
 use PhpCsFixer\AbstractFixer;
 use PhpCsFixer\Utils;
 
+/**
+ * @deprecated v3.26.0
+ */
 abstract class AbstractCustomFixer extends AbstractFixer
 {
     /**
@@ -35,9 +38,6 @@ abstract class AbstractCustomFixer extends AbstractFixer
         return $namespace.'/'.Utils::camelCaseToUnderscore($name);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getName(): string
     {
         return self::name();

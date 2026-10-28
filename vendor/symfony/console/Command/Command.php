@@ -32,7 +32,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Command
+class Command implements SignalableCommandInterface
 {
     // see https://tldp.org/LDP/abs/html/exitcodes.html
     public const SUCCESS = 0;
@@ -49,45 +49,39 @@ class Command
     private string $description = '';
     private ?InputDefinition $fullDefinition = null;
     private bool $ignoreValidationErrors = false;
-    private ?\Closure $code = null;
+    private ?InvokableCommand $code = null;
     private array $synopsis = [];
     private array $usages = [];
     private ?HelperSet $helperSet = null;
-
-    public static function getDefaultName(): ?string
-    {
-        if ($attribute = (new \ReflectionClass(static::class))->getAttributes(AsCommand::class)) {
-            return $attribute[0]->newInstance()->name;
-        }
-
-        return null;
-    }
-
-    public static function getDefaultDescription(): ?string
-    {
-        if ($attribute = (new \ReflectionClass(static::class))->getAttributes(AsCommand::class)) {
-            return $attribute[0]->newInstance()->description;
-        }
-
-        return null;
-    }
 
     /**
      * @param string|null $name The name of the command; passing null means it must be set in configure()
      *
      * @throws LogicException When the command name is empty
      */
-    public function __construct(?string $name = null)
+    public function __construct(?string $name = null, ?callable $code = null)
     {
         $this->definition = new InputDefinition();
 
-        if (null === $name && null !== $name = static::getDefaultName()) {
+        $attribute = $this->getCommandAttribute($code);
+
+        if ($code) {
+            $this->setCode($code);
+        }
+
+        if (null !== $name ??= $attribute?->name) {
             $aliases = explode('|', $name);
 
             if ('' === $name = array_shift($aliases)) {
                 $this->setHidden(true);
                 $name = array_shift($aliases);
             }
+
+            // we must not overwrite existing aliases, combine new ones with existing ones
+            $aliases = array_unique([
+                ...$this->aliases,
+                ...$aliases,
+            ]);
 
             $this->setAliases($aliases);
         }
@@ -97,7 +91,19 @@ class Command
         }
 
         if ('' === $this->description) {
-            $this->setDescription(static::getDefaultDescription() ?? '');
+            $this->setDescription($attribute?->description ?? '');
+        }
+
+        if ('' === $this->help) {
+            $this->setHelp($attribute?->help ?? '');
+        }
+
+        foreach ($attribute?->usages ?? [] as $usage) {
+            $this->addUsage($usage);
+        }
+
+        if (!$code && \is_callable($this) && self::class === (new \ReflectionMethod($this, 'execute'))->class) {
+            $this->code = new InvokableCommand($this, $this(...));
         }
 
         $this->configure();
@@ -159,10 +165,8 @@ class Command
 
     /**
      * Configures the current command.
-     *
-     * @return void
      */
-    protected function configure()
+    protected function configure(): void
     {
     }
 
@@ -191,10 +195,8 @@ class Command
      * This method is executed before the InputDefinition is validated.
      * This means that this is the only place where the command can
      * interactively ask for values of missing required arguments.
-     *
-     * @return void
      */
-    protected function interact(InputInterface $input, OutputInterface $output)
+    protected function interact(InputInterface $input, OutputInterface $output): void
     {
     }
 
@@ -207,10 +209,8 @@ class Command
      *
      * @see InputInterface::bind()
      * @see InputInterface::validate()
-     *
-     * @return void
      */
-    protected function initialize(InputInterface $input, OutputInterface $output)
+    protected function initialize(InputInterface $input, OutputInterface $output): void
     {
     }
 
@@ -242,6 +242,14 @@ class Command
             }
         }
 
+        // The command name argument is often omitted when a command is executed directly with its run() method,
+        // and it may hold an abbreviation or an alias when the command was resolved from one (e.g. Application::find()).
+        // Normalize it to the command's actual name so it can be relied on afterwards, since it's required by the
+        // application, and so argument resolution during interact() below can already rely on it.
+        if ($input->hasArgument('command') && null !== $name = $this->getName()) {
+            $input->setArgument('command', $name);
+        }
+
         $this->initialize($input, $output);
 
         if (null !== $this->processTitle) {
@@ -262,24 +270,19 @@ class Command
 
         if ($input->isInteractive()) {
             $this->interact($input, $output);
-        }
 
-        // The command name argument is often omitted when a command is executed directly with its run() method.
-        // It would fail the validation if we didn't make sure the command argument is present,
-        // since it's required by the application.
-        if ($input->hasArgument('command') && null === $input->getArgument('command')) {
-            $input->setArgument('command', $this->getName());
+            if ($this->code?->isInteractive()) {
+                $this->code->interact($input, $output);
+            }
         }
 
         $input->validate();
 
         if ($this->code) {
-            $statusCode = ($this->code)($input, $output);
-        } else {
-            $statusCode = $this->execute($input, $output);
+            return ($this->code)($input, $output);
         }
 
-        return is_numeric($statusCode) ? (int) $statusCode : 0;
+        return $this->execute($input, $output);
     }
 
     /**
@@ -293,6 +296,16 @@ class Command
         } elseif (CompletionInput::TYPE_ARGUMENT_VALUE === $input->getCompletionType() && $definition->hasArgument($input->getCompletionName())) {
             $definition->getArgument($input->getCompletionName())->complete($input, $suggestions);
         }
+    }
+
+    /**
+     * Gets the code that is executed by the command.
+     *
+     * @return ?callable null if the code has not been set with setCode()
+     */
+    public function getCode(): ?callable
+    {
+        return $this->code?->getCode();
     }
 
     /**
@@ -311,23 +324,7 @@ class Command
      */
     public function setCode(callable $code): static
     {
-        if ($code instanceof \Closure) {
-            $r = new \ReflectionFunction($code);
-            if (null === $r->getClosureThis()) {
-                set_error_handler(static function () {});
-                try {
-                    if ($c = \Closure::bind($code, $this)) {
-                        $code = $c;
-                    }
-                } finally {
-                    restore_error_handler();
-                }
-            }
-        } else {
-            $code = $code(...);
-        }
-
-        $this->code = $code;
+        $this->code = new InvokableCommand($this, $code);
 
         return $this;
     }
@@ -395,7 +392,13 @@ class Command
      */
     public function getNativeDefinition(): InputDefinition
     {
-        return $this->definition ?? throw new LogicException(\sprintf('Command class "%s" is not correctly initialized. You probably forgot to call the parent constructor.', static::class));
+        $definition = $this->definition ?? throw new LogicException(\sprintf('Command class "%s" is not correctly initialized. You probably forgot to call the parent constructor.', static::class));
+
+        if ($this->code && !$definition->getArguments() && !$definition->getOptions()) {
+            $this->code->configure($definition);
+        }
+
+        return $definition;
     }
 
     /**
@@ -580,7 +583,7 @@ class Command
             $list[] = $alias;
         }
 
-        $this->aliases = \is_array($aliases) ? $aliases : $list;
+        $this->aliases = $list;
 
         return $this;
     }
@@ -648,6 +651,16 @@ class Command
         return $this->helperSet->get($name);
     }
 
+    public function getSubscribedSignals(): array
+    {
+        return $this->code?->getSubscribedSignals() ?? [];
+    }
+
+    public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
+    {
+        return $this->code?->handleSignal($signal, $previousExitCode) ?? false;
+    }
+
     /**
      * Validates a command name.
      *
@@ -660,5 +673,61 @@ class Command
         if (!preg_match('/^[^\:]++(\:[^\:]++)*$/', $name)) {
             throw new InvalidArgumentException(\sprintf('Command name "%s" is invalid.', $name));
         }
+    }
+
+    private function getCommandAttribute(?callable $code): ?AsCommand
+    {
+        if (null === $code) {
+            /** @var AsCommand|null $attribute */
+            $attribute = (new \ReflectionClass(static::class)->getAttributes(AsCommand::class)[0] ?? null)?->newInstance();
+
+            return $attribute;
+        }
+
+        $reflection = new \ReflectionFunction($code(...));
+
+        if ($reflection->isAnonymous() || !$class = $reflection->getClosureScopeClass()) {
+            throw new InvalidArgumentException(\sprintf('The command must be an instance of "%s", an invokable object or a method of an object.', self::class));
+        }
+
+        /** @var AsCommand|null $attribute */
+        $attribute = ($reflection->getAttributes(AsCommand::class)[0] ?? null)?->newInstance();
+
+        if ('__invoke' === $reflection->getName()) {
+            $classAttribute = $class->getAttributes(AsCommand::class)[0] ?? null;
+
+            if ($attribute && $classAttribute) {
+                throw new LogicException(\sprintf('The "%s" class and its "__invoke()" method cannot both have the "%s" attribute.', $class->getName(), AsCommand::class));
+            }
+
+            /** @var AsCommand|null $attribute */
+            $attribute ??= $classAttribute?->newInstance();
+        } elseif ($attribute && $prefix = ($class->getAttributes(AsCommand::class)[0] ?? null)?->newInstance()->name) {
+            // the class-level name prefixes the names declared on methods
+            $hidden = str_starts_with($prefix, '|');
+            if ($prefix = explode('|', ltrim($prefix, '|'))[0]) {
+                $names = explode('|', $attribute->name);
+                if ($hidden && '' !== $names[0]) {
+                    // the method commands of a hidden class-level command are hidden too
+                    array_unshift($names, '');
+                }
+                $attribute->name = implode('|', array_map(static function (string $name) use ($prefix, $class, $reflection) {
+                    if ('' === $name) {
+                        return $name;
+                    }
+                    if (str_starts_with($name, $prefix.':')) {
+                        throw new LogicException(\sprintf('The name "%s" of the command "%s::%s()" repeats the class-level name "%s": method-level names are relative to it, use "%s" instead.', $name, $class->getName(), $reflection->getName(), $prefix, substr($name, \strlen($prefix) + 1)));
+                    }
+
+                    return $prefix.':'.$name;
+                }, $names));
+            }
+        }
+
+        if (!$attribute) {
+            throw new LogicException(\sprintf('The command must use the "%s" attribute.', AsCommand::class));
+        }
+
+        return $attribute;
     }
 }

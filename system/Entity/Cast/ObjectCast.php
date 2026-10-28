@@ -14,13 +14,10 @@ declare(strict_types=1);
 namespace CodeIgniter\Entity\Cast;
 
 /**
- * Class ObjectCast
+ * @extends BaseCast<object, mixed>
  */
 class ObjectCast extends BaseCast
 {
-    /**
-     * {@inheritDoc}
-     */
     public static function get($value, array $params = []): object
     {
         return (object) $value;

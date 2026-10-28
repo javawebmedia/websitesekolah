@@ -99,7 +99,7 @@ abstract class BaseCommand
     /**
      * Actually execute a command.
      *
-     * @param array<int|string, string|null> $params
+     * @param array<array-key, string|null> $params
      *
      * @return int|void
      */
@@ -108,7 +108,7 @@ abstract class BaseCommand
     /**
      * Can be used by a command to run other commands.
      *
-     * @param array<int|string, string|null> $params
+     * @param array<array-key, string|null> $params
      *
      * @return int|void
      *
@@ -142,7 +142,7 @@ abstract class BaseCommand
     {
         CLI::write(lang('CLI.helpUsage'), 'yellow');
 
-        if (isset($this->usage)) {
+        if ($this->usage !== null) {
             $usage = $this->usage;
         } else {
             $usage = $this->name;
@@ -154,7 +154,7 @@ abstract class BaseCommand
 
         CLI::write($this->setPad($usage, 0, 0, 2));
 
-        if (isset($this->description)) {
+        if ($this->description !== null) {
             CLI::newLine();
             CLI::write(lang('CLI.helpDescription'), 'yellow');
             CLI::write($this->setPad($this->description, 0, 0, 2));

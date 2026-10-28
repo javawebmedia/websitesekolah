@@ -59,9 +59,11 @@ abstract class PrettyPrinterAbstract implements PrettyPrinter {
         BinaryOp\Mod::class            => [ 40,  41,  40],
         BinaryOp\Plus::class           => [ 50,  51,  50],
         BinaryOp\Minus::class          => [ 50,  51,  50],
+        // FIXME: This precedence is incorrect for PHP 8.
         BinaryOp\Concat::class         => [ 50,  51,  50],
         BinaryOp\ShiftLeft::class      => [ 60,  61,  60],
         BinaryOp\ShiftRight::class     => [ 60,  61,  60],
+        BinaryOp\Pipe::class           => [ 65,  66,  65],
         BinaryOp\Smaller::class        => [ 70,  70,  70],
         BinaryOp\SmallerOrEqual::class => [ 70,  70,  70],
         BinaryOp\Greater::class        => [ 70,  70,  70],
@@ -102,6 +104,7 @@ abstract class PrettyPrinterAbstract implements PrettyPrinter {
         Expr\Include_::class           => [220,  -1,  -1],
         Expr\ArrowFunction::class      => [230,  -1,  -1],
         Expr\Throw_::class             => [240,  -1,  -1],
+        Expr\Cast\Void_::class         => [250,  -1,  -1],
     ];
 
     /** @var int Current indentation level. */
@@ -163,8 +166,9 @@ abstract class PrettyPrinterAbstract implements PrettyPrinter {
      * @var array<string, array{int|string|null, string, string}>
      */
     protected array $emptyListInsertionMap;
-    /** @var array<string, array{string, int}> Map from "{$class}->{$subNode}" to [$printFn, $token]
-     *       where $printFn is the function to print the modifiers and $token is the token before which
+    /** @var array<string, array{string, int, int}>
+     *       Map from "{$class}->{$subNode}" to [$printFn, $skipToken, $findToken] where $printFn is the function to
+     *       print the modifiers, $skipToken is the token to skip at the start and $findToken is the token before which
      *       the modifiers should be reprinted. */
     protected array $modifierChangeMap;
 
@@ -674,9 +678,11 @@ abstract class PrettyPrinterAbstract implements PrettyPrinter {
                     return $this->pFallback($fallbackNode, $precedence, $lhsPrecedence);
                 }
 
-                [$printFn, $findToken] = $this->modifierChangeMap[$key];
+                [$printFn, $skipToken, $findToken] = $this->modifierChangeMap[$key];
+                $skipWSPos = $this->origTokens->skipRight($pos, $skipToken);
+                $result .= $this->origTokens->getTokenCode($pos, $skipWSPos, $indentAdjustment);
                 $result .= $this->$printFn($subNode);
-                $pos = $this->origTokens->findRight($pos, $findToken);
+                $pos = $this->origTokens->findRight($skipWSPos, $findToken);
                 continue;
             }
 
@@ -1000,9 +1006,25 @@ abstract class PrettyPrinterAbstract implements PrettyPrinter {
 
             list($findToken, $extraLeft, $extraRight) = $this->emptyListInsertionMap[$mapKey];
             if (null !== $findToken) {
-                $insertPos = $this->origTokens->findRight($pos, $findToken) + 1;
-                $result .= $this->origTokens->getTokenCode($pos, $insertPos, $indentAdjustment);
-                $pos = $insertPos;
+                // For anon classes skip to the class keyword.
+                $isAnonClassArgs = $mapKey === PrintableNewAnonClassNode::class . '->args';
+                if ($isAnonClassArgs) {
+                    $insertPos = $this->origTokens->findRight($pos, \T_CLASS) + 1;
+                    $result .= $this->origTokens->getTokenCode($pos, $insertPos, $indentAdjustment);
+                    $pos = $insertPos;
+                }
+
+                // If "new Foo" was used without arguments, we need to convert to "new Foo()".
+                if (($mapKey === Expr\New_::class . '->args' || $isAnonClassArgs) &&
+                    !$this->origTokens->haveTokenImmediatelyAfter($pos - 1, '(')
+                ) {
+                    $extraLeft = '(';
+                    $extraRight = ')';
+                } else {
+                    $insertPos = $this->origTokens->findRight($pos, $findToken) + 1;
+                    $result .= $this->origTokens->getTokenCode($pos, $insertPos, $indentAdjustment);
+                    $pos = $insertPos;
+                }
             }
 
             $first = true;
@@ -1142,6 +1164,9 @@ abstract class PrettyPrinterAbstract implements PrettyPrinter {
      * @return bool Whether parentheses are required
      */
     protected function callLhsRequiresParens(Node $node): bool {
+        if ($node instanceof Expr\New_) {
+            return !$this->phpVersion->supportsNewDereferenceWithoutParentheses();
+        }
         return !($node instanceof Node\Name
             || $node instanceof Expr\Variable
             || $node instanceof Expr\ArrayDimFetch
@@ -1173,6 +1198,9 @@ abstract class PrettyPrinterAbstract implements PrettyPrinter {
      * @return bool Whether parentheses are required
      */
     protected function staticDereferenceLhsRequiresParens(Node $node): bool {
+        if ($node instanceof Expr\New_) {
+            return !$this->phpVersion->supportsNewDereferenceWithoutParentheses();
+        }
         return !($node instanceof Expr\Variable
             || $node instanceof Node\Name
             || $node instanceof Expr\ArrayDimFetch
@@ -1196,18 +1224,22 @@ abstract class PrettyPrinterAbstract implements PrettyPrinter {
      * @return bool Whether parentheses are required
      */
     protected function newOperandRequiresParens(Node $node): bool {
-        if ($node instanceof Node\Name || $node instanceof Expr\Variable) {
-            return false;
+        while (true) {
+            if ($node instanceof Node\Name || $node instanceof Expr\Variable) {
+                return false;
+            }
+            if ($node instanceof Expr\ArrayDimFetch || $node instanceof Expr\PropertyFetch ||
+                $node instanceof Expr\NullsafePropertyFetch
+            ) {
+                $node = $node->var;
+                continue;
+            }
+            if ($node instanceof Expr\StaticPropertyFetch) {
+                $node = $node->class;
+                continue;
+            }
+            return true;
         }
-        if ($node instanceof Expr\ArrayDimFetch || $node instanceof Expr\PropertyFetch ||
-            $node instanceof Expr\NullsafePropertyFetch
-        ) {
-            return $this->newOperandRequiresParens($node->var);
-        }
-        if ($node instanceof Expr\StaticPropertyFetch) {
-            return $this->newOperandRequiresParens($node->class);
-        }
-        return true;
     }
 
     /**
@@ -1281,7 +1313,7 @@ abstract class PrettyPrinterAbstract implements PrettyPrinter {
         $this->labelCharMap = [];
         for ($i = 0; $i < 256; $i++) {
             $chr = chr($i);
-            $this->labelCharMap[$chr] = $i >= 0x80 || ctype_alnum($chr);
+            $this->labelCharMap[$chr] = (bool) preg_match('/^[a-zA-Z0-9_\x80-\xff]$/', $chr);
         }
 
         if ($this->phpVersion->allowsDelInIdentifiers()) {
@@ -1372,7 +1404,7 @@ abstract class PrettyPrinterAbstract implements PrettyPrinter {
             BinaryOp\NotIdentical::class, BinaryOp\Spaceship::class, BinaryOp\BitwiseAnd::class,
             BinaryOp\BitwiseXor::class, BinaryOp\BitwiseOr::class, BinaryOp\BooleanAnd::class,
             BinaryOp\BooleanOr::class, BinaryOp\Coalesce::class, BinaryOp\LogicalAnd::class,
-            BinaryOp\LogicalXor::class, BinaryOp\LogicalOr::class,
+            BinaryOp\LogicalXor::class, BinaryOp\LogicalOr::class, BinaryOp\Pipe::class,
         ];
         foreach ($binaryOps as $binaryOp) {
             $this->fixupMap[$binaryOp] = [
@@ -1627,6 +1659,8 @@ abstract class PrettyPrinterAbstract implements PrettyPrinter {
             Stmt\Function_::class . '->params' => ['(', '', ''],
             Stmt\Interface_::class . '->attrGroups' => [null, '', "\n"],
             Stmt\Class_::class . '->attrGroups' => [null, '', "\n"],
+            Stmt\Enum_::class . '->attrGroups' => [null, '', "\n"],
+            Stmt\EnumCase::class . '->attrGroups' => [null, '', "\n"],
             Stmt\ClassConst::class . '->attrGroups' => [null, '', "\n"],
             Stmt\ClassMethod::class . '->attrGroups' => [null, '', "\n"],
             Stmt\Function_::class . '->attrGroups' => [null, '', "\n"],
@@ -1634,6 +1668,7 @@ abstract class PrettyPrinterAbstract implements PrettyPrinter {
             Stmt\Trait_::class . '->attrGroups' => [null, '', "\n"],
             Expr\ArrowFunction::class . '->attrGroups' => [null, '', ' '],
             Expr\Closure::class . '->attrGroups' => [null, '', ' '],
+            Stmt\Const_::class . '->attrGroups' => [null, '', "\n"],
             PrintableNewAnonClassNode::class . '->attrGroups' => [\T_NEW, ' ', ''],
 
             /* These cannot be empty to start with:
@@ -1672,15 +1707,15 @@ abstract class PrettyPrinterAbstract implements PrettyPrinter {
         }
 
         $this->modifierChangeMap = [
-            Stmt\ClassConst::class . '->flags' => ['pModifiers', \T_CONST],
-            Stmt\ClassMethod::class . '->flags' => ['pModifiers', \T_FUNCTION],
-            Stmt\Class_::class . '->flags' => ['pModifiers', \T_CLASS],
-            Stmt\Property::class . '->flags' => ['pModifiers', \T_VARIABLE],
-            PrintableNewAnonClassNode::class . '->flags' => ['pModifiers', \T_CLASS],
-            Param::class . '->flags' => ['pModifiers', \T_VARIABLE],
-            PropertyHook::class . '->flags' => ['pModifiers', \T_STRING],
-            Expr\Closure::class . '->static' => ['pStatic', \T_FUNCTION],
-            Expr\ArrowFunction::class . '->static' => ['pStatic', \T_FN],
+            Stmt\ClassConst::class . '->flags' => ['pModifiers', \T_WHITESPACE, \T_CONST],
+            Stmt\ClassMethod::class . '->flags' => ['pModifiers', \T_WHITESPACE, \T_FUNCTION],
+            Stmt\Class_::class . '->flags' => ['pModifiers', \T_WHITESPACE, \T_CLASS],
+            Stmt\Property::class . '->flags' => ['pModifiers', \T_WHITESPACE, \T_VARIABLE],
+            PrintableNewAnonClassNode::class . '->flags' => ['pModifiers', \T_NEW, \T_CLASS],
+            Param::class . '->flags' => ['pModifiers', \T_WHITESPACE, \T_VARIABLE],
+            PropertyHook::class . '->flags' => ['pModifiers', \T_WHITESPACE, \T_STRING],
+            Expr\Closure::class . '->static' => ['pStatic', \T_WHITESPACE, \T_FUNCTION],
+            Expr\ArrowFunction::class . '->static' => ['pStatic', \T_WHITESPACE, \T_FN],
             //Stmt\TraitUseAdaptation\Alias::class . '->newModifier' => 0, // TODO
         ];
 

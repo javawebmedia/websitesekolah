@@ -20,6 +20,8 @@ use CodeIgniter\Exceptions\InvalidArgumentException;
 
 /**
  * Builder for SQLite3
+ *
+ * @extends BaseBuilder<Connection>
  */
 class Builder extends BaseBuilder
 {
@@ -42,14 +44,14 @@ class Builder extends BaseBuilder
     /**
      * ORDER BY random keyword
      *
-     * @var array
+     * @var list<string>
      */
     protected $randomKeyword = [
         'RANDOM()',
     ];
 
     /**
-     * @var array
+     * @var array<string, string>
      */
     protected $supportedIgnoreStatements = [
         'insert' => 'OR IGNORE',
@@ -142,7 +144,7 @@ class Builder extends BaseBuilder
         if ($sql === '') {
             $constraints = $this->QBOptions['constraints'] ?? [];
 
-            if (empty($constraints)) {
+            if ($constraints === []) {
                 $fieldNames = array_map(static fn ($columnName): string => trim($columnName, '`'), $keys);
 
                 $allIndexes = array_filter($this->db->getIndexData($table), static function ($index) use ($fieldNames): bool {
@@ -151,15 +153,15 @@ class Builder extends BaseBuilder
                     return ($index->type === 'PRIMARY' || $index->type === 'UNIQUE') && $hasAllFields;
                 });
 
-                foreach (array_map(static fn ($index) => $index->fields, $allIndexes) as $index) {
-                    $constraints[] = current($index);
+                foreach ($allIndexes as $index) {
+                    $constraints = $index->fields;
                     break;
                 }
 
                 $constraints = $this->onConstraint($constraints)->QBOptions['constraints'] ?? [];
             }
 
-            if (empty($constraints)) {
+            if ($constraints === []) {
                 if ($this->db->DBDebug) {
                     throw new DatabaseException('No constraint found for upsert.');
                 }
@@ -240,7 +242,7 @@ class Builder extends BaseBuilder
                 // @codeCoverageIgnore
             }
 
-            if (is_string(current(array_keys($constraints)))) {
+            if (is_string(array_key_first($constraints))) {
                 $concat1 = implode(' || ', array_keys($constraints));
                 $concat2 = implode(' || ', array_values($constraints));
             } else {

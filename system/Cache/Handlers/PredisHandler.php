@@ -31,14 +31,24 @@ class PredisHandler extends BaseHandler
     /**
      * Default config
      *
-     * @var array
+     * @var array{
+     *   scheme: string,
+     *   host: string,
+     *   password: string|null,
+     *   port: int,
+     *   async: bool,
+     *   persistent: bool,
+     *   timeout: int
+     * }
      */
     protected $config = [
-        'scheme'   => 'tcp',
-        'host'     => '127.0.0.1',
-        'password' => null,
-        'port'     => 6379,
-        'timeout'  => 0,
+        'scheme'     => 'tcp',
+        'host'       => '127.0.0.1',
+        'password'   => null,
+        'port'       => 6379,
+        'async'      => false,
+        'persistent' => false,
+        'timeout'    => 0,
     ];
 
     /**
@@ -55,28 +65,20 @@ class PredisHandler extends BaseHandler
     {
         $this->prefix = $config->prefix;
 
-        if (isset($config->redis)) {
-            $this->config = array_merge($this->config, $config->redis);
-        }
+        $this->config = array_merge($this->config, $config->redis);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function initialize()
+    public function initialize(): void
     {
         try {
             $this->redis = new Client($this->config, ['prefix' => $this->prefix]);
             $this->redis->time();
         } catch (Exception $e) {
-            throw new CriticalError('Cache: Predis connection refused (' . $e->getMessage() . ').');
+            throw new CriticalError('Cache: Predis connection refused (' . $e->getMessage() . ').', $e->getCode(), $e);
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function get(string $key)
+    public function get(string $key): mixed
     {
         $key = static::validateKey($key);
 
@@ -90,17 +92,13 @@ class PredisHandler extends BaseHandler
         }
 
         return match ($data['__ci_type']) {
-            'array', 'object' => unserialize($data['__ci_value']),
-            // Yes, 'double' is returned and NOT 'float'
+            'array', 'object'                                => unserialize($data['__ci_value']),
             'boolean', 'integer', 'double', 'string', 'NULL' => settype($data['__ci_value'], $data['__ci_type']) ? $data['__ci_value'] : null,
-            default => null,
+            default                                          => null,
         };
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function save(string $key, $value, int $ttl = 60)
+    public function save(string $key, mixed $value, int $ttl = 60): bool
     {
         $key = static::validateKey($key);
 
@@ -112,7 +110,7 @@ class PredisHandler extends BaseHandler
 
             case 'boolean':
             case 'integer':
-            case 'double': // Yes, 'double' is returned and NOT 'float'
+            case 'double':
             case 'string':
             case 'NULL':
                 break;
@@ -133,22 +131,14 @@ class PredisHandler extends BaseHandler
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function delete(string $key)
+    public function delete(string $key): bool
     {
         $key = static::validateKey($key);
 
         return $this->redis->del($key) === 1;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return int
-     */
-    public function deleteMatching(string $pattern)
+    public function deleteMatching(string $pattern): int
     {
         $matchedKeys = [];
 
@@ -156,49 +146,38 @@ class PredisHandler extends BaseHandler
             $matchedKeys[] = $key;
         }
 
+        if ($matchedKeys === []) {
+            return 0;
+        }
+
         return $this->redis->del($matchedKeys);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function increment(string $key, int $offset = 1)
+    public function increment(string $key, int $offset = 1): int
     {
         $key = static::validateKey($key);
 
         return $this->redis->hincrby($key, 'data', $offset);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function decrement(string $key, int $offset = 1)
+    public function decrement(string $key, int $offset = 1): int
     {
         $key = static::validateKey($key);
 
         return $this->redis->hincrby($key, 'data', -$offset);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function clean()
+    public function clean(): bool
     {
         return $this->redis->flushdb()->getPayload() === 'OK';
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getCacheInfo()
+    public function getCacheInfo(): array
     {
         return $this->redis->info();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getMetaData(string $key)
+    public function getMetaData(string $key): ?array
     {
         $key = static::validateKey($key);
 
@@ -218,11 +197,42 @@ class PredisHandler extends BaseHandler
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function isSupported(): bool
     {
         return class_exists(Client::class);
+    }
+
+    public function ping(): bool
+    {
+        try {
+            $result = $this->redis->ping();
+
+            if (is_object($result)) {
+                return $result->getPayload() === 'PONG';
+            }
+
+            return $result === 'PONG';
+        } catch (Exception) {
+            return false;
+        }
+    }
+
+    public function reconnect(): bool
+    {
+        try {
+            $this->redis->disconnect();
+        } catch (Exception) {
+            // Connection already dead, that's fine
+        }
+
+        try {
+            $this->initialize();
+
+            return true;
+        } catch (CriticalError $e) {
+            log_message('error', 'Cache: Predis reconnection failed: ' . $e->getMessage());
+
+            return false;
+        }
     }
 }

@@ -15,26 +15,35 @@ namespace CodeIgniter\Test\Mock;
 
 use CodeIgniter\Events\Events;
 
-/**
- * Events
- */
 class MockEvents extends Events
 {
+    /**
+     * @return array<string, array{0: bool, 1: list<int>, 2: list<callable(mixed): mixed>}>
+     */
     public function getListeners()
     {
         return self::$listeners;
     }
 
+    /**
+     * @return list<string>
+     */
     public function getEventsFile()
     {
         return self::$files;
     }
 
+    /**
+     * @return bool
+     */
     public function getSimulate()
     {
         return self::$simulate;
     }
 
+    /**
+     * @return void
+     */
     public function unInitialize()
     {
         static::$initialized = false;

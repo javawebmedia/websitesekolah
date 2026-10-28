@@ -425,6 +425,9 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
 
     abstract public function replace(string $from, string $to): static;
 
+    /**
+     * @param-immediately-invoked-callable $to
+     */
     abstract public function replaceMatches(string $fromRegexp, string|callable $to): static;
 
     abstract public function reverse(): static;
@@ -436,6 +439,11 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
     public function kebab(): static
     {
         return $this->snake()->replace('_', '-');
+    }
+
+    public function pascal(): static
+    {
+        return $this->camel()->title();
     }
 
     abstract public function splice(string $replacement, int $start = 0, ?int $length = null): static;
@@ -680,7 +688,9 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
         $string = '';
         $j = 0;
         $b = $i = -1;
-        $mask = wordwrap($mask, $width, '#', $cut);
+        // wordwrap() does not recognize a break at the very end of its input and counts it as part of the last line
+        $wrapped = rtrim($mask, '#');
+        $mask = wordwrap($wrapped, $width, '#', $cut).substr($mask, \strlen($wrapped));
 
         while (false !== $b = strpos($mask, '#', $b + 1)) {
             for (++$i; $i < $b; ++$i) {
@@ -701,9 +711,9 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
         return $str;
     }
 
-    public function __sleep(): array
+    public function __serialize(): array
     {
-        return ['string'];
+        return ['string' => $this->string];
     }
 
     public function __clone()

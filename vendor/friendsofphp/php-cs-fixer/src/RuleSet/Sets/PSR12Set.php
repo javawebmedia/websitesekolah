@@ -14,12 +14,14 @@ declare(strict_types=1);
 
 namespace PhpCsFixer\RuleSet\Sets;
 
-use PhpCsFixer\RuleSet\AbstractRuleSetDescription;
+use PhpCsFixer\RuleSet\AbstractRuleSetDefinition;
 
 /**
  * @internal
+ *
+ * @no-named-arguments Parameter names are not covered by the backward compatibility promise.
  */
-final class PSR12Set extends AbstractRuleSetDescription
+final class PSR12Set extends AbstractRuleSetDefinition
 {
     public function getRules(): array
     {
@@ -32,6 +34,7 @@ final class PSR12Set extends AbstractRuleSetDescription
             'blank_line_between_import_groups' => true,
             'blank_lines_before_namespace' => true,
             'braces_position' => [
+                'allow_single_line_anonymous_functions' => false,
                 'allow_single_line_empty_anonymous_classes' => true,
             ],
             'class_definition' => [
@@ -42,8 +45,16 @@ final class PSR12Set extends AbstractRuleSetDescription
             'declare_equal_normalize' => true,
             'lowercase_cast' => true,
             'lowercase_static_reference' => true,
-            'new_with_parentheses' => true,
+            'modifier_keywords' => true,
+            'new_with_parentheses' => [
+                'anonymous_class' => true,
+            ],
             'no_blank_lines_after_class_opening' => true,
+            'no_extra_blank_lines' => [
+                'tokens' => [
+                    'use', // defined in PSR12 ¶3. Declare Statements, Namespace, and Import Statements
+                ],
+            ],
             'no_leading_import_slash' => true,
             'no_whitespace_in_blank_line' => true,
             'ordered_class_elements' => [
@@ -62,10 +73,51 @@ final class PSR12Set extends AbstractRuleSetDescription
             'return_type_declaration' => true,
             'short_scalar_cast' => true,
             'single_import_per_statement' => ['group_to_single_imports' => false],
+            'single_space_around_construct' => [
+                'constructs_followed_by_a_single_space' => [
+                    'abstract',
+                    'as',
+                    'case',
+                    'catch',
+                    'class',
+                    'const_import',
+                    'do',
+                    'else',
+                    'elseif',
+                    'final',
+                    'finally',
+                    'for',
+                    'foreach',
+                    'function',
+                    'function_import',
+                    'if',
+                    'insteadof',
+                    'interface',
+                    'namespace',
+                    'new',
+                    'private',
+                    'protected',
+                    'public',
+                    'static',
+                    'switch',
+                    'trait',
+                    'try',
+                    'use',
+                    'use_lambda',
+                    'while',
+                ],
+                'constructs_preceded_by_a_single_space' => [
+                    'as',
+                    'else',
+                    'elseif',
+                    'use_lambda',
+                ],
+            ],
             'single_trait_insert_per_statement' => true,
             'ternary_operator_spaces' => true,
-            'unary_operator_spaces' => true,
-            'visibility_required' => true,
+            'unary_operator_spaces' => [
+                'only_dec_inc' => true,
+            ],
         ];
     }
 

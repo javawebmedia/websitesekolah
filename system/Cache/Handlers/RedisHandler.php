@@ -29,14 +29,22 @@ class RedisHandler extends BaseHandler
     /**
      * Default config
      *
-     * @var array
+     * @var array{
+     *   host: string,
+     *   password: string|null,
+     *   port: int,
+     *   timeout: int,
+     *   persistent: bool,
+     *   database: int,
+     * }
      */
     protected $config = [
-        'host'     => '127.0.0.1',
-        'password' => null,
-        'port'     => 6379,
-        'timeout'  => 0,
-        'database' => 0,
+        'host'       => '127.0.0.1',
+        'password'   => null,
+        'port'       => 6379,
+        'timeout'    => 0,
+        'persistent' => false,
+        'database'   => 0,
     ];
 
     /**
@@ -56,30 +64,18 @@ class RedisHandler extends BaseHandler
         $this->config = array_merge($this->config, $config->redis);
     }
 
-    /**
-     * Closes the connection to Redis if present.
-     */
-    public function __destruct()
-    {
-        if (isset($this->redis)) {
-            $this->redis->close();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function initialize()
+    public function initialize(): void
     {
         $config = $this->config;
 
         $this->redis = new Redis();
 
         try {
+            $funcConnection = isset($config['persistent']) && $config['persistent'] ? 'pconnect' : 'connect';
+
             // Note:: If Redis is your primary cache choice, and it is "offline", every page load will end up been delayed by the timeout duration.
             // I feel like some sort of temporary flag should be set, to indicate that we think Redis is "offline", allowing us to bypass the timeout for a set period of time.
-
-            if (! $this->redis->connect($config['host'], ($config['host'][0] === '/' ? 0 : $config['port']), $config['timeout'])) {
+            if (! $this->redis->{$funcConnection}($config['host'], ($config['host'][0] === '/' ? 0 : $config['port']), $config['timeout'])) {
                 // Note:: I'm unsure if log_message() is necessary, however I'm not 100% comfortable removing it.
                 log_message('error', 'Cache: Redis connection failed. Check your configuration.');
 
@@ -98,14 +94,11 @@ class RedisHandler extends BaseHandler
                 throw new CriticalError('Cache: Redis select database failed.');
             }
         } catch (RedisException $e) {
-            throw new CriticalError('Cache: RedisException occurred with message (' . $e->getMessage() . ').');
+            throw new CriticalError('Cache: RedisException occurred with message (' . $e->getMessage() . ').', $e->getCode(), $e);
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function get(string $key)
+    public function get(string $key): mixed
     {
         $key  = static::validateKey($key, $this->prefix);
         $data = $this->redis->hMget($key, ['__ci_type', '__ci_value']);
@@ -115,17 +108,13 @@ class RedisHandler extends BaseHandler
         }
 
         return match ($data['__ci_type']) {
-            'array', 'object' => unserialize($data['__ci_value']),
-            // Yes, 'double' is returned and NOT 'float'
+            'array', 'object'                                => unserialize($data['__ci_value']),
             'boolean', 'integer', 'double', 'string', 'NULL' => settype($data['__ci_value'], $data['__ci_type']) ? $data['__ci_value'] : null,
-            default => null,
+            default                                          => null,
         };
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function save(string $key, $value, int $ttl = 60)
+    public function save(string $key, mixed $value, int $ttl = 60): bool
     {
         $key = static::validateKey($key, $this->prefix);
 
@@ -137,7 +126,7 @@ class RedisHandler extends BaseHandler
 
             case 'boolean':
             case 'integer':
-            case 'double': // Yes, 'double' is returned and NOT 'float'
+            case 'double':
             case 'string':
             case 'NULL':
                 break;
@@ -158,22 +147,14 @@ class RedisHandler extends BaseHandler
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function delete(string $key)
+    public function delete(string $key): bool
     {
         $key = static::validateKey($key, $this->prefix);
 
         return $this->redis->del($key) === 1;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return int
-     */
-    public function deleteMatching(string $pattern)
+    public function deleteMatching(string $pattern): int
     {
         /** @var list<string> $matchedKeys */
         $matchedKeys = [];
@@ -181,7 +162,7 @@ class RedisHandler extends BaseHandler
         $iterator    = null;
 
         do {
-            /** @var false|list<string>|Redis $keys */
+            /** @var false|list<string> $keys */
             $keys = $this->redis->scan($iterator, $pattern);
 
             if (is_array($keys)) {
@@ -189,47 +170,32 @@ class RedisHandler extends BaseHandler
             }
         } while ($iterator > 0);
 
-        return $this->redis->del($matchedKeys);
+        return (int) $this->redis->del($matchedKeys);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function increment(string $key, int $offset = 1)
+    public function increment(string $key, int $offset = 1): int
     {
         $key = static::validateKey($key, $this->prefix);
 
         return $this->redis->hIncrBy($key, '__ci_value', $offset);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function decrement(string $key, int $offset = 1)
+    public function decrement(string $key, int $offset = 1): int
     {
         return $this->increment($key, -$offset);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function clean()
+    public function clean(): bool
     {
         return $this->redis->flushDB();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getCacheInfo()
+    public function getCacheInfo(): array
     {
         return $this->redis->info();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getMetaData(string $key)
+    public function getMetaData(string $key): ?array
     {
         $value = $this->get($key);
 
@@ -248,11 +214,44 @@ class RedisHandler extends BaseHandler
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function isSupported(): bool
     {
         return extension_loaded('redis');
+    }
+
+    public function ping(): bool
+    {
+        if (! isset($this->redis)) {
+            return false;
+        }
+
+        try {
+            $result = $this->redis->ping();
+
+            return in_array($result, [true, '+PONG'], true);
+        } catch (RedisException) {
+            return false;
+        }
+    }
+
+    public function reconnect(): bool
+    {
+        if (isset($this->redis)) {
+            try {
+                $this->redis->close();
+            } catch (RedisException) {
+                // Connection already dead, that's fine
+            }
+        }
+
+        try {
+            $this->initialize();
+
+            return true;
+        } catch (CriticalError $e) {
+            log_message('error', 'Cache: Redis reconnection failed: ' . $e->getMessage());
+
+            return false;
+        }
     }
 }

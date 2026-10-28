@@ -24,9 +24,9 @@ use Config\App;
  *
  * @see \CodeIgniter\HTTP\SiteURIFactoryTest
  */
-final class SiteURIFactory
+final readonly class SiteURIFactory
 {
-    public function __construct(private readonly App $appConfig, private readonly Superglobals $superglobals)
+    public function __construct(private App $appConfig, private Superglobals $superglobals)
     {
     }
 
@@ -132,7 +132,8 @@ final class SiteURIFactory
             && pathinfo($this->superglobals->server('SCRIPT_NAME'), PATHINFO_EXTENSION) === 'php'
         ) {
             // Compare each segment, dropping them until there is no match
-            $segments = $keep = explode('/', $path);
+            $segments = explode('/', rawurldecode($path));
+            $keep     = explode('/', $path);
 
             foreach (explode('/', $this->superglobals->server('SCRIPT_NAME')) as $i => $segment) {
                 // If these segments are not the same then we're done
@@ -144,6 +145,15 @@ final class SiteURIFactory
             }
 
             $path = implode('/', $keep);
+        }
+
+        // Cleanup: if indexPage is still visible in the path, remove it
+        if ($this->appConfig->indexPage !== '' && str_starts_with($path, $this->appConfig->indexPage)) {
+            $remainingPath = substr($path, strlen($this->appConfig->indexPage));
+            // Only remove if followed by '/' (route) or nothing (root)
+            if ($remainingPath === '' || str_starts_with($remainingPath, '/')) {
+                $path = ltrim($remainingPath, '/');
+            }
         }
 
         // This section ensures that even on servers that require the URI to
@@ -217,7 +227,7 @@ final class SiteURIFactory
      */
     private function getHost(): ?string
     {
-        $httpHostPort = $this->superglobals->server('HTTP_HOST') ?? null;
+        $httpHostPort = $this->superglobals->server('HTTP_HOST');
 
         if ($httpHostPort !== null) {
             [$httpHost] = explode(':', $httpHostPort, 2);

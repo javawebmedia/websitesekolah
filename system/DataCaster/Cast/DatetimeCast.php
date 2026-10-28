@@ -18,10 +18,10 @@ use CodeIgniter\Exceptions\InvalidArgumentException;
 use CodeIgniter\I18n\Time;
 
 /**
- * Class DatetimeCast
- *
  * (PHP) [Time --> string] --> (DB driver) --> (DB column) datetime
  *       [     <-- string] <-- (DB driver) <-- (DB column) datetime
+ *
+ * @extends BaseCast<Time, string>
  */
 class DatetimeCast extends BaseCast
 {
@@ -40,9 +40,7 @@ class DatetimeCast extends BaseCast
             throw new InvalidArgumentException($message);
         }
 
-        /**
-         * @see https://www.php.net/manual/en/datetimeimmutable.createfromformat.php#datetimeimmutable.createfromformat.parameters
-         */
+        /** @see https://www.php.net/manual/en/datetimeimmutable.createfromformat.php#datetimeimmutable.createfromformat.parameters */
         $format = self::getDateTimeFormat($params, $helper);
 
         return Time::createFromFormat($format, $value);

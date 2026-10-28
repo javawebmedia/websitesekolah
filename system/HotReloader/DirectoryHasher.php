@@ -39,6 +39,8 @@ final class DirectoryHasher
     /**
      * Generates an array of md5 hashes for all directories that are
      * watched by the Hot Reloader, as defined in the Config\Toolbar.
+     *
+     * @return array<string, string>
      */
     public function hashApp(): array
     {
@@ -73,9 +75,11 @@ final class DirectoryHasher
 
         foreach ($iterator as $file) {
             if ($file->isFile()) {
-                $hashes[] = md5_file($file->getRealPath());
+                $hashes[$file->getRealPath()] = md5_file($file->getRealPath());
             }
         }
+
+        ksort($hashes);
 
         return md5(implode('', $hashes));
     }

@@ -23,6 +23,7 @@ use ErrorException;
  * @template TConnection
  * @template TStatement
  * @template TResult
+ * @template TDb of BaseConnection
  *
  * @implements PreparedQueryInterface<TConnection, TStatement, TResult>
  */
@@ -31,8 +32,7 @@ abstract class BasePreparedQuery implements PreparedQueryInterface
     /**
      * The prepared statement itself.
      *
-     * @var         object|resource|null
-     * @phpstan-var TStatement|null
+     * @var TStatement|null
      */
     protected $statement;
 
@@ -48,7 +48,7 @@ abstract class BasePreparedQuery implements PreparedQueryInterface
      *
      * @var string
      */
-    protected $errorString;
+    protected $errorString = '';
 
     /**
      * Holds the prepared query object
@@ -61,8 +61,7 @@ abstract class BasePreparedQuery implements PreparedQueryInterface
     /**
      * A reference to the db connection to use.
      *
-     * @var         BaseConnection
-     * @phpstan-var BaseConnection<TConnection, TResult>
+     * @var TDb
      */
     protected $db;
 
@@ -71,28 +70,19 @@ abstract class BasePreparedQuery implements PreparedQueryInterface
         $this->db = $db;
     }
 
-    /**
-     * Prepares the query against the database, and saves the connection
-     * info necessary to execute the query later.
-     *
-     * NOTE: This version is based on SQL code. Child classes should
-     * override this method.
-     *
-     * @return $this
-     */
     public function prepare(string $sql, array $options = [], string $queryClass = Query::class)
     {
-        // We only supports positional placeholders (?)
-        // in order to work with the execute method below, so we
-        // need to replace our named placeholders (:name)
-        $sql = preg_replace('/:[^\s,)]+/', '?', $sql);
+        // We only support positional placeholders (?), so convert
+        // named placeholders (:name or :name:) while leaving dialect
+        // syntax like PostgreSQL casts (::type) untouched.
+        $sql = preg_replace('/(?<!:):([a-zA-Z_]\w*):?(?!:)/', '?', $sql);
 
         /** @var Query $query */
         $query = new $queryClass($this->db);
 
         $query->setQuery($sql);
 
-        if (! empty($this->db->swapPre) && ! empty($this->db->DBPrefix)) {
+        if ($this->db->swapPre !== '' && $this->db->DBPrefix !== '') {
             $query->swapPrefix($this->db->DBPrefix, $this->db->swapPre);
         }
 
@@ -102,19 +92,13 @@ abstract class BasePreparedQuery implements PreparedQueryInterface
     }
 
     /**
-     * The database-dependent portion of the prepare statement.
+     * @param array<array-key, mixed> $options Passed to the connection's prepare statement. Only the SQLSRV driver uses it.
      *
      * @return $this
      */
     abstract public function _prepare(string $sql, array $options = []);
 
     /**
-     * Takes a new set of data and runs it against the currently
-     * prepared query. Upon success, will return a Results object.
-     *
-     * @return         bool|ResultInterface
-     * @phpstan-return bool|ResultInterface<TConnection, TResult>
-     *
      * @throws DatabaseException
      */
     public function execute(...$data)
@@ -137,9 +121,7 @@ abstract class BasePreparedQuery implements PreparedQueryInterface
             $query->setDuration($startTime, $startTime);
 
             // This will trigger a rollback if transactions are being used
-            if ($this->db->transDepth !== 0) {
-                $this->db->transStatus = false;
-            }
+            $this->db->handleTransStatus();
 
             if ($this->db->DBDebug) {
                 // We call this function in order to roll-back queries
@@ -190,22 +172,17 @@ abstract class BasePreparedQuery implements PreparedQueryInterface
     }
 
     /**
-     * The database dependant version of the execute method.
+     * @param list<mixed> $data
      */
     abstract public function _execute(array $data): bool;
 
     /**
      * Returns the result object for the prepared query.
      *
-     * @return object|resource|null
+     * @return false|object|resource|null
      */
     abstract public function _getResult();
 
-    /**
-     * Explicitly closes the prepared statement.
-     *
-     * @throws BadMethodCallException
-     */
     public function close(): bool
     {
         if (! isset($this->statement)) {
@@ -219,14 +196,8 @@ abstract class BasePreparedQuery implements PreparedQueryInterface
         }
     }
 
-    /**
-     * The database-dependent version of the close method.
-     */
     abstract protected function _close(): bool;
 
-    /**
-     * Returns the SQL that has been prepared.
-     */
     public function getQueryString(): string
     {
         if (! $this->query instanceof QueryInterface) {
@@ -241,20 +212,14 @@ abstract class BasePreparedQuery implements PreparedQueryInterface
      */
     public function hasError(): bool
     {
-        return ! empty($this->errorString);
+        return $this->errorString !== '';
     }
 
-    /**
-     * Returns the error code created while executing this statement.
-     */
     public function getErrorCode(): int
     {
         return $this->errorCode;
     }
 
-    /**
-     * Returns the error message created while executing this statement.
-     */
     public function getErrorMessage(): string
     {
         return $this->errorString;

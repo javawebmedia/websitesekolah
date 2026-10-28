@@ -24,13 +24,10 @@ use PhpCsFixer\Tokenizer\Tokens;
 /**
  * Simple comments should have one space after the `//`.
  *
- * @deprecated
+ * @deprecated v3.26.0
  */
 final class SpaceAfterCommentStartFixer extends AbstractCustomFixer implements DeprecatedFixerInterface
 {
-    /**
-     * {@inheritDoc}
-     */
     public function getDefinition(): FixerDefinitionInterface
     {
         return new FixerDefinition(
@@ -42,17 +39,11 @@ final class SpaceAfterCommentStartFixer extends AbstractCustomFixer implements D
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getSuccessorsNames(): array
     {
         return ['single_line_comment_spacing'];
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function isCandidate(Tokens $tokens): bool
     {
         return $tokens->isTokenKindFound(T_COMMENT);
@@ -68,9 +59,6 @@ final class SpaceAfterCommentStartFixer extends AbstractCustomFixer implements D
         return 3;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     protected function applyFix(\SplFileInfo $file, Tokens $tokens): void
     {
         for ($index = 1, $count = $tokens->count(); $index < $count; ++$index) {
@@ -91,7 +79,9 @@ final class SpaceAfterCommentStartFixer extends AbstractCustomFixer implements D
                 continue;
             }
 
-            preg_match('/^\/\/(\s*)(.+)/', $comment, $matches);
+            if (preg_match('/^\/\/(\s*)(.+)/', $comment, $matches) !== 1) {
+                continue;
+            }
 
             if (' ' === $matches[1]) {
                 continue;

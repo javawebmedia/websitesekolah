@@ -44,7 +44,7 @@ class Query implements QueryInterface, Stringable
     /**
      * The binds and their values used for binding.
      *
-     * @var array
+     * @var array<array-key, array{0: mixed, 1: bool}>
      */
     protected $binds = [];
 
@@ -85,7 +85,7 @@ class Query implements QueryInterface, Stringable
      *
      * @var string
      */
-    protected $errorString;
+    protected $errorString = '';
 
     /**
      * Pointer to database connection.
@@ -100,14 +100,7 @@ class Query implements QueryInterface, Stringable
         $this->db = $db;
     }
 
-    /**
-     * Sets the raw query string to use for this statement.
-     *
-     * @param mixed $binds
-     *
-     * @return $this
-     */
-    public function setQuery(string $sql, $binds = null, bool $setEscape = true)
+    public function setQuery(string $sql, mixed $binds = null, bool $setEscape = true): self
     {
         $this->originalQueryString = $sql;
         unset($this->swappedQueryString);
@@ -136,6 +129,8 @@ class Query implements QueryInterface, Stringable
     /**
      * Will store the variables to bind into the query later.
      *
+     * @param array<array-key, mixed> $binds
+     *
      * @return $this
      */
     public function setBinds(array $binds, bool $setEscape = true)
@@ -153,33 +148,20 @@ class Query implements QueryInterface, Stringable
         return $this;
     }
 
-    /**
-     * Returns the final, processed query string after binding, etal
-     * has been performed.
-     */
     public function getQuery(): string
     {
-        if (empty($this->finalQueryString)) {
+        if (! isset($this->finalQueryString) || $this->finalQueryString === '') {
             $this->compileBinds();
         }
 
         return $this->finalQueryString;
     }
 
-    /**
-     * Records the execution time of the statement using microtime(true)
-     * for it's start and end values. If no end value is present, will
-     * use the current time to determine total duration.
-     *
-     * @return $this
-     */
-    public function setDuration(float $start, ?float $end = null)
+    public function setDuration(float $start, ?float $end = null): self
     {
         $this->startTime = $start;
 
-        if ($end === null) {
-            $end = microtime(true);
-        }
+        $end ??= microtime(true);
 
         $this->endTime = $end;
 
@@ -200,23 +182,12 @@ class Query implements QueryInterface, Stringable
         return number_format($this->startTime, $decimals);
     }
 
-    /**
-     * Returns the duration of this query during execution, or null if
-     * the query has not been executed yet.
-     *
-     * @param int $decimals The accuracy of the returned time.
-     */
     public function getDuration(int $decimals = 6): string
     {
         return number_format(($this->endTime - $this->startTime), $decimals);
     }
 
-    /**
-     * Stores the error description that happened for this query.
-     *
-     * @return $this
-     */
-    public function setError(int $code, string $error)
+    public function setError(int $code, string $error): self
     {
         $this->errorCode   = $code;
         $this->errorString = $error;
@@ -224,44 +195,27 @@ class Query implements QueryInterface, Stringable
         return $this;
     }
 
-    /**
-     * Reports whether this statement created an error not.
-     */
     public function hasError(): bool
     {
-        return ! empty($this->errorString);
+        return $this->errorString !== '';
     }
 
-    /**
-     * Returns the error code created while executing this statement.
-     */
     public function getErrorCode(): int
     {
         return $this->errorCode;
     }
 
-    /**
-     * Returns the error message created while executing this statement.
-     */
     public function getErrorMessage(): string
     {
         return $this->errorString;
     }
 
-    /**
-     * Determines if the statement is a write-type query or not.
-     */
     public function isWriteType(): bool
     {
         return $this->db->isWriteType($this->originalQueryString);
     }
 
-    /**
-     * Swaps out one table prefix for a new one.
-     *
-     * @return $this
-     */
-    public function swapPrefix(string $orig, string $swap)
+    public function swapPrefix(string $orig, string $swap): self
     {
         $sql = $this->swappedQueryString ?? $this->originalQueryString;
 
@@ -275,9 +229,6 @@ class Query implements QueryInterface, Stringable
         return $this;
     }
 
-    /**
-     * Returns the original SQL that was passed into the system.
-     */
     public function getOriginalQuery(): string
     {
         return $this->originalQueryString;
@@ -287,13 +238,15 @@ class Query implements QueryInterface, Stringable
      * Escapes and inserts any binds into the finalQueryString property.
      *
      * @see https://regex101.com/r/EUEhay/5
+     *
+     * @return void
      */
     protected function compileBinds()
     {
         $sql   = $this->swappedQueryString ?? $this->originalQueryString;
         $binds = $this->binds;
 
-        if (empty($binds)) {
+        if ($binds === []) {
             $this->finalQueryString = $sql;
 
             return;
@@ -314,7 +267,7 @@ class Query implements QueryInterface, Stringable
     }
 
     /**
-     * Match bindings
+     * @param array<array-key, array{0: mixed, 1: bool}> $binds
      */
     protected function matchNamedBinds(string $sql, array $binds): string
     {
@@ -338,7 +291,7 @@ class Query implements QueryInterface, Stringable
     }
 
     /**
-     * Match bindings
+     * @param array<array-key, array{0: mixed, 1: bool}> $binds
      */
     protected function matchSimpleBinds(string $sql, array $binds, int $bindCount, int $ml): string
     {

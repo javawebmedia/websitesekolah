@@ -107,12 +107,12 @@ class CLI
     /**
      * List of array segments.
      *
-     * @var array
+     * @var list<string>
      */
     protected static $segments = [];
 
     /**
-     * @var array
+     * @var array<string, string|null>
      */
     protected static $options = [];
 
@@ -214,9 +214,9 @@ class CLI
      * // Do not provide options but requires a valid email
      * $email = CLI::prompt('What is your email?', null, 'required|valid_email');
      *
-     * @param string                  $field      Output "field" question
-     * @param list<int|string>|string $options    String to a default value, array to a list of options (the first option will be the default value)
-     * @param array|string|null       $validation Validation rules
+     * @param string                   $field      Output "field" question
+     * @param list<int|string>|string  $options    String to a default value, array to a list of options (the first option will be the default value)
+     * @param list<string>|string|null $validation Validation rules
      *
      * @return string The user input
      */
@@ -254,11 +254,12 @@ class CLI
             $default = $options[0];
         }
 
-        static::fwrite(STDOUT, $field . (trim($field) !== '' ? ' ' : '') . $extraOutput . ': ');
+        static::$lastWrite = 'write';
 
-        // Read the input from keyboard.
-        $input = trim(static::$io->input());
-        $input = ($input === '') ? (string) $default : $input;
+        // The reader renders the prompt itself, so readline redraws repaint it instead of erasing it.
+        $prompt = sprintf('%s%s%s: ', $field, trim($field) !== '' ? ' ' : '', $extraOutput);
+        $input  = trim(static::$io->input($prompt));
+        $input  = $input === '' ? (string) $default : $input;
 
         if ($validation !== []) {
             while (! static::validate('"' . trim($field) . '"', $input, $validation)) {
@@ -272,10 +273,10 @@ class CLI
     /**
      * prompt(), but based on the option's key
      *
-     * @param array|string      $text       Output "field" text or an one or two value array where the first value is the text before listing the options
-     *                                      and the second value the text before asking to select one option. Provide empty string to omit
-     * @param array             $options    A list of options (array(key => description)), the first option will be the default value
-     * @param array|string|null $validation Validation rules
+     * @param list<string>|string      $text       Output "field" text or an one or two value array where the first value is the text before listing the options
+     *                                             and the second value the text before asking to select one option. Provide empty string to omit
+     * @param array<array-key, string> $options    A list of options (array(key => description)), the first option will be the default value
+     * @param list<string>|string|null $validation Validation rules
      *
      * @return string The selected key of $options
      */
@@ -301,11 +302,11 @@ class CLI
     /**
      * This method is the same as promptByKey(), but this method supports multiple keys, separated by commas.
      *
-     * @param string $text    Output "field" text or an one or two value array where the first value is the text before listing the options
-     *                        and the second value the text before asking to select one option. Provide empty string to omit
-     * @param array  $options A list of options (array(key => description)), the first option will be the default value
+     * @param string                   $text    Output "field" text or an one or two value array where the first value is the text before listing the options
+     *                                          and the second value the text before asking to select one option. Provide empty string to omit
+     * @param array<array-key, string> $options A list of options (array(key => description)), the first option will be the default value
      *
-     * @return array The selected key(s) and value(s) of $options
+     * @return array<array-key, string> The selected key(s) and value(s) of $options
      */
     public static function promptByMultipleKeys(string $text, array $options): array
     {
@@ -318,11 +319,7 @@ class CLI
         if ($opts === []) {
             $extraOutput = $extraOutputDefault;
         } else {
-            $optsKey = [];
-
-            foreach (array_keys($opts) as $key) {
-                $optsKey[] = $key;
-            }
+            $optsKey     = array_keys($opts);
             $extraOutput = '[' . $extraOutputDefault . ', ' . implode(', ', $optsKey) . ']';
             $extraOutput = 'You can specify multiple values separated by commas.' . PHP_EOL . $extraOutput;
         }
@@ -378,6 +375,8 @@ class CLI
 
     /**
      * Validation for $options in promptByKey() and promptByMultipleKeys(). Return an error if $options is an empty array.
+     *
+     * @param array<array-key, string> $options
      */
     private static function isZeroOptions(array $options): void
     {
@@ -388,6 +387,8 @@ class CLI
 
     /**
      * Print each key and value one by one
+     *
+     * @param array<array-key, string> $options
      */
     private static function printKeysAndValues(array $options): void
     {
@@ -407,9 +408,9 @@ class CLI
     /**
      * Validate one prompt "field" at a time
      *
-     * @param string       $field Prompt "field" output
-     * @param string       $value Input value
-     * @param array|string $rules Validation rules
+     * @param string              $field Prompt "field" output
+     * @param string              $value Input value
+     * @param list<string>|string $rules Validation rules
      */
     protected static function validate(string $field, string $value, $rules): bool
     {
@@ -462,7 +463,8 @@ class CLI
         }
 
         if (static::$lastWrite !== 'write') {
-            $text              = PHP_EOL . $text;
+            $text = PHP_EOL . $text;
+
             static::$lastWrite = 'write';
         }
 
@@ -477,14 +479,21 @@ class CLI
     public static function error(string $text, string $foreground = 'light_red', ?string $background = null)
     {
         // Check color support for STDERR
-        $stdout            = static::$isColored;
-        static::$isColored = static::hasColorSupport(STDERR);
+        $stdout = static::$isColored;
+
+        static::$isColored = is_cli() && static::hasColorSupport(STDERR);
 
         if ($foreground !== '' || (string) $background !== '') {
             $text = static::color($text, $foreground, $background);
         }
 
-        static::fwrite(STDERR, $text . PHP_EOL);
+        if (static::$lastWrite !== 'write') {
+            $text = PHP_EOL . $text;
+
+            static::$lastWrite = 'write';
+        }
+
+        static::fwrite(is_cli() ? STDERR : STDOUT, $text . PHP_EOL);
 
         // return STDOUT color support
         static::$isColored = $stdout;
@@ -563,7 +572,7 @@ class CLI
     {
         // Unix systems, and Windows with VT100 Terminal support (i.e. Win10)
         // can handle CSI sequences. For lower than Win10 we just shove in 40 new lines.
-        is_windows() && ! static::streamSupports('sapi_windows_vt100_support', STDOUT)
+        is_windows() && is_cli() && ! static::streamSupports('sapi_windows_vt100_support', STDOUT)
             ? static::newLine(40)
             : static::fwrite(STDOUT, "\033[H\033[2J");
     }
@@ -702,7 +711,7 @@ class CLI
     public static function hasColorSupport($resource): bool
     {
         // Follow https://no-color.org/
-        if (isset($_SERVER['NO_COLOR']) || getenv('NO_COLOR') !== false) {
+        if (isset($_SERVER['NO_COLOR']) || getenv('NO_COLOR') !== false) { // @phpstan-ignore codeigniter.superglobalsOffsetAccess (reads live $_SERVER, not the snapshot service)
             return false;
         }
 
@@ -713,7 +722,7 @@ class CLI
         if (is_windows()) {
             // @codeCoverageIgnoreStart
             return static::streamSupports('sapi_windows_vt100_support', $resource)
-                || isset($_SERVER['ANSICON'])
+                || isset($_SERVER['ANSICON']) // @phpstan-ignore codeigniter.superglobalsOffsetAccess (reads live $_SERVER, not the snapshot service)
                 || getenv('ANSICON') !== false
                 || getenv('ConEmuANSI') === 'ON'
                 || getenv('TERM') === 'xterm';
@@ -732,7 +741,7 @@ class CLI
             static::generateDimensions();
         }
 
-        return static::$width ?: $default;
+        return (static::$width === null || static::$width === 0) ? $default : static::$width;
     }
 
     /**
@@ -744,7 +753,7 @@ class CLI
             static::generateDimensions();
         }
 
-        return static::$height ?: $default;
+        return (static::$height === null || static::$height === 0) ? $default : static::$height;
     }
 
     /**
@@ -773,12 +782,12 @@ class CLI
                         static::$width  = (int) $matches[2];
                     }
                 }
-            } elseif (($size = exec('stty size')) && preg_match('/(\d+)\s+(\d+)/', $size, $matches)) {
+            } elseif (($size = exec('stty size 2>/dev/null')) && preg_match('/(\d+)\s+(\d+)/', $size, $matches)) {
                 static::$height = (int) $matches[1];
                 static::$width  = (int) $matches[2];
             } else {
-                static::$height = (int) exec('tput lines');
-                static::$width  = (int) exec('tput cols');
+                static::$height = (int) exec('tput lines 2>/dev/null');
+                static::$width  = (int) exec('tput cols 2>/dev/null');
             }
         } catch (Throwable $e) {
             // Reset the dimensions so that the default values will be returned later.
@@ -810,7 +819,7 @@ class CLI
         if ($thisStep !== false) {
             // Don't allow div by zero or negative numbers....
             $thisStep   = abs($thisStep);
-            $totalSteps = $totalSteps < 1 ? 1 : $totalSteps;
+            $totalSteps = max(1, $totalSteps);
 
             $percent = (int) (($thisStep / $totalSteps) * 100);
             $step    = (int) round($percent / 10);
@@ -882,7 +891,7 @@ class CLI
      */
     protected static function parseCommandLine()
     {
-        $args = $_SERVER['argv'] ?? [];
+        $args = $_SERVER['argv'] ?? []; // @phpstan-ignore codeigniter.superglobalsOffsetAccess (reads live $_SERVER, not the snapshot service)
         array_shift($args); // scrap invoking program
         $optionValue = false;
 
@@ -944,6 +953,8 @@ class CLI
 
     /**
      * Returns the raw array of segments found.
+     *
+     * @return list<string>
      */
     public static function getSegments(): array
     {
@@ -971,6 +982,8 @@ class CLI
 
     /**
      * Returns the raw array of options found.
+     *
+     * @return array<string, string|null>
      */
     public static function getOptions(): array
     {
@@ -1003,7 +1016,7 @@ class CLI
                 continue;
             }
 
-            if (mb_strpos($value, ' ') !== false) {
+            if (str_contains($value, ' ')) {
                 $out .= "\"{$value}\" ";
             } elseif ($value !== null) {
                 $out .= "{$value} ";
@@ -1016,8 +1029,8 @@ class CLI
     /**
      * Returns a well formatted table
      *
-     * @param array $tbody List of rows
-     * @param array $thead List of columns
+     * @param list<array<array-key, mixed>> $tbody List of rows
+     * @param list<string>                  $thead List of columns
      *
      * @return void
      */
@@ -1129,7 +1142,35 @@ class CLI
     /**
      * Testing purpose only
      *
-     * @testTag
+     * @internal
+     */
+    public static function reset(): void
+    {
+        static::$initialized = false;
+        static::$segments    = [];
+        static::$options     = [];
+        static::$lastWrite   = null;
+        static::$height      = null;
+        static::$width       = null;
+        static::$isColored   = static::hasColorSupport(STDOUT);
+
+        static::resetInputOutput();
+    }
+
+    /**
+     * Testing purpose only
+     *
+     * @internal
+     */
+    public static function resetLastWrite(): void
+    {
+        static::$lastWrite = null;
+    }
+
+    /**
+     * Testing purpose only
+     *
+     * @internal
      */
     public static function setInputOutput(InputOutput $io): void
     {
@@ -1139,7 +1180,7 @@ class CLI
     /**
      * Testing purpose only
      *
-     * @testTag
+     * @internal
      */
     public static function resetInputOutput(): void
     {

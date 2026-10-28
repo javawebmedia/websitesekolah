@@ -20,16 +20,13 @@ trait ConditionalTrait
      *
      * @template TWhen of mixed
      *
-     * @phpstan-param TWhen                                            $condition
-     * @phpstan-param callable(self, TWhen): mixed                     $callback
-     * @phpstan-param (callable(self): mixed)|null                     $defaultCallback
-     * @param         array|bool|float|int|object|resource|string|null $condition
-     *
-     * @return $this
+     * @param TWhen                        $condition
+     * @param callable(self, TWhen): mixed $callback
+     * @param (callable(self): mixed)|null $defaultCallback
      */
     public function when($condition, callable $callback, ?callable $defaultCallback = null): self
     {
-        if ($condition !== '' && $condition !== false && $condition !== null) {
+        if ((bool) $condition) {
             $callback($this, $condition);
         } elseif ($defaultCallback !== null) {
             $defaultCallback($this);
@@ -43,16 +40,13 @@ trait ConditionalTrait
      *
      * @template TWhenNot of mixed
      *
-     * @phpstan-param TWhenNot                                         $condition
-     * @phpstan-param callable(self, TWhenNot): mixed                  $callback
-     * @phpstan-param (callable(self): mixed)|null                     $defaultCallback
-     * @param         array|bool|float|int|object|resource|string|null $condition
-     *
-     * @return $this
+     * @param TWhenNot                        $condition
+     * @param callable(self, TWhenNot): mixed $callback
+     * @param (callable(self): mixed)|null    $defaultCallback
      */
     public function whenNot($condition, callable $callback, ?callable $defaultCallback = null): self
     {
-        if ($condition === '' || $condition === null || $condition === false || $condition === '0') {
+        if (! (bool) $condition) {
             $callback($this, $condition);
         } elseif ($defaultCallback !== null) {
             $defaultCallback($this);

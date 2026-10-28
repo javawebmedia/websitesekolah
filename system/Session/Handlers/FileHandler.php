@@ -16,29 +16,26 @@ namespace CodeIgniter\Session\Handlers;
 use CodeIgniter\I18n\Time;
 use CodeIgniter\Session\Exceptions\SessionException;
 use Config\Session as SessionConfig;
-use ReturnTypeWillChange;
 
 /**
- * Session handler using file system for storage
+ * Session handler using file system for storage.
  */
 class FileHandler extends BaseHandler
 {
     /**
      * Where to save the session files to.
-     *
-     * @var string
      */
     protected $savePath;
 
     /**
-     * The file handle
+     * The file handle.
      *
      * @var resource|null
      */
     protected $fileHandle;
 
     /**
-     * File Name
+     * File Name.
      *
      * @var string
      */
@@ -59,7 +56,7 @@ class FileHandler extends BaseHandler
     protected $matchIP = false;
 
     /**
-     * Regex of session ID
+     * Regex of session ID.
      *
      * @var string
      */
@@ -69,7 +66,7 @@ class FileHandler extends BaseHandler
     {
         parent::__construct($config, $ipAddress);
 
-        if (! empty($this->savePath)) {
+        if (is_string($this->savePath) && $this->savePath !== '') {
             $this->savePath = rtrim($this->savePath, '/\\');
             ini_set('session.save_path', $this->savePath);
         } else {
@@ -88,8 +85,8 @@ class FileHandler extends BaseHandler
     /**
      * Re-initialize existing session, or creates a new one.
      *
-     * @param string $path The path where to store/retrieve the session
-     * @param string $name The session name
+     * @param string $path The path where to store/retrieve the session.
+     * @param string $name The session name.
      *
      * @throws SessionException
      */
@@ -114,13 +111,9 @@ class FileHandler extends BaseHandler
     /**
      * Reads the session data from the session storage, and returns the results.
      *
-     * @param string $id The session ID
-     *
-     * @return false|string Returns an encoded string of the read data.
-     *                      If nothing was read, it must return false.
+     * @param string $id The session ID.
      */
-    #[ReturnTypeWillChange]
-    public function read($id)
+    public function read($id): false|string
     {
         // This might seem weird, but PHP 5.6 introduced session_reset(),
         // which re-reads session data
@@ -141,9 +134,7 @@ class FileHandler extends BaseHandler
                 return false;
             }
 
-            if (! isset($this->sessionID)) {
-                $this->sessionID = $id;
-            }
+            $this->sessionID ??= $id;
 
             if ($this->fileNew) {
                 chmod($this->filePath . $id, 0600);
@@ -175,8 +166,8 @@ class FileHandler extends BaseHandler
     /**
      * Writes the session data to the session storage.
      *
-     * @param string $id   The session ID
-     * @param string $data The encoded session data
+     * @param string $id   The session ID.
+     * @param string $data The encoded session data.
      */
     public function write($id, $data): bool
     {
@@ -201,7 +192,9 @@ class FileHandler extends BaseHandler
         if (($length = strlen($data)) > 0) {
             $result = null;
 
-            for ($written = 0; $written < $length; $written += $result) {
+            $written = 0;
+
+            for (; $written < $length; $written += $result) {
                 if (($result = fwrite($this->fileHandle, substr($data, $written))) === false) {
                     break;
                 }
@@ -237,9 +230,9 @@ class FileHandler extends BaseHandler
     }
 
     /**
-     * Destroys a session
+     * Destroys a session.
      *
-     * @param string $id The session ID being destroyed
+     * @param string $id The session ID being destroyed.
      */
     public function destroy($id): bool
     {
@@ -265,11 +258,8 @@ class FileHandler extends BaseHandler
      *
      * @param int $max_lifetime Sessions that have not updated
      *                          for the last max_lifetime seconds will be removed.
-     *
-     * @return false|int Returns the number of deleted sessions on success, or false on failure.
      */
-    #[ReturnTypeWillChange]
-    public function gc($max_lifetime)
+    public function gc($max_lifetime): false|int
     {
         if (! is_dir($this->savePath) || ($directory = opendir($this->savePath)) === false) {
             $this->logger->debug("Session: Garbage collector couldn't list files under directory '" . $this->savePath . "'.");
@@ -308,24 +298,20 @@ class FileHandler extends BaseHandler
     }
 
     /**
-     * Configure Session ID regular expression
+     * Configure Session ID regular expression. To make life easier, we force the PHP defaults because PHP 9 forces them.
      *
-     * To make life easier, we force the PHP defaults. Because PHP9 forces them.
-     * See https://wiki.php.net/rfc/deprecations_php_8_4#sessionsid_length_and_sessionsid_bits_per_character
+     * @see https://wiki.php.net/rfc/deprecations_php_8_4#sessionsid_length_and_sessionsid_bits_per_character
+     *
+     * @return void
      */
     protected function configureSessionIDRegex()
     {
-        $bitsPerCharacter = (int) ini_get('session.sid_bits_per_character');
-        $sidLength        = (int) ini_get('session.sid_length');
+        if ((int) ini_get('session.sid_bits_per_character') !== 4) {
+            ini_set('session.sid_bits_per_character', '4');
+        }
 
-        // We force the PHP defaults.
-        if (PHP_VERSION_ID < 90000) {
-            if ($bitsPerCharacter !== 4) {
-                ini_set('session.sid_bits_per_character', '4');
-            }
-            if ($sidLength !== 32) {
-                ini_set('session.sid_length', '32');
-            }
+        if ((int) ini_get('session.sid_length') !== 32) {
+            ini_set('session.sid_length', '32');
         }
 
         $this->sessionIDRegex = '[0-9a-f]{32}';

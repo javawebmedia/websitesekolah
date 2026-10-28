@@ -9,6 +9,8 @@
  */
 namespace SebastianBergmann\LinesOfCode;
 
+use function assert;
+use function file_get_contents;
 use function substr_count;
 use PhpParser\Error;
 use PhpParser\Node;
@@ -22,7 +24,11 @@ final class Counter
      */
     public function countInSourceFile(string $sourceFile): LinesOfCode
     {
-        return $this->countInSourceString(file_get_contents($sourceFile));
+        $source = file_get_contents($sourceFile);
+
+        assert($source !== false);
+
+        return $this->countInSourceString($source);
     }
 
     /**
@@ -47,15 +53,16 @@ final class Counter
         } catch (Error $error) {
             throw new RuntimeException(
                 $error->getMessage(),
-                (int) $error->getCode(),
-                $error
+                $error->getCode(),
+                $error,
             );
         }
         // @codeCoverageIgnoreEnd
     }
 
     /**
-     * @param Node[] $nodes
+     * @param non-negative-int $linesOfCode
+     * @param Node[]           $nodes
      *
      * @throws RuntimeException
      */
@@ -73,8 +80,8 @@ final class Counter
         } catch (Error $error) {
             throw new RuntimeException(
                 $error->getMessage(),
-                (int) $error->getCode(),
-                $error
+                $error->getCode(),
+                $error,
             );
         }
         // @codeCoverageIgnoreEnd

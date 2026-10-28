@@ -16,6 +16,7 @@ namespace CodeIgniter;
 use CodeIgniter\Cache\FactoriesCache;
 use CodeIgniter\CLI\Console;
 use CodeIgniter\Config\DotEnv;
+use Config\App;
 use Config\Autoload;
 use Config\Modules;
 use Config\Optimize;
@@ -76,6 +77,67 @@ class Boot
     }
 
     /**
+     * Bootstrap for FrankenPHP worker mode.
+     *
+     * This method performs one-time initialization for worker mode,
+     * loading everything except the CodeIgniter instance, which should
+     * be created fresh for each request.
+     *
+     * @used-by `public/frankenphp-worker.php`
+     */
+    public static function bootWorker(Paths $paths): CodeIgniter
+    {
+        static::definePathConstants($paths);
+        if (! defined('APP_NAMESPACE')) {
+            static::loadConstants();
+        }
+        static::checkMissingExtensions();
+
+        static::loadDotEnv($paths);
+        static::defineEnvironment();
+        static::loadEnvironmentBootstrap($paths);
+
+        static::loadCommonFunctions();
+        static::loadAutoloader();
+        static::setExceptionHandler();
+        static::initializeKint();
+
+        static::checkOptimizationsForWorker();
+
+        static::autoloadHelpers();
+
+        return Boot::initializeCodeIgniter();
+    }
+
+    /**
+     * Used by command line scripts other than
+     * * `spark`
+     * * `php-cli`
+     * * `phpunit`
+     *
+     * @used-by `system/util_bootstrap.php`
+     */
+    public static function bootConsole(Paths $paths): void
+    {
+        static::definePathConstants($paths);
+        static::loadConstants();
+        static::checkMissingExtensions();
+
+        static::loadDotEnv($paths);
+        static::loadEnvironmentBootstrap($paths);
+
+        static::loadCommonFunctions();
+        static::loadAutoloader();
+        static::setExceptionHandler();
+        static::initializeKint();
+        static::autoloadHelpers();
+
+        // We need to force the request to be a CLIRequest since we're in console
+        Services::createRequest(new App(), true);
+        service('routes')->loadRoutes();
+    }
+
+    /**
      * Used by `spark`
      *
      * @return int Exit code.
@@ -115,7 +177,9 @@ class Boot
         static::loadDotEnv($paths);
         static::loadEnvironmentBootstrap($paths, false);
 
+        static::loadCommonFunctionsMock();
         static::loadCommonFunctions();
+
         static::loadAutoloader();
         static::setExceptionHandler();
         static::initializeKint();
@@ -141,7 +205,8 @@ class Boot
     protected static function loadDotEnv(Paths $paths): void
     {
         require_once $paths->systemDirectory . '/Config/DotEnv.php';
-        (new DotEnv($paths->appDirectory . '/../'))->load();
+        $envDirectory = $paths->envDirectory ?? $paths->appDirectory . '/../'; // @phpstan-ignore nullCoalesce.property
+        (new DotEnv($envDirectory))->load();
     }
 
     protected static function defineEnvironment(): void
@@ -230,6 +295,11 @@ class Boot
         require_once SYSTEMPATH . 'Common.php';
     }
 
+    protected static function loadCommonFunctionsMock(): void
+    {
+        require_once SYSTEMPATH . 'Test/Mock/MockCommon.php';
+    }
+
     /**
      * The autoloader allows all the pieces to work together in the framework.
      * We have to load it here, though, so that the config files can use the
@@ -274,7 +344,6 @@ class Boot
 
         foreach ([
             'intl',
-            'json',
             'mbstring',
         ] as $extension) {
             if (! extension_loaded($extension)) {
@@ -295,6 +364,20 @@ class Boot
         echo $message;
 
         exit(EXIT_ERROR);
+    }
+
+    protected static function checkOptimizationsForWorker(): void
+    {
+        if (class_exists(Optimize::class)) {
+            $optimize = new Optimize();
+
+            if ($optimize->configCacheEnabled || $optimize->locatorCacheEnabled) {
+                echo 'Optimization settings (configCacheEnabled, locatorCacheEnabled) '
+                    . 'must be disabled in Config\Optimize when running in Worker Mode.';
+
+                exit(EXIT_ERROR);
+            }
+        }
     }
 
     protected static function initializeKint(): void
@@ -343,10 +426,11 @@ class Boot
     {
         $console = new Console();
 
+        $args = $_SERVER['argv'] ?? []; // @phpstan-ignore codeigniter.superglobalsOffsetAccess (reads live $_SERVER, not the snapshot service)
+
         // Show basic information before we do anything else.
-        // @phpstan-ignore-next-line
-        if (is_int($suppress = array_search('--no-header', $_SERVER['argv'], true))) {
-            unset($_SERVER['argv'][$suppress]); // @phpstan-ignore-line
+        if (is_int($suppress = array_search('--no-header', $args, true))) {
+            unset($args[$suppress]);
             $suppress = true;
         }
 

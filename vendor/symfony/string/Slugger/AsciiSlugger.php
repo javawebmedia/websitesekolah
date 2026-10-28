@@ -81,7 +81,7 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
 
     public function getLocale(): string
     {
-        return $this->defaultLocale;
+        return $this->defaultLocale ?? '';
     }
 
     /**
@@ -128,8 +128,8 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
 
         if (\is_array($this->symbolsMap)) {
             $map = null;
-            if (isset($this->symbolsMap[$locale])) {
-                $map = $this->symbolsMap[$locale];
+            if (isset($this->symbolsMap[$locale ?? ''])) {
+                $map = $this->symbolsMap[$locale ?? ''];
             } else {
                 $parent = self::getParentLocale($locale);
                 if ($parent && isset($this->symbolsMap[$parent])) {

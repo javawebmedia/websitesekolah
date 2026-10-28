@@ -11,25 +11,18 @@ namespace PHPUnit\Framework\Constraint;
 
 use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\ExpectationFailedException;
-use SebastianBergmann\RecursionContext\InvalidArgumentException;
-use Traversable;
 
 /**
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
  */
 final class TraversableContainsOnly extends Constraint
 {
-    /**
-     * @var Constraint
-     */
-    private $constraint;
+    private readonly Constraint $constraint;
+    private readonly string $type;
 
     /**
-     * @var string
-     */
-    private $type;
-
-    /**
+     * @param 'array'|'bool'|'boolean'|'callable'|'double'|'float'|'int'|'integer'|'iterable'|'null'|'numeric'|'object'|'real'|'resource (closed)'|'resource'|'scalar'|'string'|class-string $type
+     *
      * @throws Exception
      */
     public function __construct(string $type, bool $isNativeType = true)
@@ -37,9 +30,7 @@ final class TraversableContainsOnly extends Constraint
         if ($isNativeType) {
             $this->constraint = new IsType($type);
         } else {
-            $this->constraint = new IsInstanceOf(
-                $type,
-            );
+            $this->constraint = new IsInstanceOf($type);
         }
 
         $this->type = $type;
@@ -55,12 +46,9 @@ final class TraversableContainsOnly extends Constraint
      * a boolean value instead: true in case of success, false in case of a
      * failure.
      *
-     * @param mixed|Traversable $other
-     *
      * @throws ExpectationFailedException
-     * @throws InvalidArgumentException
      */
-    public function evaluate($other, string $description = '', bool $returnResult = false): ?bool
+    public function evaluate(mixed $other, string $description = '', bool $returnResult = false): bool
     {
         $success = true;
 
@@ -72,15 +60,11 @@ final class TraversableContainsOnly extends Constraint
             }
         }
 
-        if ($returnResult) {
-            return $success;
-        }
-
-        if (!$success) {
+        if (!$success && !$returnResult) {
             $this->fail($other, $description);
         }
 
-        return null;
+        return $success;
     }
 
     /**

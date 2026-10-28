@@ -27,6 +27,8 @@ use PhpCsFixer\Tokenizer\Tokens;
 
 /**
  * @author Jonathan Gruber <gruberjonathan@gmail.com>
+ *
+ * @no-named-arguments Parameter names are not covered by the backward compatibility promise.
  */
 final class PhpdocParamOrderFixer extends AbstractFixer
 {
@@ -34,7 +36,7 @@ final class PhpdocParamOrderFixer extends AbstractFixer
 
     public function isCandidate(Tokens $tokens): bool
     {
-        return $tokens->isTokenKindFound(T_DOC_COMMENT);
+        return $tokens->isTokenKindFound(\T_DOC_COMMENT);
     }
 
     /**
@@ -54,30 +56,32 @@ final class PhpdocParamOrderFixer extends AbstractFixer
             'Orders all `@param` annotations in DocBlocks according to method signature.',
             [
                 new CodeSample(
-                    '<?php
-/**
- * Annotations in wrong order
- *
- * @param int   $a
- * @param Foo   $c
- * @param array $b
- */
-function m($a, array $b, Foo $c) {}
-'
+                    <<<'PHP'
+                        <?php
+                        /**
+                         * Annotations in wrong order
+                         *
+                         * @param int   $a
+                         * @param Foo   $c
+                         * @param array $b
+                         */
+                        function m($a, array $b, Foo $c) {}
+
+                        PHP,
                 ),
-            ]
+            ],
         );
     }
 
     protected function applyFix(\SplFileInfo $file, Tokens $tokens): void
     {
         foreach ($tokens as $index => $token) {
-            if (!$token->isGivenKind(T_DOC_COMMENT)) {
+            if (!$token->isGivenKind(\T_DOC_COMMENT)) {
                 continue;
             }
 
             // Check for function / closure token
-            $nextFunctionToken = $tokens->getNextTokenOfKind($index, [[T_FUNCTION], [T_FN]]);
+            $nextFunctionToken = $tokens->getNextTokenOfKind($index, [[\T_FUNCTION], [\T_FN]]);
             if (null === $nextFunctionToken) {
                 return;
             }
@@ -88,7 +92,7 @@ function m($a, array $b, Foo $c) {}
                 return;
             }
 
-            $doc = new DocBlock($tokens[$index]->getContent());
+            $doc = new DocBlock($token->getContent());
             $paramAnnotations = $doc->getAnnotationsOfType(self::PARAM_TAG);
 
             if ([] === $paramAnnotations) {
@@ -98,22 +102,22 @@ function m($a, array $b, Foo $c) {}
             $paramNames = $this->getFunctionParamNames($tokens, $paramBlockStart);
             $doc = $this->rewriteDocBlock($doc, $paramNames, $paramAnnotations);
 
-            $tokens[$index] = new Token([T_DOC_COMMENT, $doc->getContent()]);
+            $tokens[$index] = new Token([\T_DOC_COMMENT, $doc->getContent()]);
         }
     }
 
     /**
-     * @return Token[]
+     * @return list<Token>
      */
     private function getFunctionParamNames(Tokens $tokens, int $paramBlockStart): array
     {
-        $paramBlockEnd = $tokens->findBlockEnd(Tokens::BLOCK_TYPE_PARENTHESIS_BRACE, $paramBlockStart);
+        $paramBlockEnd = $tokens->findBlockEnd(Tokens::BLOCK_TYPE_PARENTHESIS, $paramBlockStart);
 
         $paramNames = [];
         for (
-            $i = $tokens->getNextTokenOfKind($paramBlockStart, [[T_VARIABLE]]);
+            $i = $tokens->getNextTokenOfKind($paramBlockStart, [[\T_VARIABLE]]);
             null !== $i && $i < $paramBlockEnd;
-            $i = $tokens->getNextTokenOfKind($i, [[T_VARIABLE]])
+            $i = $tokens->getNextTokenOfKind($i, [[\T_VARIABLE]])
         ) {
             $paramNames[] = $tokens[$i];
         }
@@ -124,8 +128,8 @@ function m($a, array $b, Foo $c) {}
     /**
      * Overwrite the param annotations in order.
      *
-     * @param Token[]      $paramNames
-     * @param Annotation[] $paramAnnotations
+     * @param list<Token>                $paramNames
+     * @param non-empty-list<Annotation> $paramAnnotations
      */
     private function rewriteDocBlock(DocBlock $doc, array $paramNames, array $paramAnnotations): DocBlock
     {
@@ -161,35 +165,32 @@ function m($a, array $b, Foo $c) {}
     /**
      * Sort the param annotations according to the function parameters.
      *
-     * @param Token[]      $funcParamNames
-     * @param Annotation[] $paramAnnotations
+     * @param list<Token>                $funcParamNames
+     * @param non-empty-list<Annotation> $paramAnnotations
      *
-     * @return string[]
+     * @return non-empty-list<string>
      */
     private function sortParamAnnotations(array $funcParamNames, array $paramAnnotations): array
     {
         $validParams = [];
         foreach ($funcParamNames as $paramName) {
-            $indices = $this->findParamAnnotationByIdentifier($paramAnnotations, $paramName->getContent());
-
-            // Found an exactly matching @param annotation
-            if (\is_array($indices)) {
-                foreach ($indices as $index) {
-                    $validParams[$index] = $paramAnnotations[$index]->getContent();
-                }
+            foreach ($this->findParamAnnotationByIdentifier($paramAnnotations, $paramName->getContent()) as $index => $annotation) {
+                // Found an exactly matching @param annotation
+                $validParams[$index] = $annotation->getContent();
             }
         }
 
         // Detect superfluous annotations
-        /** @var Annotation[] $invalidParams */
-        $invalidParams = array_diff_key($paramAnnotations, $validParams);
-        $invalidParams = array_values($invalidParams);
+        $invalidParams = array_values(
+            array_diff_key($paramAnnotations, $validParams),
+        );
 
         // Append invalid parameters to the (ordered) valid ones
         $orderedParams = array_values($validParams);
         foreach ($invalidParams as $params) {
             $orderedParams[] = $params->getContent();
         }
+        \assert(\count($orderedParams) > 0);
 
         return $orderedParams;
     }
@@ -197,9 +198,9 @@ function m($a, array $b, Foo $c) {}
     /**
      * Fetch all annotations except the param ones.
      *
-     * @param Annotation[] $paramAnnotations
+     * @param list<Annotation> $paramAnnotations
      *
-     * @return string[]
+     * @return list<string>
      */
     private function getOtherAnnotationsBetweenParams(DocBlock $doc, array $paramAnnotations): array
     {
@@ -227,17 +228,17 @@ function m($a, array $b, Foo $c) {}
     /**
      * Return the indices of the lines of a specific parameter annotation.
      *
-     * @param Annotation[] $paramAnnotations
+     * @param list<Annotation> $paramAnnotations
      *
-     * @return null|array<int>
+     * @return array<int, Annotation> Mapping of found indices and corresponding Annotations
      */
-    private function findParamAnnotationByIdentifier(array $paramAnnotations, string $identifier): ?array
+    private function findParamAnnotationByIdentifier(array $paramAnnotations, string $identifier): array
     {
         $blockLevel = 0;
         $blockMatch = false;
         $blockIndices = [];
 
-        $paramRegex = '/\*\s*@param\s*(?:|'.TypeExpression::REGEX_TYPES.'\s*)&?(?=\$\b)'.preg_quote($identifier).'\b/';
+        $paramRegex = '/\*\h*@param\h*(?:|'.TypeExpression::REGEX_TYPES.'\h*)&?(?=\$\b)'.preg_quote($identifier).'\b/';
 
         foreach ($paramAnnotations as $i => $param) {
             $blockStart = Preg::match('/\s*{\s*/', $param->getContent());
@@ -247,7 +248,7 @@ function m($a, array $b, Foo $c) {}
                 if ($blockStart) {
                     $blockMatch = true; // Start of a nested block
                 } else {
-                    return [$i]; // Top level match
+                    return [$i => $param]; // Top level match
                 }
             }
 
@@ -260,13 +261,13 @@ function m($a, array $b, Foo $c) {}
             }
 
             if ($blockMatch) {
-                $blockIndices[] = $i;
+                $blockIndices[$i] = $param;
                 if (0 === $blockLevel) {
                     return $blockIndices;
                 }
             }
         }
 
-        return null;
+        return [];
     }
 }
