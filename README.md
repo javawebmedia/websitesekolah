@@ -1,9 +1,18 @@
 # Website Profil dan Manajemen Sekolah menguunakan CodeIgniter 4 Framework
 Aplikasi website profil dan manajemen sekolah dari [Java Web Media](https://javawebmedia.com/) dengan berbagai fitur yang semoga bermanfaat. 
 
-Demo unofficial sementara http://sekolah.down.my.id/
+**Demo yang sudah menggunakan website:**
+- https://smkn2kotadepok.sch.id/
+- https://www.mtsn2pacitan.sch.id/
+- https://sman2blora.sch.id
+- https://man1manggarai.sch.id/
 
-Spesifikasi Teknis Source Code
+**Memerlukan Customisasi dan Installasi Khusus?**
+Anda bisa menghubungi kami di nomor Whatsapp:
+- 081210697841
+- 085715100485
+
+**Spesifikasi Teknis Source Code**
 Website ini dikembangkan dengan beberapa spesifikasi:
 1. Dikembangan dengan Codeigniter 4. Pastikan teman-teman membaca Server Requirements dari CI4 ini yah.
 2. Template Admin menggunakan AdminLTE 3.2.0. Bisa diakses di https://adminlte.io/
