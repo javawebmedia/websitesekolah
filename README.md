@@ -8,6 +8,7 @@ Aplikasi website profil dan manajemen sekolah dari [Java Web Media](https://java
 - https://man1manggarai.sch.id/
 
 **Memerlukan Customisasi dan Installasi Khusus?**
+
 Anda bisa menghubungi kami di nomor Whatsapp:
 - 081210697841
 - 085715100485
