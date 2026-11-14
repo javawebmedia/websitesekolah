@@ -10,8 +10,8 @@ Aplikasi website profil dan manajemen sekolah dari [Java Web Media](https://java
 **Memerlukan Customisasi dan Installasi Khusus?**
 
 Anda bisa menghubungi kami di nomor Whatsapp:
-- https://wa.me/6281210697841?text=Halo%2C%20saya%20ingin%20bertanya.
-- https://wa.me/6285715100485?text=Halo%2C%20saya%20ingin%20bertanya.
+- 081210697841: https://wa.me/6281210697841?text=Halo%2C%20saya%20ingin%20bertanya.
+- 085715100485: https://wa.me/6285715100485?text=Halo%2C%20saya%20ingin%20bertanya.
 
 **Spesifikasi Teknis Source Code**
 Website ini dikembangkan dengan beberapa spesifikasi:
